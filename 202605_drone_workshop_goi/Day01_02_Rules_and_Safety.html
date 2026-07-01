@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>.b[Drone Safety and DGCA Regulations]</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=".mv0.lh-solid[Dr. Ankit Deshmukh Assistant Professor SoT, PDEU]" />
+    <meta name="date" content="2026-05-26" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script src="libs/xaringanExtra-progressBar/progress-bar.js"></script>
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/htmltools-fill/fill.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/jquery/jquery-3.6.0.min.js"></script>
+    <link href="libs/leaflet/leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet/leaflet.js"></script>
+    <link href="libs/leafletfix/leafletfix.css" rel="stylesheet" />
+    <script src="libs/proj4/proj4.min.js"></script>
+    <script src="libs/Proj4Leaflet/proj4leaflet.js"></script>
+    <link href="libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+    <script src="libs/leaflet-binding/leaflet.js"></script>
+    <link rel="stylesheet" href="css/default.css" type="text/css" />
+    <link rel="stylesheet" href="css/metropolis.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# .b[Drone Safety and DGCA Regulations]
+]
+.subtitle[
+## .f3[Drone-Based Data Collection, Safety, and DGCA Regulations]
+]
+.author[
+### .mv0.lh-solid[Dr. Ankit Deshmukh<br />Assistant Professor SoT, PDEU]
+]
+.date[
+### 26 May 2026
+]
+
+---
+
+class: left top inverse
+
+
+
+<div>
+<style type="text/css">.xaringan-extra-logo {
+width: 40px;
+height: 40px;
+z-index: 0;
+background-image: url(./css/Anix-Logo.png);
+background-size: contain;
+background-repeat: no-repeat;
+position: absolute;
+top:1em;right:1em;
+}
+</style>
+<script>(function () {
+  let tries = 0
+  function addLogo () {
+    if (typeof slideshow === 'undefined') {
+      tries += 1
+      if (tries < 10) {
+        setTimeout(addLogo, 100)
+      }
+    } else {
+      document.querySelectorAll('.remark-slide-content:not(.title-slide):not(.inverse):not(.hide_logo)')
+        .forEach(function (slide) {
+          const logo = document.createElement('a')
+          logo.classList = 'xaringan-extra-logo'
+          logo.href = 'https://www.ankitdeshmukh.com/'
+          slide.appendChild(logo)
+        })
+    }
+  }
+  document.addEventListener('DOMContentLoaded', addLogo)
+})()</script>
+</div><style>.xe__progress-bar__container {
+  top:0;
+  opacity: 1;
+  position:absolute;
+  right:0;
+  left: 0;
+}
+.xe__progress-bar {
+  height: 0.25em;
+  background-color: #ffb14a;
+  width: calc(var(--slide-current) / var(--slide-total) * 100%);
+}
+.remark-visible .xe__progress-bar {
+  animation: xe__progress-bar__wipe 200ms forwards;
+  animation-timing-function: cubic-bezier(.86,0,.07,1);
+}
+@keyframes xe__progress-bar__wipe {
+  0% { width: calc(var(--slide-previous) / var(--slide-total) * 100%); }
+  100% { width: calc(var(--slide-current) / var(--slide-total) * 100%); }
+}</style>
+
+&lt;!-- ------------------------- Start your slides ------------------------- --&gt;
+
+# .gold[Outline:]
+## DGCA Regulations in India
+## Drone Safety
+.center[&lt;img src="images/drone_training.png" style="width:90%;border-radius:20px;border:4px solid gold;"&gt;]
+
+.footnote[.white[source: ]https://xkcd.com/1881/]
+
+---
+
+class: left top inverse
+# .gold[DGCA Drone Regulations in India]
+.pull-left[
+- DGCA and Drone Governance Framework in India
+- Drone Rules 2021: Core Legal Structure
+- Drone Classification by Weight Category
+- Digital Sky Platform, UIN, and Drone Registration
+- Remote Pilot Licence (RPL) and Certification Process
+- Airspace Zones, Operational Restrictions, and NPNT
+
+.footnote[[Drones Rules, 2021 dated 25 August 2021](https://egazette.gov.in/WriteReadData/2021/229221.pdf)]
+]
+
+.pull-right[
+.center[&lt;img src="images/Gazett.png" style="width:80%;"&gt;]
+]
+
+---
+
+# DGCA and Drone Governance Framework in India
+* DGCA is the primary aviation regulator under the Directorate General of Civil Aviation responsible for civil drone regulation.
+
+* Drone governance is jointly influenced by:
+  * Ministry of Civil Aviation (MoCA)
+  * DGCA
+  * Airports Authority of India (AAI)
+  * Ministry of Home Affairs (MHA)
+  * Ministry of Defence (MoD)
+
+* India transitioned from restrictive 2018 RPAS rules to the liberalized Drone Rules 2021 framework.
+
+## Key Regulatory Objectives
+
+* Promote drone ecosystem and manufacturing
+* Ensure aviation safety and national security
+* Enable commercial drone operations
+* Integrate drones into controlled airspace
+* Develop drone logistics and UTM ecosystem
+
+---
+
+# Drone Rules 2021: Core Legal Structure
+Drone Rules 2021 apply to:
+* All civilian unmanned aircraft systems (UAS)
+* Weight up to 500 kg
+* Recreational, commercial, research, and logistics applications
+
+.center[&lt;img src="images/regulation.png" style="width:100%;"&gt;]
+
+---
+
+# Drone Rules 2021: Core Legal Structure
+## Key Features
+
+* Digital Sky as single-window portal
+* Airspace zoning system
+* NPNT architecture mandatory
+* Reduced operator burden
+* Remote pilot licensing framework
+* Promotion of indigenous manufacturing
+
+## Important Operational Principles
+
+* Visual Line of Sight (VLOS) mandatory unless specially approved
+* Daylight operations preferred
+* Airspace permission required depending on zone
+* Geo-fencing and real-time tracking encouraged
+
+## Maximum Penalty
+
+* Violations may attract penalties up to INR 1,00,000 under Drone Rules. ([Vikaspedia][2])
+
+---
+
+# Drone Rules 2021: Framework
+
+.center[&lt;img src="images/Framework.png" style="width:80%;"&gt;]
+
+- Drone operations require regulatory compliance through QCI-certified drone approval, DGCA-approved pilot training, drone registration, and issuance of a Remote Pilot Certificate.
+
+- Operational security is supported through mandatory insurance coverage, with unrestricted access in green zones and prior permission required for flying in yellow and red zones.
+---
+
+# Drone Classification by Weight Category
+.pl-30[
+DGCA classify based on Weight
+
+| Category | Weight Range      |
+| -------- | ----------------- |
+| Nano     | &lt;= 250 g          |
+| Micro    | &gt;250 g to 2 kg    |
+| Small    | &gt;2 kg to 25 kg    |
+| Medium   | &gt;25 kg to 150 kg  |
+| Large    | &gt;150 kg to 500 kg |
+
+.footnote[[legalaffairs.gov.in](https://legalaffairs.gov.in/sites/default/files/Civil%20Aviation%20Regulatory%20Landscape%20of%20Indian%20Drone%20Ecosystem%20red.pdf?trk=public_post-text)]
+
+]
+.pr-70[
+.center[&lt;img src="images/class-drone.png" style="width:100%;"&gt;]
+]
+---
+
+# Digital Sky Platform, UIN, and Drone Registration
+.pull-left[
+**[Digital Sky](https://digitalsky.dgca.gov.in/?utm_source=chatgpt.com) is India's centralized drone governance platform used for:**
+* Drone registration
+* UIN generation
+* Pilot licensing
+* Flight permissions
+
+**UIN (Unique Identification Number)**
+* Equivalent to vehicle registration number for drones
+* Mandatory for most drones except exempted categories
+
+**UIN Linked With**
+* Manufacturer serial number
+* Flight controller serial number
+* Owner details
+* Type certificate
+]
+.pull-right[
+**Registration Process**
+1. Create Digital Sky account
+2. Submit drone specifications
+3. Upload required documents
+4. Pay registration fee
+5. Obtain UIN digitally
+
+**Required Documents**
+* Aadhaar/PAN
+* GST details (commercial entity)
+* Drone serial number
+* Type certificate reference
+* Manufacturer details
+
+**DAN (Drone Acknowledgement Number)** Temporary acknowledgement issued during transitional regularization schemes
+]
+---
+
+# Remote Pilot Licence (RPL) and Certification Process
+.pull-left[
+**Remote Pilot Licence (RPL) is mandatory For**
+* Commercial drone operations
+* Most drones above nano category
+* Professional survey and mapping operations
+
+**Eligibility Criteria**
+
+| Requirement | Criteria           |
+| ----------- | ------------------ |
+| Minimum age | 18 years           |
+| Maximum age | 65 years           |
+| Education   | Class 10 pass      |
+| Training    | DGCA-approved RPTO |
+]
+.pull-right[
+**Remote Pilot Training Organizations (RPTOs):**DGCA-authorized institutes provide:
+* Theory training
+* Simulator sessions
+* Practical flying
+* Emergency procedures
+* Airspace awareness
+
+**Training Duration:** ~40 hours total (20 hours theory + 20 hours practical)
+
+**Remote Pilot Certificate (RPC)**
+* Issued after passing tests
+* Uploaded on Digital Sky
+* Licence validity: 10 years
+]
+---
+
+# Airspace Zones, Operational Restrictions, and NPNT
+.pull-left[
+**Green Zone**
+* No prior permission required
+* Allowed up to:
+  * 400 ft (120 m) in uncontrolled airspace
+  * 200 ft near airports (specific conditions)
+
+**Yellow Zone**
+* Controlled airspace
+* ATC permission required
+* Commonly:
+  * 8-12 km around airports
+  * Sensitive aviation corridors
+
+**Red Zone**
+* Flying prohibited without central government clearance
+
+]
+.pull-right[
+.center[&lt;img src="images/Aerospace.png" style="width:80%;"&gt;]
+]
+
+---
+# DGCA-Flying Zones Rules
+.center[&lt;img src="images/Zones-3.jpg" style="width:90%;"&gt;]
+.footnote[[DigitalSky - Airspace Map](https://digitalsky.dgca.gov.in/airspace-map/#/app)]
+
+---
+
+# Operational Restrictions, and NPNT
+.pull-left[
+**NPNT - No Permission, No Takeoff**: Drone firmware prevents takeoff without digital authorization.
+
+**NPNT Workflow**
+1. Pilot submits flight request
+2. Airspace validation performed
+3. Digital permission token issued
+4. Drone unlocks takeoff capability
+]
+
+.pull-right[
+**Operational Restrictions**
+
+| Restriction        | Limit                      |
+| ------------------ | -------------------------- |
+| Maximum altitude   | 400 ft AGL                 |
+| VLOS requirement   | Mandatory                  |
+| Night operations   | Restricted unless approved |
+| Flying over crowds | Prohibited                 |
+| Hazardous payloads | Prohibited                 |
+]
+
+**BVLOS (Beyond Visual Line of Sight)**
+Currently restricted and requires:
+
+* Special DGCA approval
+* Experimental corridors
+* Safety case submission
+* Advanced detect-and-avoid systems
+]
+
+---
+
+# DGCA-Flying Zones Rules
+.center[&lt;img src="images/Zones.jpg" style="width:80%;"&gt;]
+.footnote[[DigitalSky - Airspace Map](https://digitalsky.dgca.gov.in/airspace-map/#/app)]
+
+---
+# Flying Zones at PDEU
+.center[&lt;img src="images/Zones-pdpu.jpg" style="width:90%;"&gt;]
+.footnote[[DigitalSky - Airspace Map](https://digitalsky.dgca.gov.in/airspace-map/#/app)]
+
+---
+
+# PDEU in Outer Yellow zone!
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-87190b98f6b362681ef1" style="width:100%;height:504px;"></div>
+<script type="application/json" data-for="htmlwidget-87190b98f6b362681ef1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addPolygons","args":[[[[{"lng":[72.75176304478836,72.75169687459626,72.75131001958641,72.75060358055208,72.74957953382311,72.74824072541169,72.74659086278461,72.74463450428887,72.74237704626424,72.73982470788229,72.73698451375751,72.73386427438149,72.73047256443765,72.72681869905843,72.72291270809271,72.71876530845607,72.71438787464136,72.70979240747153,72.70499150118091,72.69999830891574,72.69482650674776,72.68949025629915,72.6840041660797,72.67838325164068,72.67264289465248,72.66679880101553,72.66086695811643,72.65486359134327,72.64880511997552,72.64270811256569,72.63658924193065,72.63046523987205,72.62435285174506,72.6182687909955,72.61222969378547,72.60625207382689,72.6003522775423,72.59454643967126,72.58885043943965,72.58327985740753,72.57784993311019,72.57257552360447,72.56747106303071,72.56255052329789,72.55782737599718,72.5533145556459,72.5490244243607,72.5449687380555,72.54115861425572,72.53760450161668,72.53431615122966,72.53130258979473,72.52857209473505,72.52613217132212,72.52398953187668,72.52215007710478,72.52061887962279,72.51940016971983,72.51849732340027,72.51791285274275,72.51764839860665,72.51770472571005,72.51808172009761,72.51877838901,72.51979286315978,72.52112240141295,72.52276339786771,72.52471139131606,72.52696107706704,72.52950632110353,72.53234017653824,72.53545490232791,72.53884198419762,72.54249215772181,72.54639543350126,72.55054112436954,72.55491787455655,72.55951369073048,72.56431597483437,72.56931155862745,72.57448673983686,72.57982731981977,72.58531864263178,72.59094563539257,72.59669284983664,72.60254450493176,72.60848453044611,72.61449661134061,72.62056423286135,72.62667072620397,72.63279931462063,72.63893315983854,72.64505540865771,72.6511492395953,72.65719790944392,72.66318479961087,72.66909346210645,72.67490766505036,72.68061143756684,72.68618911394088,72.69162537691015,72.69690529997025,72.70201438857377,72.70693862010675,72.71166448253081,72.71617901158217,72.72046982642443,72.72452516365566,72.72833390957609,72.73188563062781,72.73517060192327,72.73817983378524,72.74090509622688,72.7433389413068,72.74547472329992,72.7473066166318,72.74882963153054,72.75003962735651,72.75093332357794,72.75150830836562,72.75176304478836],"lat":[23.07511000800086,23.0694388749381,23.06377871594249,23.05814504595861,23.05255330537849,23.04701881773514,23.04155674773743,23.03618205976093,23.03090947690756,23.02575344074586,23.0207280718406,23.01584713117903,23.011123982598,23.00657155631315,23.00220231364865,22.99802821306209,22.99406067755584,22.9903105635621,22.98678813138485,22.98350301727755,22.98046420723101,22.97768001254116,22.97515804722155,22.97290520732049,22.97092765219741,22.969230787808,22.96781925204223,22.96669690215354,22.96586680431243,22.9653312253116,22.96509162644422,22.96514865957115,22.96550216538727,22.96615117389073,22.96709390705388,22.96832778368815,22.96984942648973,22.97165467124698,22.97373857818493,22.97609544541626,22.97871882446313,22.9816015378082,22.98473569842804,22.98811273125696,22.99172339652399,22.9955578149008,22.99960549439357,23.00385535890695,23.0082957784041,23.01291460058215,23.01769918397835,23.0226364324186,23.02771283071584,23.03291448152287,23.03822714324045,23.04363626887899,23.04912704576908,23.054684436014,23.06029321757473,23.06593802587668,23.0716033958251,23.07727380411541,23.08293371172313,23.08856760645799,23.09416004546565,23.09969569756124,23.10515938527815,23.11053612651713,23.11581117568064,23.12097006417917,23.12599864019759,23.13088310761125,23.13561006394387,23.14016653726162,23.14454002190049,23.14871851292715,23.15269053923677,23.156445195195,23.15997217073513,23.16326177982553,23.16630498722719,23.16909343346553,23.17161945794583,23.17387612014635,23.17585721882935,23.17755730921471,23.17897171806735,23.18009655665531,23.18092873154102,23.18146595317496,23.18170674226675,23.18165043391499,23.18129717948399,23.18064794622143,23.17970451461759,23.17846947351353,23.17694621297151,23.1751389149278,23.17305254165406,23.17069282205966,23.16806623587397,23.16517999575286,23.16204202736023,23.15866094748088,23.15504604022638,23.15120723140139,23.14715506110253,23.14290065462742,23.1384556917755,23.1338323746275,23.12904339389376,23.12410189392624,23.11902143649229,23.11381596341145,23.10849975816019,23.10308740655136,23.09759375659834,23.09203387767537,23.08642301908756,23.0807765681656,23.07511000800086]}]]],null,"12 km Buffer",{"interactive":true,"className":"","stroke":true,"color":"#361d1a","weight":2,"opacity":0.5,"fill":true,"fillColor":"#ffe260","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolygons","args":[[[[{"lng":[72.71274079322129,72.71269777339685,72.71244096478495,72.71197108926616,72.7112894525428,72.71039794036544,72.70929901317379,72.70799569916879,72.70649158583687,72.70479080995153,72.70289804608136,72.70081849363768,72.69855786249899,72.69612235725253,72.69351866009781,72.69075391245946,72.68783569536092,72.68477200861312,72.68157124887551,72.67824218664973,72.67479394226891,72.67123596094804,72.66757798696317,72.66383003702971,72.66000237295144,72.65610547361459,72.6521500064019,72.64814679810402,72.64410680540594,72.64004108502786,72.63596076360048,72.63187700735504,72.62780099170963,72.62374387083256,72.61971674726453,72.61573064168053,72.61179646287225,72.60792497803141,72.60412678341334,72.60041227545925,72.59679162245476,72.59327473680055,72.58987124796951,72.58659047622338,72.58344140715944,72.5804326671563,72.57757249978491,72.57486874324908,72.57232880891689,72.56995966100156,72.56776779744757,72.56575923207467,72.56393947802914,72.56231353258842,72.56088586336159,72.5596603959246,72.55864050292553,72.55782899469098,72.55722811136123,72.55683951657721,72.55666429273867,72.55670293784829,72.55695536395278,72.55742089718699,72.55809827942338,72.55898567152421,72.56008065819006,72.56138025439309,72.56288091337976,72.56457853622311,72.56646848289996,72.56854558486475,72.57080415908709,72.57323802351584,72.57584051392888,72.57860450212307,72.5815224153958,72.58458625726514,72.58778762937237,72.59111775450678,72.59456750068999,72.5981274062531,72.60178770583778,72.60553835724899,72.60936906908498,72.61326932906768,72.6172284329943,72.62123551422953,72.6252795736555,72.62934950999592,72.63343415042893,72.63752228140312,72.64160267956977,72.64566414274447,72.64969552081121,72.65368574648164,72.65762386582335,72.66149906847122,72.66530071743674,72.66901837843213,72.67264184862636,72.67616118475314,72.67956673049176,72.68284914304475,72.68599941883794,72.68900891827177,72.69186938945502,72.69457299085548,72.697112312805,72.69948039779997,72.70167075954168,72.7036774006647,72.70549482910536,72.70711807306613,72.70854269453595,72.70976480133069,72.71078105762214,72.71158869292812,72.7121855095408,72.71256988837489,72.71274079322129],"lat":[23.07454962923175,23.07076895000012,23.06699553426727,23.06323972510597,23.05951181646363,23.05582202495317,23.05218046186517,23.04859710547794,23.04508177374116,23.04164409740733,23.03829349368452,23.035039140482,23.0318899513184,23.02885455096106,23.02594125186193,23.02315803145426,23.02051251037114,23.0180119316449,23.01566314094319,23.01347256789526,23.0114462085583,23.00958960907131,23.00790785054001,23.00640553519355,23.00508677384991,23.00395517472354,23.00301383360519,23.00226532543987,23.0017116973257,23.00135446295187,23.00119459849064,23.00123253995425,23.00146818202336,23.00190087835033,23.00252944333607,23.00335215537557,23.00436676156356,23.00557048384699,23.00696002660821,23.00853158565806,23.0102808586149,23.01220305664139,23.0142929175076,23.0165447199453,23.01895229925481,23.02150906412234,23.02420801460278,23.02704176121929,23.03000254512857,23.03308225929726,23.03627247063242,23.03956444300664,23.04294916111534,23.04641735510206,23.04995952588505,23.05356597111661,23.05722681170513,23.06093201882749,23.06467144135898,23.06843483364584,23.07221188354506,23.07599224065511,23.07976554466039,23.08352145371224,23.08724967276885,23.0909399818164,23.09458226389411,23.09816653284633,23.10168296072522,23.1051219047688,23.10847393387977,23.11172985453213,23.11488073603396,23.11791793507643,23.12083311950086,23.12361829121802,23.12626580821589,23.1287684055945,23.1311192155694,23.13331178638774,23.13534010010429,23.13719858916742,23.13888215176873,23.14038616591324,23.14170650217048,23.14283953507084,23.14378215311479,23.14453176736693,23.14508631861057,23.14544428304249,23.14560467649167,23.14556705715018,23.1453315268081,23.14489873058897,23.14426985518637,23.1434466256063,23.14243130042441,23.14122666557124,23.13983602666285,23.13826319989808,23.136512501548,23.13458873606696,23.13249718285832,23.13024358173202,23.12783411709462,23.125275400916,23.12257445452028,23.11973868925195,23.11677588607108,23.11369417413458,23.1105020084233,23.10720814647713,23.10382162430316,23.10035173152345,23.09680798583204,23.09320010683155,23.08953798932219,23.08583167611719,23.08209133045969,23.07832720811734,23.07454962923175]}]]],null,"8 km Buffer",{"interactive":true,"className":"","stroke":true,"color":"#361d1a","weight":2,"opacity":0.5,"fill":true,"fillColor":"#ff8f33","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addPolygons","args":[[[[{"lng":[72.68347491037059,72.68344853563065,72.68328854355057,72.68299537968565,72.68256985453765,72.68201314125716,72.68132677235356,72.68051263542237,72.67957296790267,72.67851035087952,72.67732770194921,72.67602826716738,72.67461561210295,72.67309361202254,72.67146644123315,72.66973856161228,72.66791471035754,72.66599988698951,72.66399933964342,72.66191855068742,72.65976322170681,72.65753925789529,72.65525275189573,72.65290996713441,72.65051732069423,72.64808136577332,72.64560877377633,72.64310631608748,72.64058084557408,72.63803927787092,72.63548857249603,72.6329357138487,72.63038769214094,72.62785148431432,72.625334034993,72.62284223752486,72.62038291516154,72.61796280242837,72.6155885267344,72.61326659027209,72.61100335225579,72.60880501154681,72.60667758971216,72.60462691456304,72.60265860421732,72.60077805172986,72.59899041033188,72.59730057932006,72.5957131906336,72.59423259615625,72.5928628557777,72.59160772624772,72.59047065085323,72.58945474994725,72.588562812356,72.58779728768786,72.58716027956616,72.58665353980471,72.5862784635426,72.5860360853525,72.58592707633379,72.58595174219909,72.58611002236056,72.58640149001901,72.58682535325664,72.58738045713106,72.58806528676587,72.58887797143005,72.58981628959589,72.5908776749621,72.59205922342669,72.59335770099095,72.59476955257347,72.59629091171074,72.59791761111815,72.59964519408275,72.6014689266572,72.60338381062122,72.60538459717574,72.60746580133184,72.60962171695517,72.61184643242471,72.6141338468623,72.61647768688864,72.61887152385908,72.62130879153186,72.62378280411949,72.62628677467343,72.62881383375114,72.63135704831312,72.63390944079795,72.63646400832208,72.63901374195054,72.6415516459856,72.64407075721908,72.6465641640948,72.64902502572809,72.65144659072902,72.65382221577723,72.65614538389637,72.65840972237784,72.66060902030341,72.66273724561863,72.66478856170923,72.66675734343504,72.66863819257669,72.67042595265285,72.67211572306658,72.67370287254261,72.6751830518181,72.6765522055524,72.67780658342318,72.67894275037887,72.67995759601949,72.68084834308057,72.68161255499741,72.68224814252943,72.68275336942712,72.6831268571266,72.68336758845977,72.68347491037059],"lat":[23.07412302913335,23.07176014102565,23.06940176796504,23.06705437425363,23.06472439376093,23.06241821229112,23.06014215008576,23.0579024445098,23.05570523296834,23.05355653610056,23.05146224129711,23.04942808658548,23.04745964492761,23.0455623089723,23.04374127630406,23.0420015352284,23.04034785113217,23.03878475345611,23.03731652331476,23.03594718179749,23.03468047898208,23.03351988369088,23.03246857401698,23.03152942864619,23.03070501899808,23.02999760220752,23.02940911496533,23.0289411682349,23.02859504285895,23.02837168606793,23.02827170889988,23.0282953845384,23.02844264757304,23.02871309418429,23.02910598325247,23.02962023838741,23.03025445087348,23.03100688352189,23.03187547541982,23.03285784756347,23.0339513093598,23.03515286597926,23.03645922653975,23.03786681309946,23.03937177043432,23.04096997657366,23.04265705406538,23.04442838194018,23.04627910834255,23.04820416379397,23.05019827505275,23.05225597953252,23.05437164024055,23.05653946119508,23.05875350327995,23.06100770049336,23.06329587654643,23.06561176176665,23.06794901025984,23.07030121728416,23.07266193678847,23.07502469906733,23.07738302848444,23.07973046121584,23.0820605629645,23.08436694659775,23.08664328965912,23.08888335170651,23.09108099142931,23.09323018349706,23.09532503509362,23.09735980209118,23.09932890481949,23.1012269433869,23.10304871251098,23.10478921581744,23.10644367956827,23.1080075657807,23.10947658470079,23.11084670659715,23.11211417284201,23.1132755062487,23.11432752063718,23.11526732960063,23.116092354449,23.11680033130716,23.11738931734804,23.11785769614329,23.11820418211642,23.11842782408618,23.11852800789001,23.11850445808041,23.11835723868921,23.11808675305773,23.11769374273318,23.11717928543426,23.11654479209156,23.11579200297098,23.11492298289095,23.11394011554654,23.11284609695632,23.11164392805021,23.11033690641865,23.1089286172463,23.10742292345521,23.10582395508483,23.10413609793842,23.10236398152733,23.10051246634647,23.09858663051635,23.09659175582866,23.09453331323403,23.09241694781215,23.09024846326573,23.08803380598139,23.08577904870116,23.08349037385013,23.08117405656571,23.07883644747587,23.07648395527321,23.07412302913335]}]]],null,"5 km Buffer",{"interactive":true,"className":"","stroke":true,"color":"red","weight":2,"opacity":0.5,"fill":true,"fillColor":"red","fillOpacity":0.3,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addMarkers","args":[23.0734,72.6347,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Ahmedabad Airport",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addMarkers","args":[23.155411,72.665031,{"iconUrl":{"data":"https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png","index":0},"iconWidth":25,"iconHeight":41,"iconAnchorX":12,"iconAnchorY":41,"shadowUrl":{"data":"https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png","index":0}},null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"PDEU (You are Here!)",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[22.96509162644422,23.18170674226675],"lng":[72.51764839860665,72.75176304478836]},"setView":[[23.0734,72.6347],11,[]]},"evals":[],"jsHooks":[]}</script>
+
+---
+# DGCA Skymap for Kochi City
+
+&lt;!-- Option 1: Screenshot --&gt;
+![DigitalSky Map](images/digital-sky-map.png)
+
+&lt;!-- Option 2: Link --&gt;
+[Click here to open the interactive DigitalSky Map](https://digitalsky.aai.aero/digital-sky-map){target="_blank"}
+
+---
+
+# Flying a drone in a restricted or no-fly zones
+Flying a drone in a restricted or no-fly zone in India can lead to:
+- Monetary fines
+- Drone confiscation
+- FIR/criminal charges
+- Possible imprisonment in serious security-sensitive cases
+
+Under India's drone regulations and related aviation/security laws 2021:
+- .red.b.f3[First violations may attract fines up to approximately ₹50,000.]
+- .red.b.f3[Repeat or serious violations may increase penalties to ₹1,00,000 and possible imprisonment up to 6 months.]
+
+---
+class: left top inverse
+# .gold[Drone Safety]
+.f3.pull-left[
+- Importance of Drone Safety
+- Pre-Flight Safety Checklist
+- Weather and Environmental Considerations
+- No-Fly Zones and Restricted Areas
+- Common Causes of Drone Accidents
+
+.footnote[[Drones Rules, 2021 dated 25 August 2021](https://egazette.gov.in/WriteReadData/2021/229221.pdf)]
+]
+
+.f3.pull-right[
+.center[&lt;img src="images/safety.jpg" style="width:80%;"&gt;]
+]
+
+---
+# 1. Importance of Drone Safety
+
+- Drone technology is transforming agriculture, surveying, disaster management, filmmaking, and infrastructure monitoring across India. However, even a small operational mistake can cause serious accidents, injuries, or airspace conflicts.
+
+- Safe drone operations protect not only the pilot and equipment, but also people on the ground and nearby aircraft.
+
+- In India, the DGCA Drone Rules, 2021 emphasize responsible flying practices to ensure safe integration of drones into civil airspace. A strong safety culture also improves public trust in commercial drone applications.
+
+---
+
+.pull-left[
+# 2. Pre-Flight Checklist
+- Every successful drone mission begins before the drone even leaves the ground.
+- Pilots should inspect propellers, motors, batteries, GPS connection, and communication systems before takeoff.
+- Weather conditions, nearby obstacles, and airspace permissions must also be verified through platforms such as Digital Sky in India.
+- A simple pre-flight checklist can prevent common issues like signal loss, unstable flight, or battery failure. Professional operators often treat pre-flight preparation as seriously as the flight itself.
+]
+.pull-right[
+
+.center[&lt;img src="images/list.png" style="width:70%;"&gt;]
+]
+
+---
+
+# 3. Weather and Environmental Considerations
+.pl-30[
+  .center[&lt;img src="images/weather.png" style="width:90%;"&gt;]
+]
+
+.pr-70[
+Weather plays a major role in drone safety, especially in regions with extreme heat, dust, humidity, or monsoon conditions.
+- Wind Speed	Affects flight stability; drones can typically handle sustained winds of 10-20 mph. Gusts can destabilize flight paths, especially during takeoff and landing.
+
+- Temperature	Influences battery efficiency and motor performance. Extreme temperatures can shorten battery life and impair signal transmission.
+
+- Precipitation	Can lead to equipment damage and affect visibility. Drones are generally not waterproof unless specifically designed for such conditions.
+]
+
+---
+
+# 4. No-Fly Zones and Responsible Drone Use
+
+- Not every location is safe or legal for drone operations.
+- Airports, military areas, government facilities, and densely populated urban regions often fall under restricted airspace categories.
+- India's Digital Sky platform classifies areas into Green, Yellow, and Red zones to help pilots identify permitted flight regions.
+- Responsible drone use also includes respecting privacy and avoiding unnecessary surveillance of people or private property.
+- Ethical flying behavior is becoming increasingly important as drone usage expands globally.
+
+---
+
+# 5. Common Causes of Drone Accidents
+.pull-left[
+- Many drone accidents occur because of avoidable human errors rather than technical failure alone.
+
+- Poor pilot training, ignoring weather conditions, low battery levels, and flying beyond visual line of sight are among the most common causes.
+
+- Urban environments create additional risks due to signal interference, tall structures, and crowded spaces.
+
+- Accident investigations worldwide consistently show that lack of preparation is a major contributing factor.
+Developing strong operational discipline is therefore one of the most effective safety measures.
+]
+
+.pull-right[
+  .center[&lt;img src="images/acc.jpg" style="width:100%;border-radius:20px"&gt;]
+]
+
+---
+
+# References
+- Directorate General of Civil Aviation. (2021). *Drone Rules, 2021*. Government of India.
+- International Civil Aviation Organization. (2020). *Manual on Remotely Piloted Aircraft Systems (RPAS)*.
+- Federal Aviation Administration. (2023). *Small Unmanned Aircraft Systems Regulations (Part 107)*.
+- Finn, R. L., &amp; Wright, D. (2016). Privacy, data protection and ethics for civil drone practice. *Computer Law &amp; Security Review, 32*(4), 577-586.
+- Clothier, R., Greer, D., Greer, F., &amp; Mehta, A. (2015). Risk perception and public acceptance of drones. *Risk Analysis, 35*(6), 1167-1183.
+- Ministry of Civil Aviation. (2021). Liberalised Drone Rules, 2021. Government of India.
+- Digital Sky Platform. (2025). DGCA Drone Governance Portal. Government of India.
+- Asteria Aerospace. (2021). India's new drone regulations.
+- Anand and Anand. (2021). Drone Rules 2021: Regulatory overview.
+- [Regulatory landscape of Indian drone ecosystem](https://legalaffairs.gov.in/sites/default/files/Civil%20Aviation%20Regulatory%20Landscape%20of%20Indian%20Drone%20Ecosystem%20red.pdf?trk=public_post-text)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "solarized-light",
+  "highlightLines": true,
+  "countIncrementalSlides": false,
+  "ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

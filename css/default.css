@@ -1,0 +1,156 @@
+a,
+a > code {
+  color: rgb(249, 38, 114);
+  text-decoration: none;
+}
+/* .footnote {
+  position: absolute;
+  bottom: 1em;
+  padding-right: 4em;
+  margin-bottom: -0.5em;
+  font-size: 90%;
+  color: #925458;
+} */
+
+.footnote {
+  position: absolute;
+  bottom: 0.3em;
+
+  width: 35%;
+  padding-top: 0.05em;
+  padding-left: 0.3em;
+
+  border-top: 0.5px solid #777;
+
+  font-size: 0.7em;
+  font-style: italic;
+
+  color: #666;
+}
+
+.remark-code-line-highlighted {
+  background-color: #ffff88;
+}
+
+.inverse {
+  background-color: #272822;
+  color: #d6d6d6;
+  text-shadow: 0 0 20px #333;
+}
+.inverse h1,
+.inverse h2,
+.inverse h3 {
+  color: #f3f3f3;
+}
+/* Two-column layout */
+.left-column {
+  color: #777;
+  width: 20%;
+  height: 92%;
+  float: left;
+}
+.left-column h2:last-of-type,
+.left-column h3:last-child {
+  color: #000;
+}
+.right-column {
+  width: 75%;
+  float: right;
+  padding-top: 1em;
+}
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right + * {
+  clear: both;
+}
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+blockquote {
+  border-left: solid 5px lightgray;
+  padding-left: 1em;
+}
+.remark-slide table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+.remark-slide table thead th {
+  border-bottom: 1px solid #ddd;
+}
+th,
+td {
+  padding: 5px;
+}
+.remark-slide thead,
+.remark-slide tfoot,
+.remark-slide tr:nth-child(even) {
+  background: #eee;
+}
+
+@page {
+  margin: 0;
+}
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+
+.pl-30 {
+  float: left;
+  width: 30%;
+}
+
+.pr-70 {
+  float: right;
+  width: 68%;
+}
+
+.pl-70 {
+  float: left;
+  width: 68%;
+}
+
+.pr-30 {
+  float: right;
+  width: 30%;
+}
+
+/* for 40-60 */
+
+.pl-40 {
+  float: left;
+  width: 40%;
+}
+
+.pr-60 {
+  float: right;
+  width: 58%;
+}
+
+.pl-60 {
+  float: left;
+  width: 58%;
+}
+
+.pr-40 {
+  float: right;
+  width: 40%;
+}
+
+/* .remark-slide-content {
+  text-align: justify;
+} */

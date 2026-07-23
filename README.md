@@ -38,12 +38,14 @@ For more information about my work, research, and professional background, pleas
 
 The slides are organized intuitively. Browse directly through the folders:
 
-```plaintext
+<pre>
 📁 slides/
-├── 📂 [Topic-1]/
+├── 📂 Topic-1/
 │   ├── presentation.html
 │   └── slides.pdf
-├── 📂 [Topic-2]/
+├── 📂 Topic-2/
 │   ├── workshop.html
 │   └── handout.pdf
 └── ...
+</pre>
+

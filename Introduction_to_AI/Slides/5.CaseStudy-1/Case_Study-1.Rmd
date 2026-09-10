@@ -1,0 +1,587 @@
+---
+title: "Retail Sales - (Exploratory Data Analysis - EDA)"
+author: "Don Jeff Bilolo (original)<br />Ankit Deshmukh (adopted in R)"
+format: html_document
+date: "2026-09-07"
+css: style.css
+theme: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  warning    = FALSE,
+  message    = FALSE,
+  fig.width  = 9,
+  fig.height = 6,
+  dpi        = 150,
+  out.width  = "100%",
+  fig.align  = "center"
+)
+
+library(ggplot2)
+
+# Global theme: every text element at size 24
+theme_set(
+  theme_minimal(base_size = 24) +
+    theme(
+      plot.title       = element_text(size = 24, face = "bold"),
+      plot.subtitle    = element_text(size = 24),
+      plot.caption     = element_text(size = 24),
+      axis.title       = element_text(size = 24),
+      axis.text        = element_text(size = 24),
+      legend.title     = element_text(size = 24),
+      legend.text      = element_text(size = 24),
+      strip.text       = element_text(size = 24, face = "bold"),
+      panel.grid.minor = element_blank()
+    )
+)
+```
+
+# Introduction
+
+Businesses have always used data to make informed business decisions. With significant advancements in collecting, storing, analyzing, and reporting data in the last couple of decades, extracting actionable insights from large and complex datasets has never been easier. It has now become an indispensable tool for organizations seeking to gain a competitive edge. More than ever, organizations have now been able to drive informed decisions, optimize processes, and improve overall performance by leveraging analytics technology. Such organizations include large retail companies.
+
+This report presents an exploratory data analysis (EDA) of Superstore sales data, a fictitious retail company that closely resembles the operational characteristics of real-world retailers. The analysis aims to uncover valuable patterns, trends, and insights that can help the company better understand its sales dynamics, customer behavior, and profitability.
+
+# Business Question
+
+This analysis aims to address the following key business questions:
+
+1. **Sales Performance**: What are the overall sales trends, and how have they evolved over time? Are there any significant fluctuations that need to be addressed?
+2. **Product Categories**: Which product categories contributed the most to the company's sales? Which categories are underperforming, if any?
+3. **Geographic Insights**: How does sales performance vary across the regions? Are there promising geographical regions or areas requiring improved marketing?
+4. **Profitability**: Which products are more profitable and which were not? With the available data, what factors affected the company's profit? How is the company's profitability during the period?
+
+This analysis also aims to discover other valuable insights about the dataset. Ultimately, this analysis intends to provide actionable insights to guide decision-making and enhance overall business performance.
+
+# Report Structure
+
+This report is organized as follows:
+
+- **Data Overview** - dataset overview, dataset source, size, and initial observations
+- **Data Preprocessing** - data cleaning, handling missing values, and preparation for analysis
+- **Exploratory Data Analysis** - analysis: statistical summaries, visualizations, and key findings
+- **Conclusion** - summary of the main insights from the analysis
+- **Recommendations** - recommendations based on the findings
+- **Reference** - references used in the report
+
+> # Key Findings
+> Summarized below are the key findings from this analysis. Throughout the 4-year period from 2011 to 2014:
+>
+> **Sales Performance**
+>
+> * Superstore sales increased yearly, with the fastest growth in 2013 and the slowest in 2012.
+> * Seasonal sales trends was observed, notably in November, December, and September.
+> * Sales exhibited high variability, particularly in March, September, and October.
+>
+> **Product Categories**
+>
+> * Phones, chairs, and storage products led in sales by category, while copiers, furnishings, and fasteners performed least.
+> * No clear sales pattern emerged for product sub-categories.
+> * Supplies (office supplies), copiers, and appliances experienced the highest average annual sales growth, while envelopes, chairs, and machine products grew the slowest.
+>
+> **Geographical Insights**
+>
+> * Seasonal trends were consistent in all regions, with higher sales in the West and East.
+> * Sales varied among regions, with office supplies and technology products excelling in the West and East.
+> * Most regions had negative growth in 2012, except for Central region.
+> * The West had the fastest average annual growth rate, followed by East, Central, and the South.
+>
+> **Profitability**
+>
+> * The company maintained a profit margin above 10%, decreasing slightly in 2014.
+> * Furnishings, copiers, and labels were the most profitable sub-categories, while chairs, phones, and storage products were the least profitable.
+> * Phones, chairs, and binders generated the highest total profit, while machines, bookcases, and fasteners generated the least.
+> * Discounts significantly affected profits, with tables, office supplies, and bookcases experiencing the largest drops.
+> * Chairs were highly profitable in the furniture category, with copiers showing impressive profit growth. Machine products, on the other hand, had stagnant growth.
+> * Orders with discounts did not significantly differ in sales or profit compared to non-discounted orders. High discounts did not correlate with higher sales or profits.
+
+# Importing Libraries
+
+We will use R libraries for data manipulation, visualization, and analysis.
+
+```{r libraries}
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(knitr)
+```
+
+# 1. Data Overview
+
+The dataset used in this analysis is the Superstore - Sales data available on Kaggle (https://www.kaggle.com/datasets/ishanshrivastava28/superstore-sales). It is available in both csv and excel format. We load the "Orders" sheet from the Excel file.
+
+```{r load-data}
+data <- read_excel("Superstore.xlsx", sheet = "Orders")
+head(data, 3)
+```
+
+The dataset contains records of successful orders. It also contains features such as the `Order Date`, `Ship Date`, `Country` and `Region` from where the customer lives/resides, product `Category`,`Quantity`, `Sales` and `Profit`.
+
+Below are variable descriptions for each of the columns:
+
+- `row_id`: unique row identifier
+- `order_id`: unique order identifier
+- `order_date`: date the order was placed
+- `ship_date`: date the order was shipped
+- `ship_mode`: how the order was shipped
+- `customer_id`: unique customer identifier
+- `customer_name`: customer name
+- `segment`: segment of product
+- `country`: country of customer
+- `city`: city of customer
+- `state`: state of customer
+- `postal_code`: postal code of customer
+- `region`: Superstore region represented
+- `product_id`: unique product identifier
+- `category`: category of product
+- `sub_category`: subcategory of product
+- `product_name`: name of product
+- `sales`: total sales of that product in the order
+- `quantity`: total units sold of that product in the order
+- `discount`: percent discount applied for that product in the order
+- `profit`: total profit for that product in the order (net profit, all expenses including discount)
+
+```{r data-info}
+str(data)
+```
+
+The dataset contains 9994 records (rows) and 21 features (columns). Among the features, 2 have datetime data type (date), 3 are floating point (decimals), 3 are integers (whole numbers), and 13 are object (strings) data types. It also has no missing values. Memory requirement for the dataset is 1.6 MB.
+
+The dataset also has no missing values (see `Non-Null Count`).
+
+# 2. Data Preprocessing
+
+With the overview, the dataset will not need a lot of data cleaning. However, there are certain transformations that needs to be done to ready the data for the analysis. Specifically, the `Row ID` column and some others are not necessary for this particular analysis and will be removed. Feature engineering will also be done.
+
+```{r preprocessing}
+# Remove Row ID and select relevant columns
+data <- data %>%
+  select(-`Row ID`) %>%
+  select(
+    `Order ID`, `Order Date`, `Ship Date`, `Ship Mode`, Segment, City, State, Region,
+    Category, `Sub-Category`, `Product Name`, Sales, Quantity, Discount, Profit
+  )
+
+# Feature engineering
+data <- data %>%
+  mutate(
+    month = month(`Order Date`),
+    year = year(`Order Date`),
+    year_month = floor_date(`Order Date`, "month"),
+    total_discount_in_dollars = Sales * Discount,
+    selling_price = Sales / Quantity,
+    `(net)_profit_before_discount` = Sales * Discount + Profit,
+    order_fulfillment_time = as.numeric(difftime(`Ship Date`, `Order Date`, units = "days")),
+    net_profit_per_unit_sold = Profit / Quantity,
+    profit_margin = (Profit / Sales) * 100,
+    discounted_sales = Sales - (Sales * Discount)
+  ) %>%
+  rename(net_profit = Profit)
+
+head(data, 5)
+```
+
+```{r transformed-info}
+str(data)
+```
+
+The transformed dataset now contains 9994 rows and 22 columns. It has 2 datetime, 8 floating point, 3 integer, 7 string, 1 period, and 1 interval data type columns. Dataset memory requirement is still 1.6MB.
+
+The heatmap above confirms no missing values in the dataset.
+
+With this, the data is now ready for analysis. Data cleaning and transformations are always done to almost all real-world datasets. This includes handling for missing values, casting data to appropriate data types, standardizing or normalizing values, feature engineering, and date time and string types transformations, among others. Since this particular dataset only requires some transformations and not much cleaning, we can now move one.
+
+# 3. Exploratory Data Analysis
+
+```{r summary}
+summary(data %>% select(Sales, Quantity, Discount, net_profit, profit_margin))
+```
+
+The dataset contains sales data from 2011-01-04 to 2014-12-31. Earliest `Ship Date` information was in 2011-01-08, while the latest was in 2015-01-06. No apparent errors or anomalies can be observed with the `Sales`, `Quantity`, and `Discount` columns. With `net_profit`, `(net)_profit_before_discount`, and `net_profit_per_unit_sold`, there are negative values as the min, which may mean actual negative profit or possible error. This requires further investigation.
+
+## 3.1. Sales Performance
+
+What are the overall sales trends, and how have they evolved over time? Are there any significant fluctuations that need to be addressed?
+
+```{r yearly-orders-sales}
+yearly_orders <- data %>%
+  group_by(year) %>%
+  summarise(count = n())
+
+yearly_sales <- data %>%
+  group_by(year) %>%
+  summarise(total_sales = sum(Sales))
+
+# Plot
+p1 <- ggplot(yearly_orders, aes(x = year, y = count)) +
+  geom_line(color = "#003f5c") +
+  geom_point(color = "#003f5c") +
+  labs(title = "Yearly order count", y = "count")
+
+p2 <- ggplot(yearly_sales, aes(x = year, y = total_sales)) +
+  geom_line(color = "#003f5c") +
+  geom_point(color = "#003f5c") +
+  labs(title = "Yearly sales", y = "Sales")
+
+gridExtra::grid.arrange(p1, p2, ncol = 1)
+```
+
+```{r annual-sales}
+yearly_sales
+```
+
+Over time, orders had increased and so are sales. However, a slight dip in sales can be observed in 2012. From 484,247 dollars total sales in 2011, Superstore sales slightly dipped to 470,532 dollars in the following year, which is a 2.83% difference or 13,715 dollars.
+
+```{r monthly-sales-trend}
+monthly_sales <- data %>%
+  group_by(year_month) %>%
+  summarise(total_sales = sum(Sales))
+
+ggplot(monthly_sales, aes(x = year_month, y = total_sales)) +
+  geom_line(color = "#003f5c", size = 1) +
+  labs(title = "Total Monthly Sales", x = "Month", y = "Total Sales")
+```
+
+Seasonal trends occurred. Superstore sales increase towards the end of the year starting in November and is sustained until December, and then drops in January. Between February and March each year, sales rise again. From April to August, a generally stable trend is evident every year. Furthermore, a sharp downward trend is observed during October.
+
+The following provides a rough estimate of this observation:
+
+```{r aggregated-monthly-sales}
+monthly_agg <- data %>%
+  group_by(month) %>%
+  summarise(total_sales = sum(Sales))
+
+ggplot(monthly_agg, aes(x = factor(month, labels = month.abb), y = total_sales)) +
+  geom_bar(stat = "identity", fill = "#1d3557", width = 0.8) +
+  labs(title = "Aggregated Monthly Sales", x = "Month", y = "Total Sales")
+```
+
+The visualization above shows total sales for each month over the course of 4 years. By magnitude, sales are higher towards the holiday seasons. Also, the academic year (opening of schools) in America usually starts in late August or early September, which can possibly explain higher sales in September of school-related products such as binders, home and office supplies, papers, bookcases, and accessories, among others (see graph below).
+
+```{r monthly-subcat-sales}
+month_subcat <- data %>%
+  group_by(month, `Sub-Category`) %>%
+  summarise(Sales = sum(Sales)) %>%
+  ungroup()
+
+# Highlight September, November, December
+month_subcat <- month_subcat %>%
+  mutate(highlight = ifelse(month %in% c(9, 11, 12), "highlight", "normal"))
+
+ggplot(month_subcat, aes(x = `Sub-Category`, y = Sales, fill = factor(month))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c(
+    "#e9d8a6", "#e9d8a6", "#e9d8a6", "#e9d8a6", "#e9d8a6",
+    "#e9d8a6", "#e9d8a6", "#e9d8a6", "#f77f00", "#e9d8a6",
+    "#d62828", "#003049"
+  )) +
+  labs(
+    title = "Monthly Sub-Category Sales (Sept, Nov, Dec highlighted)",
+    x = "Sub-Category", y = "Sales"
+  ) +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+```{r consumer-segment-monthly}
+consumer_monthly <- data %>%
+  filter(Segment == "Consumer") %>%
+  group_by(month) %>%
+  summarise(Sales = sum(Sales))
+
+ggplot(consumer_monthly, aes(x = factor(month, labels = month.abb), y = Sales)) +
+  geom_bar(stat = "identity", fill = "#1d3557", width = 0.8) +
+  labs(title = "Consumer Segment Aggregated Monthly Sales", x = "Month", y = "Sales")
+```
+
+Under consumer segment, sales in September, November, and December are higher than the rest of the year. This supports the possibility that increased sales in September may be due to the reopening of classes (sales of school-related products also increased).
+
+```{r monthly-avg-std}
+monthly_stats <- data %>%
+  group_by(year_month) %>%
+  summarise(avg = mean(Sales), std = sd(Sales))
+
+ggplot(monthly_stats, aes(x = year_month)) +
+  geom_line(aes(y = avg, color = "Average"), size = 1.5) +
+  geom_line(aes(y = std, color = "Standard Deviation"), size = 1.5) +
+  labs(title = "Monthly Sales (Average & Std)", x = "Month", y = "Value") +
+  scale_color_manual(values = c("Average" = "#d62828", "Standard Deviation" = "#033270")) +
+  theme(legend.title = element_blank())
+```
+
+Huge variation in sales within each month can be observed throughout the period. This is confirmed by the monthly sales' standard deviation above. Interestingly, this variation seems to have a pattern. Sales were more variable during March, and around September and October. Interestingly, from April 2012 until the end of the year, there seemed to have low variability in the sales. Along with this, the general sales trend in 2012 was slightly downward, as can be seen in the total yearly sales graph - when total yearly sales dipped a little from 2011 to 2012. On the other hand, sales were more variable in 2011, 2013, and 2014.
+
+Store sales are typically subject to variability in sales due to a number of observable factors such as seasonality, customer behaviors, and competitive landscape, among others.
+
+**Key findings:**
+1. Yearly sales had been growing during the 4 year period. Growth was slowest in 2012 and fastest in 2013.
+
+2. Seasonal trends can be observed with sales. Sales generally increase towards the end of the year - November and December (holidays) and in September (possibly due to the opening of schools. Sales under consumer segment also increased during these months. Increase in school and office supplies sales was also observed).
+
+3. Sales had been very variable especially in March and around September and October. No significant variability was observed from April 2012, until the end of the year.
+
+## 3.2. Product Categories
+
+Which product categories contributed the most to the company's sales? Which categories are underperforming, if any?
+
+```{r total-sales-subcat}
+df_sales <- data %>%
+  group_by(Category, `Sub-Category`) %>%
+  summarise(Sales = sum(Sales)) %>%
+  arrange(desc(Sales))
+
+ggplot(df_sales, aes(x = reorder(`Sub-Category`, Sales), y = Sales, fill = Category)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_fill_manual(values = c("#003049", "#d62828", "#f77f00")) +
+  labs(title = "Total Sales per Sub-Category", x = "Sub-Category", y = "Sales") +
+  theme(legend.title = element_blank())
+```
+
+The visualization above shows a general overview of the magnitude of sales for each product sub-category. For technology category, phones are the top sales-generating products. Chairs products for furniture category, and storage products for office supplies category. Throughout the 4-year period from 2011 - 2014, phones, chairs, and storage products are the three most sales-generating products. Along with them are tables, binders, and machine products.
+
+Under the technology category, copier products are the least performing. For the furniture and office supplies category, furnishings and fasteners are the least performing.
+
+It is worth noting that phones and chairs products sales, which are significantly higher than the rest of the sub-categories, belong to Technology and Furniture product categories, products that are generally expensive.
+
+```{r yearly-sales-subcat}
+yearly_sales_sub <- data %>%
+  group_by(`Sub-Category`, year) %>%
+  summarise(Sales = sum(Sales)) %>%
+  ungroup()
+
+ggplot(yearly_sales_sub, aes(x = `Sub-Category`, y = Sales, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("#177e89", "#db3a34", "#ffc857", "#084c61")) +
+  labs(title = "Yearly Sales per Sub-category", x = "Sub-Category", y = "Sales") +
+  theme(
+    axis.text.x = element_text(angle = 50, hjust = 1),
+    legend.title = element_blank()
+  )
+```
+
+Shown is how sales on different products had changed over the 4-year period. For some product categories, sales had been fastest growing in 2014. This was not the case for bookcases, machines, supplies, and tables, which all saw a slow growth in sales in the same year. In 2012, products under binders, phones, storages, supplies, and tables experienced negative growth in sales, especially machine products.
+
+```{r annual-growth-rate}
+yearly_growth <- yearly_sales_sub %>%
+  group_by(`Sub-Category`) %>%
+  mutate(yearly_growth_rate = (Sales / lag(Sales) - 1) * 100) %>%
+  summarise(yearly_growth_rate = mean(yearly_growth_rate, na.rm = TRUE)) %>%
+  arrange(desc(yearly_growth_rate))
+
+yearly_growth
+```
+
+By average sales annual growth rate, envelope products had been the slowest while supplies products had been the fastest at 185% annual average growth rate (AAGR), followed by copier and appliances products at 86% and 43% AAGR, respectively.
+
+**Key Findings:**
+1. During the 4-year period, phones generated the most sales under the technology category, chairs for the furniture category, and storage products for office supplies category. These three are followed by tables, binders, and machine products. On the other hand, copiers, furnishings, and fasteners are the least sales-generating products under the technology, furniture, and office supplies category, respectively.
+
+2. Yearly sales had been variable for each product sub-category. No apparent pattern is visible on them. For phones, binders, appliances, and accessories, sales growth was fastest in 2014. For copiers, machines and tables, it was in 2013.
+
+3. By average annual sales growth, supplies, copiers, and appliances were the top 3 fastest growing. On the other hand, envelopes, chairs, and machines are the top 3 slowest growing.
+
+
+## 3.3. Geographic Insights
+
+How does sales performance vary across the regions? Are there promising geographical regions or areas requiring improved marketing?
+
+```{r regional-monthly-trend}
+# Prepare data for each year
+years <- 2011:2014
+plots <- list()
+
+for (y in years) {
+  df <- data %>%
+    filter(year == y) %>%
+    group_by(Region, month) %>%
+    summarise(Sales = sum(Sales)) %>%
+    ungroup()
+
+  p <- ggplot(df, aes(x = month, y = Sales, color = Region)) +
+    geom_line(size = 1.5) +
+    scale_color_manual(values = c(
+      "Central" = "#fb8500", "South" = "#d62828",
+      "West" = "#219ebc", "East" = "#023047"
+    )) +
+    labs(
+      title = paste("Regional Monthly Sales Trend (", y, ")", sep = ""),
+      x = "Month", y = "Total Sales"
+    ) +
+    scale_x_continuous(breaks = 1:12, labels = month.abb) +
+    theme(legend.title = element_blank())
+
+  plots[[as.character(y)]] <- p
+}
+
+gridExtra::grid.arrange(grobs = plots, ncol = 1)
+```
+
+As shown before, seasonal trend occurred, with sales increasing in holidays (November and December), opening of classes (September), and possibly Easter (March). This is also the case with regional sales data per year. Total sales has been generally higher most of the year in the West, followed by the East compared to the remaining two regions. Sales in the South has been lower each year compared to other regions with the exception in March 2011 when sales in the South was more than thrice the next best performer.
+
+```{r regional-subcat-sales}
+reg_sub <- data %>%
+  group_by(Region, `Sub-Category`) %>%
+  summarise(Sales = sum(Sales)) %>%
+  ungroup()
+
+ggplot(reg_sub, aes(x = `Sub-Category`, y = Sales, fill = Region)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c(
+    "Central" = "#fb8500", "South" = "#d62828",
+    "West" = "#219ebc", "East" = "#023047"
+  )) +
+  labs(
+    title = "Total Sales per Product Sub-category (by Region)",
+    x = "Product Sub-category", y = "Total Sales"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.title = element_blank()
+  )
+```
+
+Sales for most sub-categories has been lower in the South and higher in the West. For certain products, sales has been significantly lower in the South. For instance, sales for chairs and copiers products in the South are significantly lower compared to all other regions, while machine and table products sales has been higher in the South than in other Regions. For most sub-categories, sales in the Central region was just slightly higher than that of the South. Another notable observation from this is that sales of certain products sub-category are significantly higher in the West than all other remaining regions. Those products are table, office supplies, and technology accessories.
+
+The dataset is fictional and does not provide background information about the regions. However, based on the sales, it can be hypothesized that more offices and business districts are probably located in the West and in the East than in Central and South regions. Office supplies sales like storages, binders, and appliances are significantly lower in the South and Central than the remaining regions. Conversely, sales for these products and tech ones are higher in the West and in the East. However, it is worth noting that the second highest sales for machine products was in the South.
+
+Take note that this sales refer to total sales from 2011 - 2014 in each region, which does not show how sales behaved throughout the years. This visualization rather intends to show a rough estimate of the magnitude of sales for different products in each region.
+
+```{r yearly-sales-region}
+year_s <- data %>%
+  group_by(Region, year) %>%
+  summarise(Sales = sum(Sales)) %>%
+  ungroup()
+
+ggplot(year_s, aes(x = Region, y = Sales, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("#177e89", "#db3a34", "#ffc857", "#084c61")) +
+  labs(title = "Yearly sales per region", x = "Region", y = "Sales") +
+  theme(legend.title = element_blank())
+```
+
+Shown is how sales for each region changed over time. In the Central region, a sharp positive growth was observed from 2013, while yearly positive growth was consistent in the East. For the South region, a negative growth was observed in 2012, but the region rebounded thereafter. Similarly for the West, negative growth was observed in 2012, but rebounded and sustained positive growth thereafter.
+
+It was observed that there was a slight dip in total sales in 2012. From the visualization above, it can be inferred that South had contributed the most to that dip, followed by the West and then the Central. Interestingly, the East region still grew positively in 2012.
+
+```{r regional-aagr}
+year_s_growth <- year_s %>%
+  group_by(Region) %>%
+  mutate(yearly_growth_rate = (Sales / lag(Sales) - 1) * 100) %>%
+  summarise(yearly_growth_rate = mean(yearly_growth_rate, na.rm = TRUE)) %>%
+  ungroup()
+
+year_s_growth
+```
+
+Using the Sales Average Annual Growth Rate (AAGR) of each region for the 4-year period, we see that the West had been the fastest growing Region in terms of sales, followed by the East, and then the Central region, and then South. Further investigation can be done to understand possible factors that may affect the differences which include economic factor, market conditions (saturation), consumer preference, among others.
+
+*Average Annual Growth Rate (AAGR) is calculated by getting the arithmetic mean of the yearly growth rates*
+
+**Key Findings:**
+1. Seasonal trend was also present within each region. For all, sales generally increase towards the end of the year - November and December. Significant increase also happened in September, which can be attributed to the opening of classes. One thing to support this is the increased sales of school-related products and the increased sales under consumer segment during September. Monthly sales has been higher most of the year in the West followed by the East, compared to the remaining two regions. Sales in the South has been lower most of each year compared to other regions with the exception in March 2011 when sales in the South was more than thrice the next best performer.
+
+2. Sales for most sub-categories had been lower in the South and higher in the West. Specifically, sales of office supplies and technology products are relatively higher in the West and in the East, while tables and machine products are higher in the South. For Central, sales had been generally consistent on most sub-categories. Sales for office supplies products such as art, envelopes, fasteners, and labels had been generally equal among all regions.
+3. All regions recorded negative growth in 2012, except for Central which had positive growth.
+
+4. By Sales Average Annual Growth Rate (AAGR) West had been the fastest-growing, followed by East, then Central, and then the South. (Relative growth rates comparison can also be done). Central was performing moderately well but not as strongly as the West and East.
+
+## 3.4. Profitability
+
+Which products are more profitable and which were not? With the available data, what factors affected the company's profit? How is the company's profitability during the period?
+
+```{r yearly-profit-summary}
+yearly_summary <- data %>%
+  group_by(year) %>%
+  summarise(
+    Sales = sum(Sales),
+    net_profit = sum(net_profit)
+  ) %>%
+  mutate(profit_margin = (net_profit / Sales) * 100)
+
+yearly_summary
+```
+
+Using profit margin, the company had generated the least profit in 2011 at 10.2311%. After a year, 2012, the company generated relatively higher profit at 13.0955% margin. This continued and the company registered a higher profit margin in 2013 at 13.4315%. The trend, however, slowed down and the company generated a lower profit margin at 12.7404%, even lower than that of 2012.
+
+*While profit margin is a good metric, it is not the only metric to understand the financial performance of the company. However, since this dataset primarily contains sales data and is not a comprehensive company data (does not include data on Cost of Goods Sold (COGS), shareholder's equity, operating income, etc.) the analysis will make use of profit margin.*
+
+```{r profit-margin-subcat}
+profit_margin_df <- data %>%
+  group_by(Category, `Sub-Category`) %>%
+  summarise(profit_margin = mean(profit_margin, na.rm = TRUE)) %>%
+  ungroup()
+
+profit_margin_df
+```
+
+```{r profit-margin-furniture}
+furniture_profit <- profit_margin_df %>%
+  filter(Category == "Furniture") %>%
+  select(`Sub-Category`, profit_margin)
+
+ggplot(furniture_profit, aes(x = profit_margin, y = reorder(`Sub-Category`, profit_margin))) +
+  geom_bar(stat = "identity", fill = "#1d3557", width = 0.8) +
+  labs(title = "Furnitures average profit margin", x = "Profit Margin (%)", y = "")
+```
+
+For furniture products, furnishings products, on average, are the most profitable followed by chairs products. On the other hand, the company was operating at a loss on tables and bookcases products. Assuming similar sales, loss on tables are higher than gains on furnishings.
+
+```{r profit-margin-office}
+office_profit <- profit_margin_df %>%
+  filter(Category == "Office Supplies") %>%
+  select(`Sub-Category`, profit_margin)
+
+ggplot(office_profit, aes(x = profit_margin, y = reorder(`Sub-Category`, profit_margin))) +
+  geom_bar(stat = "identity", fill = "#1d3557", width = 0.8) +
+  labs(title = "Office Supplies average profit margin", x = "Profit Margin (%)", y = "")
+```
+
+For office supplies, average profit margins vary widely. Labels, paper, envelopes, and fasteners have high profit margins (around 30-43%), while binders, appliances, and storage have lower or negative margins. Binders show the highest loss on average.
+
+```{r profit-margin-tech}
+tech_profit <- profit_margin_df %>%
+  filter(Category == "Technology") %>%
+  select(`Sub-Category`, profit_margin)
+
+ggplot(tech_profit, aes(x = profit_margin, y = reorder(`Sub-Category`, profit_margin))) +
+  geom_bar(stat = "identity", fill = "#1d3557", width = 0.8) +
+  labs(title = "Technology average profit margin", x = "Profit Margin (%)", y = "")
+```
+
+On technology products, the company, on average, was profiting more compared to furniture ones. Three of its product sub-categories were generating profit at much higher margin profit: 12% for phones, 22% for tech accessories, and 32% profit margin for copiers products. The company, on the other hand, machines products, was operating at a loss with machine products.
+
+# Conclusion
+
+Based on the exploratory data analysis, we have gained several insights into the Superstore's sales and profitability.
+
+- **Sales Performance**: Sales have been growing annually with seasonal peaks in November, December, and September. However, sales exhibited high variability, particularly in March, September, and October. The dip in 2012 suggests a need to investigate potential causes.
+
+- **Product Categories**: Phones, chairs, and storage products are top performers in sales, while copiers, furnishings, and fasteners are underperforming. The high growth rates of supplies, copiers, and appliances indicate potential areas for investment.
+
+- **Geographic Insights**: The West and East regions outperform Central and South in most categories. The South lags in many product sales, suggesting a need for targeted marketing. The Central region showed consistent growth and could be a focus for expansion.
+
+- **Profitability**: Overall profit margins are healthy but declined slightly in 2014. Products like furnishings, copiers, and labels are highly profitable, while tables, bookcases, and binders are loss-making. Discounts appear to negatively impact profit margins, especially for tables and office supplies.
+
+# Recommendations
+
+1. **Focus on High-Performing Products**: Invest in marketing and inventory for phones, chairs, storage, and other top-selling categories. Consider discontinuing or reevaluating underperforming products like copiers, furnishings, and fasteners.
+
+2. **Optimize Pricing and Discounts**: Analyze the impact of discounts on profitability. Consider reducing discounts on loss-making products like tables and bookcases. Implement dynamic pricing strategies.
+
+3. **Regional Strategies**: Develop targeted marketing campaigns for the South and Central regions to boost sales. Leverage the strong performance in the West and East as benchmarks. Consider opening new stores or expanding operations in high-growth regions.
+
+4. **Seasonal Planning**: Prepare for seasonal sales peaks by increasing inventory and staffing during November, December, and September. Use historical data to forecast demand and optimize supply chain.
+
+5. **Product Mix Optimization**: Re-evaluate the product mix to emphasize high-margin items like furnishings, copiers, and labels. Consider phasing out or repositioning low-margin products.
+
+6. **Invest in Technology**: Leverage data analytics to continuously monitor sales and profitability. Implement a dashboard for real-time performance tracking.
+
+# References
+
+- Kaggle Superstore Sales Dataset: https://www.kaggle.com/datasets/ishanshrivastava28/superstore-sales
+- R packages: readxl, dplyr, tidyr, lubridate, ggplot2, scales, knitr, gridExtra.

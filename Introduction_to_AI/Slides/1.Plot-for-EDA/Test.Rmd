@@ -1,0 +1,342 @@
+---
+title: "Various Plots and their uses"
+subtitle: "Scatter, Histogram, Density, Boxplot, Violin, Heatmap & Correlation"
+author: "Dr. Ankit Deshmukh"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: journal
+    highlight: tango
+    toc: true
+    toc_float: true
+    code_folding: show
+    fig_caption: true
+    self_contained: true
+header-includes:
+  - <link rel="preconnect" href="https://fonts.googleapis.com">
+  - <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  - <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  - <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap" rel="stylesheet">
+  - |
+    <style>
+      /* HTML document body uses Roboto Serif */
+      body, p, li, div, .main-container, .navbar, .navbar-brand, .nav-link,
+      .table, .caption, .footer, .tocify, .tocify-header, .tocify-item {
+        font-family: 'Roboto Serif', serif !important;
+      }
+      h1, h2, h3, h4, h5, h6, .title, .subtitle {
+        font-family: 'Noto Serif', serif !important;
+        font-weight: 700;
+      }
+      /* Code blocks use Roboto Mono */
+      pre, code, kbd, samp, .hljs, .sourceCode {
+        font-family: 'Roboto Mono', monospace !important;
+      }
+      .caption {
+        font-family: 'Noto Serif', serif !important;
+        font-style: italic;
+      }
+    </style>
+---
+
+```{r setup, include=FALSE}
+# 1. Load required libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(viridis)
+library(reshape2)  # for melting correlation matrices
+library(showtext)  # enables Google Fonts in R plots
+
+# 2. Add Google Fonts for use in R graphics
+#    Must be called BEFORE theme_set()
+font_add_google("Noto Serif", "noto")
+font_add_google("Roboto Mono", "roboto")
+showtext_auto()  # automatically use these fonts for all subsequent plots
+
+# 3. Global knitr options
+#    Key fixes: explicit dpi handling and Cairo device for proper font rendering
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 6,
+  out.width = "90%",
+  dpi = 300,        # Explicit DPI (replaces fig.retina for reliability)
+  dev = "png",      # Use PNG device
+  dev.args = list(type = "cairo")  # Cairo ensures showtext compatibility
+)
+
+# 4. Set a LARGER, print-friendly theme for all plots
+#    Now that fonts are loaded, we can reference "noto" safely
+theme_set(
+  theme_minimal(base_size = 18, base_family = "noto") +
+    theme(
+      plot.title = element_text(face = "bold", hjust = 0.5, size = 24, family = "noto"),
+      plot.subtitle = element_text(hjust = 0.5, color = "gray30", size = 18, family = "noto"),
+      axis.title = element_text(size = 18, family = "noto"),
+      axis.text = element_text(size = 16, family = "noto"),
+      legend.title = element_text(size = 16, family = "noto"),
+      legend.text = element_text(size = 14, family = "noto"),
+      strip.text = element_text(size = 16, face = "bold", family = "noto"),
+      legend.position = "bottom"
+    )
+)
+```
+
+# Introduction
+
+**ggplot2** implements the *Grammar of Graphics*, a systematic approach to building plots layer-by-layer.
+Every plot follows a consistent structure:
+
+1. **Data** – the dataset
+2. **Aesthetics (`aes`)** – map variables to visual properties (x, y, colour, size)
+3. **Geoms** – geometric objects (`geom_point()`, `geom_bar()`, …)
+4. **Scales** – control mapping from data to visual space
+5. **Facets** – sub-plots by categorical variables
+
+This document walks through seven essential chart types, explains **when** to use each, and shows **how** to implement them.
+
+---
+
+# 1. Scatter Plots
+
+### Utility
+
+- **Purpose**: Visualise the relationship between **two continuous variables**.
+- **What to look for**: Direction (positive/negative), form (linear/non-linear), strength (tight vs. loose cluster), and outliers.
+- **Best for**: Hypothesis generation about correlation, trend detection, and identifying data gaps.
+
+### Implementation
+
+`geom_point()` is the workhorse. Additional layers like `geom_smooth()` add trend lines.
+
+```{r scatter}
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(aes(color = factor(cyl)), size = 3, alpha = 0.8) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", linetype = "dashed") +
+  scale_color_viridis_d(name = "Cylinders") +
+  labs(
+    title = "Vehicle Weight vs. Fuel Efficiency",
+    subtitle = "Coloured by cylinder count with linear trend line",
+    x = "Weight (1000 lbs)",
+    y = "Miles per Gallon"
+  )
+```
+
+**Key arguments**: `alpha` for transparency (handles over-plotting), `size` for point emphasis, and `color`/`fill` for grouping.
+
+---
+
+# 2. Histograms
+
+### Utility
+
+- **Purpose**: Show the **distribution** of a single continuous variable by binning values.
+- **What to look for**: Skewness (tail direction), modality (number of peaks), spread, and gaps.
+- **Best for**: Initial data exploration, detecting data entry errors, and understanding central tendency.
+
+### Implementation
+
+`geom_histogram()` counts observations per bin. Choose `binwidth` carefully – too wide hides detail, too narrow creates noise.
+
+```{r histogram}
+ggplot(mtcars, aes(x = mpg)) +
+  geom_histogram(binwidth = 2, fill = "steelblue", color = "white", alpha = 0.9) +
+  labs(
+    title = "Distribution of Miles per Gallon",
+    subtitle = "Binwidth = 2",
+    x = "MPG",
+    y = "Count"
+  )
+```
+
+**Tip**: Overlay a density curve (next section) by setting `aes(y = after_stat(density))` to compare the histogram with a smooth estimate.
+
+---
+
+# 3. Density Plots
+
+### Utility
+
+- **Purpose**: A **smoothed** version of the histogram – estimates the probability density function.
+- **What to look for**: Same as histograms, but easier to compare **multiple groups** on the same axes without bin-artefacts.
+- **Best for**: Comparing distributions across categories (e.g., MPG by number of cylinders).
+
+### Implementation
+
+`geom_density()` uses a kernel smoother. The `adjust` parameter controls smoothness (higher = smoother).
+
+```{r density}
+ggplot(mtcars, aes(x = mpg, fill = factor(cyl))) +
+  geom_density(alpha = 0.5, adjust = 1.5) +
+  scale_fill_viridis_d(name = "Cylinders") +
+  labs(
+    title = "Density of MPG by Cylinder Count",
+    subtitle = "Transparent overlap highlights differences in distribution shape",
+    x = "MPG",
+    y = "Density"
+  )
+```
+
+**When to prefer over histograms**: When sample size is small, or you need a clean visual for overlapping groups.
+
+---
+
+# 4. Boxplots
+
+### Utility
+
+- **Purpose**: Display the **five-number summary** (min, Q1, median, Q3, max) and outliers.
+- **What to look for**: Median differences, interquartile range (IQR), symmetry of the middle 50%, and extreme points.
+- **Best for**: **Comparing distributions across several categorical groups** in a compact, statistically robust way.
+
+### Implementation
+
+`geom_boxplot()` – whiskers extend to 1.5×IQR; beyond that are plotted as points.
+
+```{r boxplot}
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_boxplot(outlier.color = "red", outlier.size = 2.5, alpha = 0.8) +
+  scale_fill_viridis_d(name = "Cylinders") +
+  labs(
+    title = "MPG Distribution by Cylinder Count",
+    subtitle = "Red points indicate potential outliers",
+    x = "Cylinders",
+    y = "MPG"
+  ) +
+  theme(legend.position = "none")
+```
+
+**Utility in practice**: Quickly see if groups have different medians, spreads, and whether outliers exist.
+
+---
+
+# 5. Violin Plots
+
+### Utility
+
+- **Purpose**: Combine a boxplot with a **mirrored density plot** – shows the full shape of the distribution *and* summary statistics.
+- **What to look for**: Multi-modality (multiple peaks) within groups, which boxplots hide.
+- **Best for**: Rich group comparisons when you suspect complex distributions (e.g., bimodal data).
+
+### Implementation
+
+`geom_violin()` with `trim = FALSE` keeps the tails. Add `draw_quantiles` to overlay quartile lines.
+
+```{r violin}
+ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
+  geom_violin(trim = FALSE, draw_quantiles = c(0.25, 0.5, 0.75), alpha = 0.7) +
+  scale_fill_viridis_d(name = "Cylinders") +
+  labs(
+    title = "Violin Plot of MPG by Cylinders",
+    subtitle = "Quartile lines (25%, 50%, 75%) are superimposed",
+    x = "Cylinders",
+    y = "MPG"
+  ) +
+  theme(legend.position = "none")
+```
+
+**Combination tip**: Overlay `geom_boxplot(width = 0.1)` on top of a violin to keep the summary visible while showing the density.
+
+---
+
+# 6. Heatmaps
+
+### Utility
+
+- **Purpose**: Encode a matrix of numeric values using colour intensity.
+- **What to look for**: Patterns, clusters, and gradients across two categorical/discretised dimensions.
+- **Best for**: Visualising **aggregated tables** (e.g., average sales by region and quarter), confusion matrices, or any 2-D grid of values.
+
+### Implementation
+
+`geom_tile()` creates rectangular cells. Use `geom_text()` to overlay actual numbers if the grid is small.
+
+```{r heatmap}
+# Create aggregated data: average MPG by gear and cylinder
+heat_data <- mtcars %>%
+  group_by(gear, cyl) %>%
+  summarise(avg_mpg = mean(mpg), .groups = "drop")
+
+ggplot(heat_data, aes(x = factor(gear), y = factor(cyl), fill = avg_mpg)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = round(avg_mpg, 1)), color = "black", size = 5) +
+  scale_fill_viridis_c(option = "plasma", name = "Avg MPG") +
+  labs(
+    title = "Average MPG by Gear and Cylinders",
+    subtitle = "Darker colours indicate higher fuel efficiency",
+    x = "Number of Gears",
+    y = "Cylinders"
+  )
+```
+
+**Note**: Use `coord_fixed()` if you need square tiles, especially when both axes have the same scale.
+
+---
+
+# 7. Correlation Matrices
+
+### Utility
+
+- **Purpose**: Visualise **pairwise correlations** between multiple numeric variables.
+- **What to look for**: Strong positive (red) / negative (blue) relationships at a glance.
+- **Best for**: Multicollinearity diagnosis in regression modelling, and initial feature selection.
+
+### Implementation
+
+Compute `cor()` on numeric columns, `melt()` into long format, then plot with a **diverging** colour scale (midpoint = 0).
+
+```{r correlation}
+corr_matrix <- round(cor(mtcars), 2)
+corr_melt <- melt(corr_matrix, varnames = c("Var1", "Var2"))
+
+ggplot(corr_melt, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = value), size = 3.5, color = "black") +
+  scale_fill_gradient2(
+    low = "#2c3e50",    # dark blue for negative
+    mid = "white",      # zero
+    high = "#e74c3c",   # red for positive
+    midpoint = 0,
+    limit = c(-1, 1),
+    name = "Correlation"
+  ) +
+  labs(
+    title = "Correlation Matrix of mtcars Variables",
+    subtitle = "Values range from -1 (negative) to +1 (positive)"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title = element_blank()
+  )
+```
+
+**Why diverging colours?** They make the sign and magnitude immediately obvious. `scale_fill_gradient2` is perfect for this.
+
+---
+
+# Quick Comparison Table
+
+| Plot            | Geom                  | Data Types                     | Primary Utility                                           |
+|-----------------|-----------------------|--------------------------------|-----------------------------------------------------------|
+| **Scatter**     | `geom_point()`        | 2 continuous                   | Relationship, trends, clustering, outliers                |
+| **Histogram**   | `geom_histogram()`    | 1 continuous                   | Distribution shape, skewness, modality                    |
+| **Density**     | `geom_density()`      | 1 continuous (+ fill groups)   | Smoothed distribution, compare multiple groups            |
+| **Boxplot**     | `geom_boxplot()`      | 1 continuous + 1 categorical   | Summarise and compare distributions (medians, IQR)        |
+| **Violin**      | `geom_violin()`       | 1 continuous + 1 categorical   | Full distribution + summary for group comparisons         |
+| **Heatmap**     | `geom_tile()`         | 2 categorical (values)         | Visualise 2-D aggregated metrics / patterns               |
+| **Correlation** | `geom_tile()`         | Many numeric → matrix          | Spot collinearity, feature relationships at scale         |
+
+---
+
+# Conclusion
+
+Mastering these seven visualisations covers **90%** of day-to-day exploratory data analysis needs.
+Remember the **layered** philosophy of ggplot2:
+
+> *Data → Aesthetics → Geoms → Scales → Facets → Themes*
+
+Start simple, then iteratively add labels, colors, and statistical layers to tell a compelling data story.

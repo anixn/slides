@@ -1,0 +1,893 @@
+---
+title: "Regression Analysis in R: A Complete Guide for Undergraduate Students"
+subtitle: "Linear Regression, Multiple Regression, LDA, and Other Regression Techniques"
+author: "Dr. Ankit Deshmukh"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: journal
+    highlight: tango
+    toc: true
+    toc_float: true
+    code_folding: show
+    fig_caption: true
+    self_contained: true
+header-includes:
+  - <link rel="preconnect" href="https://fonts.googleapis.com">
+  - <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  - <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  - <link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap" rel="stylesheet">
+  - |
+    <style>
+      body, p, li, div, .main-container, .navbar, .navbar-brand, .nav-link,
+      .table, .caption, .footer, .tocify, .tocify-header, .tocify-item {
+        font-family: 'Roboto Serif', serif !important;
+      }
+      h1, h2, h3, h4, h5, h6, .title, .subtitle {
+        font-family: 'Noto Serif', serif !important;
+        font-weight: 700;
+      }
+      pre, code, kbd, samp, .hljs, .sourceCode {
+        font-family: 'Roboto Mono', monospace !important;
+      }
+      .caption {
+        font-family: 'Noto Serif', serif !important;
+        font-style: italic;
+      }
+      .highlight-box {
+        background-color: #f0f8ff;
+        border-left: 5px solid #4682b4;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 0 5px 5px 0;
+      }
+      .warning-box {
+        background-color: #fff3cd;
+        border-left: 5px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 0 5px 5px 0;
+      }
+      .key-concept {
+        background-color: #e8f5e9;
+        border-left: 5px solid #4caf50;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 0 5px 5px 0;
+      }
+    </style>
+---
+
+```{r setup, include=FALSE}
+# 1. Load required libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(viridis)
+library(MASS) # for LDA
+library(gridExtra) # for arranging multiple plots
+library(corrplot) # for correlation visualization
+library(showtext) # enables Google Fonts in R plots
+
+# 2. Add Google Fonts for use in R graphics
+font_add_google("Noto Serif", "noto")
+font_add_google("Roboto Mono", "roboto")
+showtext_auto()
+
+# 3. Global knitr options
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 6,
+  out.width = "100%",
+  # dpi = 300, # Explicit DPI (replaces fig.retina for reliability)
+  dev = "png", # Use PNG device
+  dev.args = list(type = "cairo") # Cairo ensures showtext compatibility
+)
+
+# 4. Set a LARGER, print-friendly theme for all plots
+#    Now that fonts are loaded, we can reference "noto" safely
+
+theme_set(
+  theme_minimal(base_size = 55, base_family = "noto") +
+    theme(
+      # Main Titles
+      plot.title      = element_text(size = 55, face = "bold", hjust = 0.5, family = "noto"),
+      plot.subtitle   = element_text(size = 55, hjust = 0.5, color = "gray30", family = "noto"),
+      plot.caption    = element_text(size = 55, hjust = 1, family = "noto"),
+
+      # Axis Titles (X and Y)
+      axis.title      = element_text(size = 55, family = "noto"),
+      axis.title.x    = element_text(size = 55, family = "noto"),
+      axis.title.y    = element_text(size = 55, family = "noto"),
+
+      # Axis Tick Labels (Numbers / Category Names)
+      axis.text       = element_text(size = 55, family = "noto"),
+      axis.text.x     = element_text(size = 55, family = "noto"),
+      axis.text.y     = element_text(size = 55, family = "noto"),
+
+      # Legend Elements
+      legend.title    = element_text(size = 55, family = "noto"),
+      legend.text     = element_text(size = 55, family = "noto"),
+      legend.position = "bottom",
+
+      # Facet Grid / Wrap Strip Labels
+      strip.text      = element_text(size = 55, face = "bold", family = "noto"),
+      strip.text.x    = element_text(size = 55, face = "bold", family = "noto"),
+      strip.text.y    = element_text(size = 55, face = "bold", family = "noto")
+    )
+)
+
+# 5. Define a beautiful color palette for iris species
+iris_colors <- c("setosa" = "#E74C3C", "versicolor" = "#3498DB", "virginica" = "#2ECC71")
+```
+
+# Introduction to Regression Analysis
+
+## What is Regression?
+
+**Regression analysis** is one of the most fundamental and widely used statistical techniques in data science, machine learning, and scientific research. At its core, regression helps us understand **relationships between variables** and make **predictions** based on those relationships.
+
+<div class="key-concept">
+**Formal Definition**: Regression is a statistical method for estimating the relationships between a dependent variable (often called the **response** or **outcome**) and one or more independent variables (called **predictors**, **features**, or **explanatory variables**).
+</div>
+
+### The Story of Regression
+
+The term "regression" was coined by **Sir Francis Galton** in the 19th century. While studying the heights of parents and their children, Galton observed that children's heights tended to "regress" toward the average height of the population. This phenomenon, called **regression toward the mean**, gave birth to the statistical technique we use today.
+
+### Why Do We Need Regression?
+
+Imagine you are a botanist studying iris flowers. You might ask:
+
+- *"Can I predict the petal length of an iris flower based on its sepal length?"*
+- *"How do multiple measurements together help classify iris species?"*
+- *"What is the relationship between different flower parts?"*
+
+Regression helps answer these questions quantitatively. It allows us to:
+
+1. **Predict** unknown values based on known information
+2. **Explain** how changes in one variable affect another
+3. **Control** for confounding variables
+4. **Classify** observations into categories (via logistic regression or LDA)
+
+---
+
+# Understanding the Iris Dataset
+
+## The Iris Flower: Botanical Background
+
+Before diving into regression, let's understand our dataset. The **Iris dataset** is perhaps the most famous dataset in statistics and machine learning, introduced by **Sir Ronald A. Fisher** in his 1936 paper on discriminant analysis.
+
+The dataset contains measurements of **150 iris flowers** from three species:
+- **Iris setosa** (50 flowers)
+- **Iris versicolor** (50 flowers)
+- **Iris virginica** (50 flowers)
+
+### Sepal vs. Petal: What's the Difference?
+
+Understanding flower anatomy is crucial for understanding this dataset:
+
+| Term | Description | Function |
+|------|-------------|----------|
+| **Sepal** | The outer, leaf-like protective structures of a flower bud | Protect the flower before it blooms; often green and photosynthetic |
+| **Petal** | The inner, often colorful structures of a flower | Attract pollinators with color and scent |
+
+In the iris flower:
+- **Sepals** are the three outer segments that hang downward (called "falls" in iris terminology)
+- **Petals** are the three inner segments that stand upright (called "standards")
+
+### Visual Reference: The Iris Flower
+
+![Labeled Iris Flower Anatomy](https://kimi-web-img.kimi.ai/img/www.fs.usda.gov/84a35e689d97936715e41c5ef23b95ac9ba07135.jpg)
+
+*Figure 1: Anatomy of an iris flower showing petals (standards) and sepals (falls). Source: USDA Forest Service.*
+
+![Three Iris Species Comparison](https://kimi-web-img.kimi.ai/img/camo.githubusercontent.com/2b1e62221e560f9ffa2348d0dcb7df2dd61f03c6)
+
+*Figure 2: The three iris species in our dataset. Notice the differences in petal and sepal sizes. Source: GitHub educational repository.*
+
+## The Four Measurements
+
+For each flower, four measurements were recorded (in centimeters):
+
+1. **Sepal.Length** – Length of the sepal
+2. **Sepal.Width** – Width of the sepal
+3. **Petal.Length** – Length of the petal
+4. **Petal.Width** – Width of the petal
+
+## Loading and Exploring the Data
+
+```{r load-data}
+# Load the iris dataset (built into R)
+data(iris)
+
+# View the first few rows
+head(iris, 10)
+```
+
+```{r data-summary}
+# Summary statistics for each variable
+summary(iris)
+```
+
+```{r structure}
+# Check the structure of the dataset
+str(iris)
+```
+
+<div class="highlight-box">
+**Key Observation**: The iris dataset has 150 observations and 5 variables – 4 numeric measurements and 1 categorical variable (Species) with 3 levels.
+</div>
+
+## Visualizing the Data
+
+```{r species-count}
+# Count flowers per species
+ggplot(iris, aes(x = Species, fill = Species)) +
+  geom_bar(color = "white", linewidth = 1.5) +
+  scale_fill_manual(values = iris_colors) +
+  geom_text(
+    stat = "count", aes(label = after_stat(count)),
+    vjust = -0.5, size = 6, fontface = "bold"
+  ) +
+  labs(
+    title = "Distribution of Iris Species",
+    subtitle = "50 flowers from each of the three species",
+    x = "Species",
+    y = "Count"
+  ) +
+  theme(legend.position = "none") +
+  ylim(0, 60)
+```
+
+```{r pair-plot}
+# Create a scatterplot matrix to see all relationships
+pairs(iris[, 1:4],
+  col = iris_colors[iris$Species],
+  pch = 19,
+  main = "Scatterplot Matrix of Iris Measurements",
+  cex.labels = 1.5
+)
+```
+
+---
+
+# Part 1: Simple Linear Regression
+
+## What is Simple Linear Regression?
+
+**Simple Linear Regression (SLR)** is the simplest form of regression. It models the relationship between **two continuous variables** using a straight line.
+
+### The Mathematical Model
+
+$$Y = \beta_0 + \beta_1 X + \varepsilon$$
+
+Where:
+- $Y$ = Dependent variable (response)
+- $X$ = Independent variable (predictor)
+- $\beta_0$ = Intercept (value of Y when X = 0)
+- $\beta_1$ = Slope (change in Y for a one-unit change in X)
+- $\varepsilon$ = Error term (random noise)
+
+<div class="key-concept">
+**The Goal**: Find the "best-fit" line that minimizes the sum of squared errors (differences between observed and predicted values). This is called the **Least Squares Method**.
+</div>
+
+### Assumptions of Linear Regression
+
+1. **Linearity**: The relationship between X and Y is linear
+2. **Independence**: Observations are independent of each other
+3. **Homoscedasticity**: Constant variance of errors
+4. **Normality**: Errors are normally distributed
+5. **No multicollinearity**: (For multiple regression) Predictors are not highly correlated
+
+## Example: Predicting Petal Length from Sepal Length
+
+Let's predict **Petal.Length** (Y) using **Sepal.Length** (X).
+
+```{r simple-regression}
+# Fit a simple linear regression model
+model_slr <- lm(Petal.Length ~ Sepal.Length, data = iris)
+
+# View the model summary
+summary(model_slr)
+```
+
+### Interpreting the Output
+
+The output shows several important pieces of information:
+
+- **Coefficients**: The estimated $\beta_0$ (intercept) and $\beta_1$ (slope)
+- **R-squared**: Proportion of variance in Y explained by X
+- **p-values**: Statistical significance of coefficients
+- **Residual standard error**: Typical size of prediction errors
+
+```{r slr-plot}
+# Visualize the regression line
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
+  geom_point(aes(color = Species), size = 3, alpha = 0.8) +
+  geom_smooth(
+    method = "lm", se = TRUE, color = "black",
+    linetype = "dashed", linewidth = 1.5
+  ) +
+  scale_color_manual(values = iris_colors) +
+  labs(
+    title = "Simple Linear Regression: Petal Length vs Sepal Length",
+    subtitle = "Black dashed line shows the best-fit regression line",
+    x = "Sepal Length (cm)",
+    y = "Petal Length (cm)"
+  )
+```
+
+<div class="highlight-box">
+**Interpretation**: For every 1 cm increase in Sepal Length, Petal Length increases by approximately 1.86 cm (the slope coefficient). The R-squared value tells us what proportion of variation in Petal Length is explained by Sepal Length.
+</div>
+
+## Checking Model Assumptions
+
+```{r diagnostic-plots}
+# Create diagnostic plots to check assumptions
+par(mfrow = c(2, 2))
+plot(model_slr)
+par(mfrow = c(1, 1))
+```
+
+### Understanding Diagnostic Plots
+
+1. **Residuals vs Fitted**: Should show no pattern (random scatter around 0)
+2. **Normal Q-Q**: Points should fall along the diagonal line
+3. **Scale-Location**: Should show constant variance (horizontal line)
+4. **Residuals vs Leverage**: Identifies influential points
+
+---
+
+# Part 2: Multiple Linear Regression
+
+## What is Multiple Linear Regression?
+
+**Multiple Linear Regression (MLR)** extends simple linear regression by using **two or more predictors** to model the response variable.
+
+### The Mathematical Model
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \varepsilon$$
+
+Where:
+- $X_1, X_2, \ldots, X_p$ are the predictor variables
+- $\beta_1, \beta_2, \ldots, \beta_p$ are the partial regression coefficients
+
+## Example: Predicting Petal Length from All Other Measurements
+
+```{r multiple-regression}
+# Fit multiple linear regression
+model_mlr <- lm(Petal.Length ~ Sepal.Length + Sepal.Width + Petal.Width,
+  data = iris
+)
+
+# View summary
+summary(model_mlr)
+```
+
+### Interpreting Multiple Regression Coefficients
+
+In multiple regression, each coefficient represents the **change in Y for a one-unit change in that predictor, holding all other predictors constant**. This is why they're called **partial regression coefficients**.
+
+```{r mlr-plot}
+# Visualize actual vs predicted values
+iris$predicted_mlr <- predict(model_mlr)
+
+ggplot(iris, aes(x = predicted_mlr, y = Petal.Length)) +
+  geom_point(aes(color = Species), size = 3, alpha = 0.8) +
+  geom_abline(
+    intercept = 0, slope = 1, color = "black",
+    linetype = "dashed", linewidth = 1.5
+  ) +
+  scale_color_manual(values = iris_colors) +
+  labs(
+    title = "Multiple Regression: Actual vs Predicted Petal Length",
+    subtitle = "Points on the dashed line indicate perfect predictions",
+    x = "Predicted Petal Length (cm)",
+    y = "Actual Petal Length (cm)"
+  )
+```
+
+## Model Comparison: SLR vs MLR
+
+```{r model-comparison}
+# Compare R-squared values
+cat(
+  "Simple Linear Regression R-squared:",
+  round(summary(model_slr)$r.squared, 4), "\n"
+)
+cat(
+  "Multiple Linear Regression R-squared:",
+  round(summary(model_mlr)$r.squared, 4), "\n"
+)
+```
+
+<div class="key-concept">
+**Key Insight**: Multiple regression typically has higher R-squared because adding more predictors always improves fit. However, we should use **Adjusted R-squared** for fair comparison, as it penalizes unnecessary predictors.
+</div>
+
+---
+
+# Part 3: Polynomial Regression
+
+## What is Polynomial Regression?
+
+Sometimes relationships are not linear. **Polynomial regression** models curved relationships by including polynomial terms.
+
+$$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \cdots + \varepsilon$$
+
+```{r polynomial-regression}
+# Fit polynomial regression (degree 2)
+model_poly <- lm(Petal.Length ~ Sepal.Length + I(Sepal.Length^2), data = iris)
+
+# Compare with linear model
+summary(model_poly)
+```
+
+```{r poly-plot}
+# Visualize polynomial fit
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
+  geom_point(aes(color = Species), size = 3, alpha = 0.8) +
+  geom_smooth(
+    method = "lm", formula = y ~ poly(x, 2),
+    color = "black", se = TRUE, linewidth = 1.5
+  ) +
+  scale_color_manual(values = iris_colors) +
+  labs(
+    title = "Polynomial Regression (Degree 2)",
+    subtitle = "Curved line captures non-linear relationships",
+    x = "Sepal Length (cm)",
+    y = "Petal Length (cm)"
+  )
+```
+
+---
+
+# Part 4: Logistic Regression
+
+## What is Logistic Regression?
+
+**Logistic regression** is used when the response variable is **categorical** (usually binary). Instead of predicting a continuous value, we predict the **probability** of belonging to a category.
+
+### The Logistic Function
+
+$$P(Y = 1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p)}}$$
+
+The logistic function ensures predicted probabilities are between 0 and 1.
+
+## Example: Classifying Setosa vs Others
+
+```{r logistic-regression}
+# Create binary response: Is it setosa?
+iris$is_setosa <- ifelse(iris$Species == "setosa", 1, 0)
+
+# Fit logistic regression
+model_logit <- glm(
+  is_setosa ~ Sepal.Length + Sepal.Width +
+    Petal.Length + Petal.Width,
+  data = iris, family = binomial
+)
+
+# View summary
+summary(model_logit)
+```
+
+```{r logit-plot}
+# Predict probabilities
+iris$prob_setosa <- predict(model_logit, type = "response")
+
+# Visualize
+ggplot(iris, aes(x = Petal.Length, y = prob_setosa)) +
+  geom_point(aes(color = Species), size = 3, alpha = 0.8) +
+  geom_smooth(
+    method = "glm", method.args = list(family = binomial),
+    color = "black", se = TRUE, linewidth = 1.5
+  ) +
+  scale_color_manual(values = iris_colors) +
+  labs(
+    title = "Logistic Regression: Probability of Being Setosa",
+    subtitle = "S-shaped curve shows probability transition",
+    x = "Petal Length (cm)",
+    y = "Probability of Setosa"
+  )
+```
+
+---
+
+# Part 5: Linear Discriminant Analysis (LDA)
+
+## What is LDA?
+
+**Linear Discriminant Analysis (LDA)** is both a **dimensionality reduction** technique and a **classification** method. Developed by Fisher in 1936 (yes, the same Fisher who gave us the iris dataset!), LDA finds linear combinations of features that best separate classes.
+
+### How Does LDA Work?
+
+LDA makes three key assumptions:
+1. **Normality**: Each class follows a multivariate normal distribution
+2. **Equal covariance matrices**: All classes share the same covariance structure
+3. **Independence**: Observations are independent
+
+The algorithm works in two steps:
+
+1. **Find discriminant axes**: Project data onto directions that maximize between-class variance while minimizing within-class variance
+2. **Classify**: Assign new observations to the class with the closest mean (in discriminant space)
+
+### The Mathematics Behind LDA
+
+LDA seeks to find a projection vector **w** that maximizes:
+
+$$J(w) = \frac{w^T S_B w}{w^T S_W w}$$
+
+Where:
+- $S_B$ = Between-class scatter matrix (measures separation between classes)
+- $S_W$ = Within-class scatter matrix (measures spread within each class)
+
+<div class="key-concept">
+**Intuition**: LDA finds the "best viewing angle" to separate the species. Imagine rotating a 3D scatter plot until the three species are most clearly separated – that's what LDA does mathematically.
+</div>
+
+## Performing LDA on Iris Data
+
+```{r lda-analysis}
+# Perform LDA
+model_lda <- lda(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data = iris)
+# View the model
+model_lda
+```
+
+### Understanding LDA Output
+
+The output shows:
+- **Prior probabilities**: Proportion of each species in the data
+- **Group means**: Average measurements for each species
+- **Coefficients of linear discriminants**: Weights for each variable in creating the discriminant axes
+
+```{r lda-plot}
+# Predict LDA scores
+lda_scores <- predict(model_lda)$x
+
+# Create a data frame for plotting
+lda_df <- data.frame(
+  LD1 = lda_scores[, 1],
+  LD2 = lda_scores[, 2],
+  Species = iris$Species
+)
+
+# Plot LDA projection
+ggplot(lda_df, aes(x = LD1, y = LD2, color = Species)) +
+  geom_point(size = 4, alpha = 0.8) +
+  stat_ellipse(level = 0.95, linewidth = 1.5) +
+  scale_color_manual(values = iris_colors) +
+  labs(
+    title = "LDA Projection of Iris Species",
+    subtitle = "Two linear discriminants separate the three species",
+    x = "Linear Discriminant 1 (LD1)",
+    y = "Linear Discriminant 2 (LD2)"
+  ) +
+  theme(legend.position = "right")
+```
+
+<div class="highlight-box">
+**Amazing Result**: Notice how well-separated the species are in LDA space! Even though we started with 4 dimensions, just 2 discriminant axes capture most of the class separation.
+</div>
+
+## LDA Classification Performance
+
+```{r lda-performance}
+# Predict species
+lda_pred <- predict(model_lda)$class
+
+# Confusion matrix
+confusion_lda <- table(Predicted = lda_pred, Actual = iris$Species)
+print(confusion_lda)
+
+# Calculate accuracy
+accuracy_lda <- sum(diag(confusion_lda)) / sum(confusion_lda)
+cat("\nLDA Classification Accuracy:", round(accuracy_lda * 100, 2), "%\n")
+```
+
+### Visualizing the Confusion Matrix
+
+```{r confusion-plot}
+# Convert confusion matrix to data frame
+confusion_df <- as.data.frame(confusion_lda)
+
+ggplot(confusion_df, aes(x = Actual, y = Predicted, fill = Freq)) +
+  geom_tile(color = "white", linewidth = 2) +
+  geom_text(aes(label = Freq), size = 8, fontface = "bold", color = "white") +
+  scale_fill_gradient(low = "#3498DB", high = "#E74C3C") +
+  labs(
+    title = "LDA Confusion Matrix",
+    subtitle = paste("Accuracy:", round(accuracy_lda * 100, 2), "%"),
+    x = "Actual Species",
+    y = "Predicted Species"
+  ) +
+  theme(legend.position = "none")
+```
+
+---
+
+# Part 6: Other Regression Techniques
+
+## Ridge Regression (L2 Regularization)
+
+**Ridge regression** adds a penalty term to prevent overfitting when predictors are highly correlated.
+
+$$\text{Minimize: } \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2$$
+
+```{r ridge-regression}
+# Ridge regression using glmnet
+library(glmnet)
+
+# Prepare data
+x <- as.matrix(iris[, 1:4])
+y <- iris$Petal.Length
+
+# Fit ridge regression
+model_ridge <- glmnet(x, y, alpha = 0)
+
+# Plot coefficient paths
+plot(model_ridge, xvar = "lambda", label = TRUE)
+title("Ridge Regression: Coefficient Paths", line = 2.5)
+```
+
+## Lasso Regression (L1 Regularization)
+
+**Lasso** (Least Absolute Shrinkage and Selection Operator) can shrink some coefficients to exactly zero, performing variable selection.
+
+$$\text{Minimize: } \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j|$$
+
+```{r lasso-regression}
+# Fit lasso regression
+model_lasso <- glmnet(x, y, alpha = 1)
+
+# Plot coefficient paths
+plot(model_lasso, xvar = "lambda", label = TRUE)
+title("Lasso Regression: Coefficient Paths", line = 2.5)
+```
+
+## Quantile Regression
+
+**Quantile regression** estimates the conditional median or other quantiles of the response variable, rather than the mean.
+
+```{r quantile-regression}
+library(quantreg)
+
+# Fit quantile regression for median (0.5)
+model_quant <- rq(Petal.Length ~ Sepal.Length, data = iris, tau = 0.5)
+
+# Compare with linear regression
+summary(model_quant)
+```
+
+```{r quantile-plot}
+library(ggplot2)
+library(quantreg)
+
+# Visualize multiple quantile regressions with distinct colors
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
+  geom_point(aes(color = Species), size = 3, alpha = 0.7) +
+  scale_color_manual(values = iris_colors) +
+  # Use ggnewscale or map quantiles inside aes() to separate scale mappings
+  geom_quantile(
+    aes(color = factor(after_stat(quantile))),
+    quantiles = c(0.1, 0.5, 0.9),
+    linewidth = 1.5
+  ) +
+  scale_color_manual(
+    values = c("0.1" = "blue", "0.5" = "black", "0.9" = "red"),
+    labels = c("10th Percentile", "50th Percentile (Median)", "90th Percentile"),
+    name = "Quantile"
+  ) +
+  labs(
+    title = "Quantile Regression at Different Levels",
+    subtitle = "Blue: 10th percentile, Black: median, Red: 90th percentile",
+    x = "Sepal Length (cm)",
+    y = "Petal Length (cm)"
+  )
+```
+
+---
+
+# Part 7: Comparing All Methods
+
+## Summary Table
+
+| Method | Type | Response Variable | Key Feature | Best Use Case |
+|--------|------|-------------------|-------------|---------------|
+| **Simple Linear** | Regression | Continuous | One predictor | Basic relationships |
+| **Multiple Linear** | Regression | Continuous | Multiple predictors | Complex relationships |
+| **Polynomial** | Regression | Continuous | Curved relationships | Non-linear patterns |
+| **Logistic** | Classification | Binary/Categorical | Probability estimation | Binary outcomes |
+| **LDA** | Classification | Categorical | Dimension reduction | Multi-class problems |
+| **Ridge** | Regression | Continuous | L2 regularization | Correlated predictors |
+| **Lasso** | Regression | Continuous | L1 regularization | Feature selection |
+| **Quantile** | Regression | Continuous | Robust to outliers | Non-normal errors |
+
+## Performance Comparison
+
+```{r performance-comparison}
+# Create a comparison of R-squared values
+methods <- c("Simple Linear", "Multiple Linear", "Polynomial")
+r_squared <- c(
+  summary(model_slr)$r.squared,
+  summary(model_mlr)$r.squared,
+  summary(model_poly)$r.squared
+)
+
+comparison_df <- data.frame(Method = methods, R_squared = r_squared)
+
+ggplot(comparison_df, aes(x = reorder(Method, R_squared), y = R_squared, fill = R_squared)) +
+  geom_col(color = "white", linewidth = 1.5) +
+  geom_text(aes(label = round(R_squared, 4)), hjust = -0.2, size = 6, fontface = "bold") +
+  scale_fill_gradient(low = "#3498DB", high = "#E74C3C") +
+  coord_flip() +
+  labs(
+    title = "Model Comparison: R-squared Values",
+    subtitle = "Higher values indicate better fit",
+    x = "Method",
+    y = "R-squared"
+  ) +
+  theme(legend.position = "none") +
+  ylim(0, 1.1)
+```
+
+---
+
+# Part 8: Practical Guidelines for Students
+
+## When to Use Which Method?
+
+<div class="warning-box">
+**Common Mistake**: Students often use complex methods when simple ones would suffice. Always start with the simplest method and add complexity only when necessary.
+</div>
+
+### Decision Tree for Regression Methods
+
+1. **Is your response variable continuous?**
+   - Yes → Go to step 2
+   - No (categorical) → Use **Logistic Regression** or **LDA**
+
+2. **How many predictors do you have?**
+   - One → **Simple Linear Regression**
+   - Multiple → Go to step 3
+
+3. **Is the relationship linear?**
+   - Yes → **Multiple Linear Regression**
+   - No → **Polynomial Regression** or transformation
+
+4. **Are predictors highly correlated?**
+   - Yes → **Ridge Regression**
+   - Need feature selection → **Lasso Regression**
+
+5. **Do you have outliers or non-normal errors?**
+   - Yes → **Quantile Regression** or robust methods
+
+## Checking Model Assumptions in R
+
+```{r assumption-check}
+# Function to check assumptions
+check_assumptions <- function(model) {
+  par(mfrow = c(2, 2))
+  plot(model)
+  par(mfrow = c(1, 1))
+}
+
+# Example usage
+check_assumptions(model_mlr)
+```
+
+## Interpreting P-values
+
+- **p < 0.001**: Extremely significant (***)
+- **p < 0.01**: Very significant (**)
+- **p < 0.05**: Significant (*)
+- **p < 0.1**: Marginally significant (.)
+- **p ≥ 0.1**: Not significant
+
+<div class="key-concept">
+**Remember**: Statistical significance does not imply practical significance. Always consider effect sizes and confidence intervals.
+</div>
+
+---
+
+# Conclusion
+
+## Key Takeaways
+
+1. **Regression is about relationships**: It helps us understand how variables relate to each other and make predictions.
+
+2. **Start simple**: Begin with simple linear regression and add complexity only when needed.
+
+3. **Check assumptions**: Always verify that your data meets the assumptions of your chosen method.
+
+4. **LDA is powerful**: For classification problems with continuous predictors, LDA often works remarkably well (as demonstrated by our 98% accuracy on iris data!).
+
+5. **No single best method**: The "best" method depends on your data, your question, and your constraints.
+
+## The Iris Dataset: A Perfect Teaching Tool
+
+The iris dataset has taught generations of statisticians and data scientists because it:
+- Is small enough to understand completely
+- Has clear structure and patterns
+- Demonstrates both regression and classification
+- Shows the power of dimensionality reduction (LDA)
+- Connects to real-world biology
+
+## Further Reading
+
+- **"The Elements of Statistical Learning"** by Hastie, Tibshirani, and Friedman
+- **"An Introduction to Statistical Learning"** by James, Witten, Hastie, and Tibshirani
+- **"Applied Linear Statistical Models"** by Kutner, Nachtsheim, Neter, and Li
+
+---
+
+# Appendix: Complete Code Reference
+
+```{r complete-code, eval=FALSE}
+# ============================================================
+# COMPLETE CODE FOR ALL METHODS
+# ============================================================
+
+# 1. Load libraries
+library(ggplot2)
+library(dplyr)
+library(MASS)
+library(glmnet)
+library(quantreg)
+
+# 2. Load data
+data(iris)
+
+# 3. Simple Linear Regression
+model_slr <- lm(Petal.Length ~ Sepal.Length, data = iris)
+summary(model_slr)
+
+# 4. Multiple Linear Regression
+model_mlr <- lm(Petal.Length ~ Sepal.Length + Sepal.Width + Petal.Width,
+  data = iris
+)
+summary(model_mlr)
+
+# 5. Polynomial Regression
+model_poly <- lm(Petal.Length ~ Sepal.Length + I(Sepal.Length^2), data = iris)
+summary(model_poly)
+
+# 6. Logistic Regression
+iris$is_setosa <- ifelse(iris$Species == "setosa", 1, 0)
+model_logit <- glm(
+  is_setosa ~ Sepal.Length + Sepal.Width +
+    Petal.Length + Petal.Width,
+  data = iris, family = binomial
+)
+summary(model_logit)
+
+# 7. LDA
+model_lda <- lda(Species ~ ., data = iris)
+predictions <- predict(model_lda)$class
+accuracy <- mean(predictions == iris$Species)
+print(paste("LDA Accuracy:", round(accuracy * 100, 2), "%"))
+
+# 8. Ridge Regression
+x <- as.matrix(iris[, 1:4])
+y <- iris$Petal.Length
+model_ridge <- glmnet(x, y, alpha = 0)
+
+# 9. Lasso Regression
+model_lasso <- glmnet(x, y, alpha = 1)
+
+# 10. Quantile Regression
+model_quant <- rq(Petal.Length ~ Sepal.Length, data = iris, tau = 0.5)
+summary(model_quant)
+```
+
+---
+
+*Document prepared for undergraduate teaching in Civil Engineering and Data Science courses.*

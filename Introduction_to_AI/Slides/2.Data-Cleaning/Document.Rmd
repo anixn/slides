@@ -1,0 +1,309 @@
+---
+title: "Data Cleaning Procedures"
+author: "Data Analysis Report"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+---
+
+<style>
+/* Applying Sagona font with fallbacks and increasing base font sizes */
+body, p, li, td, th {
+  font-family: "Sagona", "Georgia", "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Sagona", "Georgia", "Times New Roman", serif;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+h1 { font-size: 32px; }
+h2 { font-size: 26px; }
+h3 { font-size: 22px; }
+
+/* Styling code chunks and inline code for better color visibility */
+code, pre {
+  font-family: "Source Code Pro", "Courier New", monospace;
+  font-size: 16px;
+}
+
+pre {
+  background-color: #f4f4f4; /* Light gray background for code blocks */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  position: relative; /* Required for absolute positioning of the copy button */
+}
+
+p code, li code {
+  background-color: #eaeaea;
+  color: #c7254e;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* --- Copy Button Styling --- */
+.copy-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: sans-serif;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+pre:hover .copy-btn {
+  opacity: 1; /* Show button when hovering over the code chunk */
+}
+
+.copy-btn:hover {
+  background-color: #2980b9;
+}
+
+.copy-btn:active {
+  background-color: #27ae60; /* Green flash when clicked */
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+# Loading required packages
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+# Introduction
+
+Data cleaning is a crucial step in the data analysis pipeline. It ensures that the dataset is accurate, consistent, and reliable for further analysis or modeling. In this document, we will demonstrate three primary data cleaning procedures using the built-in R datasets `iris` and `mtcars`:
+
+1. **Handling Missing Values**
+2. **Removing Duplicates**
+3. **Outlier Detection**
+
+Since `iris` and `mtcars` are inherently clean datasets, we will artificially introduce missing values and duplicates to demonstrate the cleaning techniques effectively.
+
+# 1. Handling Missing Values
+
+Missing values can skew analysis and cause errors in statistical modeling. Common strategies include removing rows with missing data or imputing them with mean, median, or mode.
+
+## Demonstration on `iris`
+
+First, we will artificially introduce `NA` (Not Available) values into the `iris` dataset.
+
+```{r}
+# Introduce missing values in Sepal.Length and Petal.Width
+iris_missing <- iris
+iris_missing$Sepal.Length[c(5, 15, 30, 50, 34, 70, 130, 80, 144)] <- NA
+iris_missing$Petal.Width[c(10, 40, 53, 81, 04, 52, 132)] <- NA
+
+# Check for missing values
+colSums(is.na(iris_missing))
+```
+
+**Visualizing Missing Data**
+
+It is often helpful to visualize where missing data occurs. We can create a robust visualization by converting the data to a `TRUE`/`FALSE` matrix indicating missingness, and then plotting it.
+
+```{r fig.width=8, fig.height=4}
+# 1. Convert the dataset to a TRUE/FALSE matrix for missing values
+missing_matrix <- as.data.frame(is.na(iris_missing))
+missing_matrix$row_num <- 1:nrow(missing_matrix)
+
+# 2. Pivot to long format for ggplot
+missing_plot_df <- missing_matrix %>%
+  pivot_longer(-row_num, names_to = "Variable", values_to = "Is_Missing")
+
+# 3. Plot the missing data pattern
+ggplot(missing_plot_df, aes(x = row_num, y = Variable, fill = Is_Missing)) +
+  geom_raster() +
+  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "lightgray"), name = "Missing?", labels = c("No", "Yes")) +
+  labs(title = "Missing Data Pattern in Iris Dataset", x = "Row Index", y = "") +
+  theme_minimal(base_size = 14)
+```
+
+**Strategy: Imputing NAs with the Mean**
+
+We will impute the missing values with the column mean and visualize the distribution before and after to show the impact.
+
+```{r fig.width=8, fig.height=4}
+iris_imputed <- iris_missing %>%
+  mutate(
+    Sepal.Length = ifelse(is.na(Sepal.Length), mean(Sepal.Length, na.rm = TRUE), Sepal.Length),
+    Petal.Width = ifelse(is.na(Petal.Width), mean(Petal.Width, na.rm = TRUE), Petal.Width)
+  )
+
+# Plotting distribution before and after imputation for Sepal.Length
+df_vis <- data.frame(
+  Value = c(iris_missing$Sepal.Length[!is.na(iris_missing$Sepal.Length)], iris_imputed$Sepal.Length),
+  Status = c(
+    rep("Original (NAs removed)", length(na.omit(iris_missing$Sepal.Length))),
+    rep("After Imputation", nrow(iris_imputed))
+  )
+)
+
+ggplot(df_vis, aes(x = Value, fill = Status)) +
+  geom_histogram(alpha = 0.6, position = "identity", bins = 15) +
+  labs(title = "Distribution of Sepal.Length: Original vs Imputed", x = "Sepal Length", y = "Count") +
+  theme_minimal(base_size = 14)
+```
+
+# 2. Removing Duplicates
+
+Duplicate rows can lead to over-representation of certain observations, biasing the results. We need to identify and remove them.
+
+## Demonstration on `iris`
+
+We will duplicate a few rows from the `iris` dataset and then use the `distinct()` function from the `dplyr` package to remove them.
+
+```{r}
+# Create duplicates by binding the first 5 rows to the original dataset
+iris_duplicated <- rbind(iris, iris[1:5, ])
+
+cat("Rows with duplicates:", nrow(iris_duplicated), "\n")
+
+# Remove duplicates
+iris_unique <- distinct(iris_duplicated)
+
+cat("Rows after removing duplicates:", nrow(iris_unique))
+```
+
+**Visualizing Row Counts Before and After**
+
+```{r fig.width=6, fig.height=4}
+df_counts <- data.frame(
+  Status = c("With Duplicates", "Duplicates Removed"),
+  Count = c(nrow(iris_duplicated), nrow(iris_unique))
+)
+
+ggplot(df_counts, aes(x = Status, y = Count, fill = Status)) +
+  geom_col(width = 0.5) +
+  geom_text(aes(label = Count), vjust = -0.5, size = 5) +
+  labs(title = "Row Count Comparison: Iris Dataset", x = "", y = "Number of Rows") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "none")
+```
+
+# 3. Outlier Detection
+
+Outliers are data points that differ significantly from other observations. They can be caused by measurement errors or natural variability. A common method for detecting outliers is the **Interquartile Range (IQR)** method. Data points falling below $Q1 - 1.5 \times IQR$ or above $Q3 + 1.5 \times IQR$ are considered outliers.
+
+## Demonstration on `iris`
+
+Let's detect outliers in the `Sepal.Width` column of the `iris` dataset using boxplot statistics and visualize them on a scatter plot.
+
+```{r fig.width=8, fig.height=5}
+# Calculate Q1, Q3, and IQR
+Q1 <- quantile(iris$Sepal.Width, 0.25)
+Q3 <- quantile(iris$Sepal.Width, 0.75)
+IQR_val <- Q3 - Q1
+
+# Define upper and lower bounds
+lower_bound <- Q1 - 1.5 * IQR_val
+upper_bound <- Q3 + 1.5 * IQR_val
+
+# Identify outliers and add a label
+iris_outlier_vis <- iris %>%
+  mutate(Outlier = ifelse(Sepal.Width < lower_bound | Sepal.Width > upper_bound, "Outlier", "Normal"))
+
+# Visualizing outliers with a scatter plot (Sepal.Width vs Sepal.Length)
+ggplot(iris_outlier_vis, aes(x = Sepal.Length, y = Sepal.Width, color = Outlier)) +
+  geom_point(size = 3, alpha = 0.8) +
+  scale_color_manual(values = c("Normal" = "steelblue", "Outlier" = "red")) +
+  geom_hline(yintercept = c(lower_bound, upper_bound), linetype = "dashed", color = "gray50") +
+  labs(
+    title = "Outlier Detection in Iris (Sepal.Width)",
+    subtitle = "Dashed lines represent IQR bounds (Q1 - 1.5*IQR, Q3 + 1.5*IQR)"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+## Demonstration on `mtcars`
+
+We will apply the same IQR method to detect outliers in the `hp` (Horsepower) column of the `mtcars` dataset and visualize them using a bar chart.
+
+```{r fig.width=8, fig.height=5}
+# Calculate Q1, Q3, and IQR for hp
+Q1_hp <- quantile(mtcars$hp, 0.25)
+Q3_hp <- quantile(mtcars$hp, 0.75)
+IQR_hp <- Q3_hp - Q1_hp
+
+# Define bounds
+lower_bound_hp <- Q1_hp - 1.5 * IQR_hp
+upper_bound_hp <- Q3_hp + 1.5 * IQR_hp
+
+# Identify outliers
+mtcars_outlier_vis <- mtcars %>%
+  mutate(
+    Car = rownames(mtcars),
+    Outlier = ifelse(hp < lower_bound_hp | hp > upper_bound_hp, "Outlier", "Normal")
+  )
+
+# Visualizing outliers with a bar chart
+ggplot(mtcars_outlier_vis, aes(x = reorder(Car, hp), y = hp, fill = Outlier)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Normal" = "gray70", "Outlier" = "darkred")) +
+  labs(
+    title = "Outlier Detection in mtcars (Horsepower)",
+    x = "Car Model",
+    y = "Horsepower"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+# Conclusion
+
+Through this document, we successfully demonstrated how to handle missing values via imputation and row removal, how to identify and filter out duplicate records, and how to detect outliers using the IQR method. By adding visualizations at each step, we can intuitively verify the effects of our data cleaning procedures, ensuring that datasets like `iris` and `mtcars` are prepped and ready for robust statistical analysis.
+
+<script>
+// JavaScript to add Copy Button to all code chunks
+document.addEventListener("DOMContentLoaded", function() {
+  const codeBlocks = document.querySelectorAll('pre');
+
+  codeBlocks.forEach(function(block) {
+    // Create the button element
+    const button = document.createElement('button');
+    button.className = 'copy-btn';
+    button.textContent = 'Copy';
+
+    // Add click event listener to the button
+    button.addEventListener('click', function() {
+      const code = block.querySelector('code');
+      if (!code) return;
+
+      const text = code.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        // Change button text to "Copied!" temporarily
+        button.textContent = 'Copied!';
+        button.style.backgroundColor = '#27ae60'; // Green flash
+
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.style.backgroundColor = '#3498db'; // Back to blue
+        }, 1500);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    });
+
+    // Append the button to the code block
+    block.appendChild(button);
+  });
+});
+</script>
+```

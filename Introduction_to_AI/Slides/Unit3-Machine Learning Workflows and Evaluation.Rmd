@@ -1,0 +1,827 @@
+---
+title: " Machine Learning Workflows & Evaluation"
+subtitle: "Unit 3 Handout"
+author: "Dr. Ankit Deshmukh"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: readable
+    highlight: tango
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+    number_sections: false
+---
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap');
+code,
+pre,
+pre code,
+.sourceCode,
+.sourceCode code {
+  font-family: 'Fira Code', 'Fira Mono', 'Courier New', monospace !important;
+  font-size: 0.95em;
+  font-variant-ligatures: contextual;
+  -webkit-font-feature-settings: "liga" 1, "calt" 1;
+  font-feature-settings: "liga" 1, "calt" 1;
+}
+
+body {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #282828;
+  font-family: "Old Standard" serif !important;
+}
+
+h1 {
+  color: #fbf1c7;
+  background: linear-gradient(90deg, #1d2021, #282828);
+  padding: 14px 18px;
+  border-radius: 5px;
+  margin-top: 30px;
+}
+
+h2 {
+  color: #fbf1c7;
+  background: linear-gradient(90deg, #282828, #3c3836);
+  padding: 10px 16px;
+  border-radius: 4px;
+  margin-top: 28px;
+}
+
+h3 {
+  color: #fbf1c7;
+  background: #282828;
+  border-bottom: 3px solid #d79921;
+  padding: 8px 14px;
+  border-radius: 4px;
+  margin-top: 22px;
+}
+
+h4 {
+  color: #fabd2f;
+  background: #282828;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-top: 18px;
+}
+
+.keybox {
+  border-left: 6px solid #d79921;
+  background: #f7ecc8;
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 5px;
+}
+
+.civilbox {
+  border-left: 6px solid #458588;
+  background: #e0e8e6;
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 5px;
+}
+
+.warnbox {
+  border-left: 6px solid #cc241d;
+  background: #f6ddd6;
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 5px;
+}
+
+.tipbox {
+  border-left: 6px solid #98971a;
+  background: #e8eac9;
+  padding: 10px 14px;
+  margin: 12px 0;
+  border-radius: 5px;
+}
+
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, warning = FALSE,
+  fig.width = 7, fig.height = 4.2, fig.align = "center"
+)
+```
+
+```{r packages}
+# ggplot2 is used for all plots. If missing, this line installs it once.
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2", repos = "https://cloud.r-project.org")
+}
+library(ggplot2)
+```
+
+<br>
+
+#  What You Will Learn in Unit 3
+
+By the end of this handout, you will be able to:
+
+1. **Describe the full Machine Learning (ML) workflow** — from question to deployed model. _(CO4)_
+2. **Prepare civil engineering data**: clean it, scale it, and encode categories. _(CO3)_
+3. **Engineer smart features** like rainfall intensity, runoff coefficient, and NDVI anomalies. _(CO3)_
+4. **Train and validate models** using train/test splits. _(CO4)_
+5. **Evaluate regression models** (MAE, RMSE, R²) and **classification models** (Accuracy, Precision, Recall, F1, ROC). _(CO5)_
+6. **Diagnose overfitting vs. underfitting** and use **cross-validation** to pick reliable models. _(CO5)_
+
+<div class="civilbox">️ <b>Civil connection:</b> Every idea in this unit is shown with a civil example — concrete strength, floods, rainfall, runoff, vegetation health, and groundwater. Same tools, real site problems.</div>
+
+<div class="tipbox"> <b>How to use this handout:</b> Read a topic, then run its code chunk in RStudio (or knit the whole file). Change the numbers and see what happens — that is how engineers learn machines!</div>
+
+---
+
+# The Machine Learning Workflow
+
+### What is it?
+
+Machine Learning is teaching a computer to find patterns in data, so it can make predictions on **new, unseen data**. The workflow is the step-by-step recipe we always follow:
+
+| Step                   | What happens                            | Civil engineering example                                  |
+| ---------------------- | --------------------------------------- | ---------------------------------------------------------- |
+| **1. Ask a question**  | Define the prediction goal              | "What will be the 28-day strength of this concrete mix?"   |
+| **2. Collect data**    | Gather measurements                     | Cube-crushing test records: cement, water, age, strength   |
+| **3. Prepare data**    | Clean, scale, encode, engineer features | Fix missing sensor readings, convert soil types to numbers |
+| **4. Split data**      | Separate into training and testing sets | Mock exam vs. final exam                                   |
+| **5. Train the model** | Let the algorithm learn patterns        | Model learns "more cement + proper curing → stronger"      |
+| **6. Evaluate**        | Check accuracy on unseen test data      | RMSE of strength predictions                               |
+| **7. Use & improve**   | Deploy, monitor, retrain                | Live strength predictor on the batching plant              |
+
+<div class="keybox"> <b>Key idea:</b> The model is like a student. You teach it with the **training set** (mock exams) and judge it with the **test set** (final exam it has never seen). Judging a student on questions they already memorised proves nothing.</div>
+
+<div class="warnbox">️ <b>Never evaluate on training data.</b> A model that is graded on data it has already seen will always look artificially good. This is called **data leakage**, and it is the #1 beginner mistake.</div>
+
+---
+
+# Data Preparation — Cleaning the Site Before Building
+
+<div class="civilbox">️ <b>Civil connection:</b> You never build on an uncleared site. You remove debris, level the ground, and set out the grid. Data preparation is exactly this — and it usually takes <b>60–80% of a data scientist's time</b>.</div>
+
+## 2.1 Data Cleaning (missing values, duplicates, impossible values)
+
+**Why?** Real sensor logs and lab registers always have gaps (sensor failure), repeats (double entry), and errors (a negative curing age!). Most ML algorithms **cannot handle missing values at all**.
+
+```{r messy-data}
+set.seed(123)
+cement <- round(runif(12, 250, 450), 1) # kg/m3
+water <- round(runif(12, 150, 220), 1) # litres/m3
+age <- sample(c(7, 14, 28, 90), 12, replace = TRUE) # curing days
+strength <- round(20 + 0.08 * cement - 0.10 * water + 0.15 * age + rnorm(12, 0, 3), 1) # MPa
+
+concrete <- data.frame(cement, water, age, strength)
+
+# --- Inject real-world problems, like a messy lab register ---
+concrete$cement[3] <- NA # sensor failed
+concrete$water[6] <- NA # reading lost
+concrete$strength[9] <- NA # cube crushed wrongly
+concrete$age[4] <- -5 # impossible: curing age can't be negative
+concrete <- rbind(concrete, concrete[2, ]) # same row typed twice
+
+concrete
+```
+
+Now the cleaning steps — count the damage, remove duplicates, fix impossible values, then handle gaps:
+
+```{r clean-data}
+# 1) How many missing values per column?
+colSums(is.na(concrete))
+
+# 2) Remove duplicate rows
+concrete <- concrete[!duplicated(concrete), ]
+
+# 3) Impossible value -> convert to NA (we don't trust it)
+concrete$age[concrete$age < 0] <- NA
+
+# 4) Strategy A: DROP incomplete rows (simple, loses data)
+concrete_dropped <- na.omit(concrete)
+
+# 5) Strategy B: IMPUTE - fill gaps with the median (keeps all rows)
+concrete_imputed <- concrete
+concrete_imputed$cement[is.na(concrete_imputed$cement)] <- median(concrete_imputed$cement, na.rm = TRUE)
+concrete_imputed$water[is.na(concrete_imputed$water)] <- median(concrete_imputed$water, na.rm = TRUE)
+concrete_imputed$strength[is.na(concrete_imputed$strength)] <- median(concrete_imputed$strength, na.rm = TRUE)
+concrete_imputed$age[is.na(concrete_imputed$age)] <- median(concrete_imputed$age, na.rm = TRUE)
+
+c(
+  "Before cleaning" = 13, "After dropping NA" = nrow(concrete_dropped),
+  "After imputing NA" = nrow(concrete_imputed)
+)
+
+head(concrete_imputed)
+```
+
+<div class="keybox"> <b>Drop vs. impute?</b> Dropping is fine when few rows are missing. Imputing (filling with the median) is better when data is precious — e.g., expensive field tests. For strong outliers, the **median** is safer than the mean because one wild value can't drag it around.</div>
+
+## 2.2 Normalization & Scaling (putting all columns on one measuring tape)
+
+**Why?** Cement ranges from 200–500 while water ranges from 140–230. A distance-based algorithm (KNN, K-means — coming in Unit 4) would think cement is "much more important" just because its numbers are bigger. Scaling puts every feature on a fair, comparable range.
+
+**Two standard methods:**
+
+- **Min-Max Normalization** — squeezes everything into 0 to 1:
+
+$$x' = \frac{x - x_{min}}{x_{max} - x_{min}}$$
+
+- **Z-score Standardization** — centres at 0 with spread 1:
+
+$$z = \frac{x - \mu}{\sigma}$$
+
+```{r scaling}
+min_max <- function(x) (x - min(x)) / (max(x) - min(x))
+
+concrete_imputed$cement_minmax <- round(min_max(concrete_imputed$cement), 3)
+concrete_imputed$water_minmax <- round(min_max(concrete_imputed$water), 3)
+concrete_imputed$strength_z <- round(as.numeric(scale(concrete_imputed$strength)), 3)
+
+head(concrete_imputed[, c("cement", "cement_minmax", "water", "water_minmax", "strength", "strength_z")])
+
+# Cement naturally "shouts louder" because its range is wider:
+round(range(concrete_imputed$cement), 0) # cement spread ~200 units
+round(range(concrete_imputed$water), 0) # water spread  ~70 units
+```
+
+**How to read it:** a z-score of +2 means "2 standard deviations above the site average" — instantly comparable across any quantity, from MPa to GPa.
+
+<div class="tipbox"> <b>Think about it:</b> Comparing compressive strength (~30 MPa) with elastic modulus (~30,000 MPa) without scaling is like measuring a column in millimetres and its shadow in metres — the numbers mislead you.</div>
+
+## 2.3 Encoding Categorical Variables (turning words into numbers)
+
+**Why?** Algorithms do maths — they cannot multiply "clay" by 2. Soil types, road surface types, and material grades must become numbers first.
+
+```{r encoding}
+soil <- c(
+  "clay", "sand", "gravel", "clay", "sand", "gravel",
+  "clay", "clay", "sand", "gravel", "sand", "clay"
+)
+
+# Option 1: LABEL encoding - factor() stores categories as integer codes
+soil_factor <- factor(soil)
+soil_factor
+
+# Option 2: ONE-HOT encoding - a separate 1/0 column per category
+onehot <- model.matrix(~ 0 + soil_factor)
+colnames(onehot) <- levels(soil_factor)
+head(onehot)
+```
+
+<div class="warnbox">️ <b>Label encoding can mislead.</b> If clay=1, gravel=2, sand=3, the model may wrongly think sand &gt; gravel. For <b>nominal</b> categories (no natural order), prefer <b>one-hot encoding</b>. Use label encoding only for <b>ordinal</b> categories (like low &lt; medium &lt; high bearing capacity).</div>
+
+---
+
+# Feature Engineering for Civil Data — Making Good Bricks from Raw Clay
+
+**What is it?** Feature engineering means **creating new, more meaningful columns** from raw measurements using engineering formulas. A good site engineer never uses raw numbers alone — they compute derived quantities. A good ML engineer does the same.
+
+## 3.1 Rainfall Intensity ($I = P/t$)
+
+Depth alone lies! A 66 mm storm over 6 hours is gentle; 30 mm in 1 hour is a downpour. Drainage design cares about **intensity**:
+
+$$I = \frac{\text{Rainfall depth } P \text{ (mm)}}{\text{Duration } t \text{ (hr)}} \quad \text{(mm/hr)}$$
+
+```{r rainfall-intensity}
+storms <- data.frame(
+  storm_id   = paste0("Storm ", 1:6),
+  depth_mm   = c(15, 42, 30, 66, 8, 55),
+  duration_h = c(2, 6, 1, 3, 0.5, 5)
+)
+storms$intensity_mmh <- storms$depth_mm / storms$duration_h
+
+storms[order(-storms$intensity_mmh), ]
+```
+
+<div class="keybox"> <b>Look carefully:</b> Storm 4 has the <b>biggest depth</b> (66 mm), but Storm 3 is the <b>most intense</b> (30 mm/hr). A model fed only "depth" would miss the storm that actually floods the culvert. This is why we engineer features!</div>
+
+## 3.2 Runoff Coefficient ($C$) and the Rational Method
+
+**What is it?** The runoff coefficient $C$ tells what fraction of rain becomes surface flow (rest soaks in). Typical values:
+
+| Surface         | Typical $C$ |
+| --------------- | ----------- |
+| Roof / pavement | 0.85–0.95   |
+| Gravel          | 0.40–0.60   |
+| Lawn / grass    | 0.10–0.30   |
+| Forest          | 0.05–0.25   |
+
+**Rational Method** (practical form):
+
+$$Q\,(\text{m}^3/\text{s}) = \frac{C \times i\,(\text{mm/hr}) \times A\,(\text{ha})}{360}$$
+
+```{r runoff-calc}
+C_paved <- 0.90
+C_grass <- 0.20
+area_paved <- 15
+area_grass <- 10 # hectares, total catchment = 25 ha
+rain_i <- 50 # design storm intensity, mm/hr
+
+C_weighted <- (C_paved * area_paved + C_grass * area_grass) / (area_paved + area_grass)
+Q_current <- C_weighted * rain_i * 25 / 360
+Q_allpaved <- 0.90 * rain_i * 25 / 360 # future scenario: everything concreted
+
+c(
+  C_weighted = round(C_weighted, 2),
+  Q_now_m3s = round(Q_current, 2),
+  Q_future_m3s = round(Q_allpaved, 2)
+)
+```
+
+<div class="civilbox">️ <b>Civil connection:</b> If the city paves every garden, $C$ rises and peak flow jumps from ~2.2 to ~3.1 m³/s — a 45% bigger flood for the same rain! This single engineered feature lets an ML model understand <b>urbanisation</b>, not just weather.</div>
+
+## 3.3 NDVI Anomalies (satellite health check for vegetation)
+
+**What is it?** The **Normalized Difference Vegetation Index** uses satellite reflectance to measure how green (healthy) land is:
+
+$$NDVI = \frac{NIR - Red}{NIR + Red}$$
+
+Healthy leaves reflect a lot of Near-Infrared (NIR) and absorb Red light, so NDVI → 1. Bare soil/water → near 0. An **anomaly** = this month's NDVI minus the normal NDVI — a red flag for drought, deforestation, or irrigation failure.
+
+```{r ndvi}
+ndvi_data <- data.frame(
+  month = factor(month.abb, levels = month.abb),
+  red   = c(0.20, 0.22, 0.19, 0.15, 0.12, 0.10, 0.09, 0.10, 0.13, 0.16, 0.18, 0.21),
+  nir   = c(0.25, 0.28, 0.32, 0.38, 0.45, 0.50, 0.52, 0.50, 0.44, 0.36, 0.30, 0.26)
+)
+ndvi_data$ndvi <- (ndvi_data$nir - ndvi_data$red) / (ndvi_data$nir + ndvi_data$red)
+
+# "Normal" here = yearly mean (for teaching). In practice, compare each month
+# against the 10-year average for that SAME month.
+normal <- mean(ndvi_data$ndvi)
+ndvi_data$anomaly <- round(ndvi_data$ndvi - normal, 3)
+ndvi_data[, c("month", "ndvi", "anomaly")]
+```
+
+```{r ndvi-plot}
+ggplot(ndvi_data, aes(x = month, y = anomaly, fill = anomaly > 0)) +
+  geom_col() +
+  scale_fill_manual(
+    values = c("TRUE" = "#2e7d32", "FALSE" = "#c62828"),
+    labels = c("FALSE" = "Below normal (stress)", "TRUE" = "Above normal"),
+    name = NULL
+  ) +
+  geom_hline(yintercept = 0, color = "grey30") +
+  labs(
+    title = "NDVI anomaly: is the vegetation thriving or stressed?",
+    x = NULL, y = "NDVI anomaly"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+<div class="civilbox">️ <b>Civil connection:</b> NDVI anomalies feed into landslide risk (dead roots = weak slopes), irrigation planning, and urban heat island studies — exactly the mapping applications of Unit 4.</div>
+
+## 3.4 Why Engineered Features Matter (quick preview)
+
+```{r feature-value, eval=FALSE}
+# We build this dataset properly in Section 4; the message is simple:
+cor(strength, age) # raw curing age: weaker, confusing signal
+cor(strength, log_age) # engineered log(age): much clearer signal
+```
+
+Concrete gains strength **fast early, slowly later** — a logarithmic pattern. Giving the model `log(age)` instead of raw `age` is like handing a student a neatly organised formula sheet instead of a pile of raw notes.
+
+---
+
+# Model Training and Validation
+
+### What is it?
+
+Training = the algorithm adjusts itself to fit the **training set**. Validation = checking it on the **unseen test set**. We use an **80/20 split**: 80% for learning, 20% for honest examination.
+
+```{r build-ml-data}
+set.seed(42)
+n <- 120
+concrete_ml <- data.frame(
+  cement = runif(n, 200, 500), # kg/m3
+  water  = runif(n, 140, 230), # litres/m3
+  age    = sample(c(3, 7, 14, 28, 90), n, replace = TRUE) # days
+)
+
+# --- Feature engineering (Section 3 in action!) ---
+concrete_ml$log_age <- log10(concrete_ml$age)
+
+concrete_ml$strength <- round(5 + 0.08 * concrete_ml$cement - 0.10 * concrete_ml$water +
+  12 * concrete_ml$log_age + rnorm(n, 0, 2.5), 1) # MPa
+
+head(concrete_ml)
+```
+
+```{r feature-check}
+c(
+  "Correlation with raw age" = round(cor(concrete_ml$strength, concrete_ml$age), 3),
+  "Correlation with log(age)" = round(cor(concrete_ml$strength, concrete_ml$log_age), 3)
+)
+```
+
+The engineered `log_age` carries a clearer signal — the model will thank us.
+
+```{r split}
+set.seed(101)
+train_idx <- sample(seq_len(nrow(concrete_ml)), size = floor(0.8 * nrow(concrete_ml)))
+train_set <- concrete_ml[train_idx, ]
+test_set <- concrete_ml[-train_idx, ]
+
+c(train_rows = nrow(train_set), test_rows = nrow(test_set))
+```
+
+```{r train}
+strength_model <- lm(strength ~ cement + water + log_age, data = train_set)
+summary(strength_model)
+```
+
+**How to read the summary:** `Estimate` = the learned slope (e.g., each extra kg of cement adds ≈ 0.08 MPa). A tiny `Pr(>|t|)` (like < 0.001) means "this relationship is real, not luck". We then ask the model to predict the **test set** it has never seen:
+
+```{r predict}
+test_pred <- predict(strength_model, newdata = test_set)
+head(data.frame(actual = test_set$strength, predicted = round(test_pred, 1)))
+```
+
+---
+
+# Evaluation Metrics for Regression (RMSE, MAE, R²)
+
+### What is it?
+
+Numbers that answer: **"How wrong are the predictions, and is the model actually useful?"**
+
+| Metric   | Formula                                 | Plain English                                    | Watch out for                        |
+| -------- | --------------------------------------- | ------------------------------------------------ | ------------------------------------ |
+| **MAE**  | $\frac{1}{n}\sum\lvert y-\hat{y}\rvert$ | "Average size of my mistake"                     | Treats all errors equally            |
+| **RMSE** | $\sqrt{\frac{1}{n}\sum (y-\hat{y})^2}$  | "Average mistake, but big errors punished extra" | Sensitive to outliers (can be good!) |
+| **R²**   | $1-\frac{SS_{res}}{SS_{tot}}$           | "Share of variation I explained" (0–1)           | High R² alone can hide big errors    |
+
+<div class="keybox"> <b>MAE vs RMSE — tiny example:</b> errors (4, 0): MAE = 2, RMSE = 2.83. Errors (2, 2): MAE = 2, RMSE = 2. Same MAE, but RMSE is worse for the scattered model! RMSE <b>hates big blunders</b> — perfect for concrete, where a badly wrong strength guess is dangerous.</div>
+
+```{r metrics}
+# Reusable metric functions (we will use them again later!)
+mae <- function(actual, predicted) mean(abs(actual - predicted))
+rmse <- function(actual, predicted) sqrt(mean((actual - predicted)^2))
+r_squared <- function(actual, predicted) {
+  1 - sum((actual - predicted)^2) / sum((actual - mean(actual))^2)
+}
+
+knitr::kable(data.frame(
+  Metric = c("MAE (MPa)", "RMSE (MPa)", "R-squared"),
+  Value = c(
+    round(mae(test_set$strength, test_pred), 2),
+    round(rmse(test_set$strength, test_pred), 2),
+    round(r_squared(test_set$strength, test_pred), 3)
+  )
+), caption = "Our model on the unseen test set")
+```
+
+**Always compare with a lazy baseline** — "guess the average strength for everything":
+
+```{r baseline}
+baseline_pred <- rep(mean(train_set$strength), nrow(test_set))
+c(
+  "RMSE of lazy baseline" = round(rmse(test_set$strength, baseline_pred), 2),
+  "RMSE of our model" = round(rmse(test_set$strength, test_pred), 2)
+)
+```
+
+```{r pred-plot}
+ggplot(
+  data.frame(actual = test_set$strength, predicted = test_pred),
+  aes(x = actual, y = predicted)
+) +
+  geom_point(color = "#2e86c1", size = 2.5, alpha = 0.8) +
+  geom_abline(
+    slope = 1, intercept = 0, linetype = "dashed",
+    color = "#c0392b", linewidth = 1
+  ) +
+  labs(
+    title = "Predicted vs actual concrete strength (test set)",
+    subtitle = "Dashed line = perfect predictions; points hugging it = good model",
+    x = "Actual strength (MPa)", y = "Predicted strength (MPa)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+<div class="civilbox">️ <b>Civil reading:</b> "RMSE ≈ 3 MPa" means predictions are typically within about ±3 MPa of the truth. If your design code needs ±2 MPa, this model is not good enough yet — engineer better features or gather more data!</div>
+
+---
+
+# Evaluation Metrics for Classification (Accuracy, Precision, Recall, F1, ROC)
+
+### What is it?
+
+Classification predicts a **category** — e.g., _"Will this catchment flood this monsoon: Yes or No?"_ We judge it with a **confusion matrix** and its children: Accuracy, Precision, Recall, F1, and the ROC curve.
+
+## 6.1 The Flood-Warning Dataset (simulated so results reproduce)
+
+```{r flood-data}
+set.seed(7)
+n <- 200
+rain <- runif(n, 10, 120) # rainfall, mm
+p_flood_true <- plogis((rain - 70) / 15) # true flood probability
+actual <- factor(ifelse(runif(n) < p_flood_true, "Flood", "No Flood"),
+  levels = c("Flood", "No Flood")
+)
+
+p_model <- plogis((rain - 72) / 14 + rnorm(n, 0, 0.35)) # our model's opinion
+predicted <- factor(ifelse(p_model >= 0.5, "Flood", "No Flood"),
+  levels = c("Flood", "No Flood")
+)
+```
+
+## 6.2 The Confusion Matrix — 4 Verbs of Judgement
+
+|                       | **Actually Flood**                    | **Actually No Flood**                       |
+| --------------------- | ------------------------------------- | ------------------------------------------- |
+| **We warned (Flood)** |  **TP** — correct siren!            |  **FP** — false alarm (costly evacuation) |
+| **We stayed quiet**   |  **FN** — MISSED flood (dangerous!) |  **TN** — correct silence                 |
+
+```{r confusion}
+cm <- table(Predicted = predicted, Actual = actual)
+knitr::kable(cm, caption = "Confusion matrix for the flood-warning model")
+```
+
+## 6.3 The Four Key Metrics
+
+$$\text{Accuracy} = \frac{TP+TN}{\text{All}} \quad \text{Precision} = \frac{TP}{TP+FP} \quad \text{Recall} = \frac{TP}{TP+FN} \quad F1 = \frac{2 \cdot P \cdot R}{P+R}$$
+
+<div class="civilbox">️ <b>Civil meaning:</b> <b>Precision</b> = "When the siren rang, how often was it real?" (false alarms make people ignore warnings — the boy who cried wolf). <b>Recall</b> = "Of all real floods, how many did we catch?" (missing a flood endangers lives). A flood system must have <b>high recall</b> even if precision suffers slightly.</div>
+
+```{r class-metrics}
+TP <- cm["Flood", "Flood"]
+FP <- cm["Flood", "No Flood"]
+FN <- cm["No Flood", "Flood"]
+TN <- cm["No Flood", "No Flood"]
+
+P <- TP / (TP + FP)
+R <- TP / (TP + FN)
+knitr::kable(data.frame(
+  Metric = c("Accuracy", "Precision", "Recall (Sensitivity)", "F1 Score"),
+  Formula = c("(TP+TN)/All", "TP/(TP+FP)", "TP/(TP+FN)", "2PR/(P+R)"),
+  Value = round(c((TP + TN) / sum(cm), P, R, 2 * P * R / (P + R)), 3)
+))
+```
+
+<div class="warnbox">️ <b>The accuracy trap:</b> if floods happen only 1% of the time, a lazy model that ALWAYS says "No Flood" scores 99% accuracy and 0% recall — while missing every single flood. For rare, dangerous events, trust Recall/F1, never accuracy alone.</div>
+
+## 6.4 The Threshold Slider — Same Model, Different Personalities
+
+The 0.5 cut-off was our choice. Move it and watch the trade-off:
+
+```{r thresholds}
+thr_table <- do.call(rbind, lapply(c(0.30, 0.50, 0.70), function(t) {
+  pred_t <- factor(ifelse(p_model >= t, "Flood", "No Flood"),
+    levels = c("Flood", "No Flood")
+  )
+  cm_t <- table(pred_t, actual)
+  TP <- cm_t["Flood", "Flood"]
+  FP <- cm_t["Flood", "No Flood"]
+  FN <- cm_t["No Flood", "Flood"]
+  TN <- cm_t["No Flood", "No Flood"]
+  data.frame(
+    Threshold = t,
+    Accuracy = round((TP + TN) / sum(cm_t), 3),
+    Precision = round(TP / (TP + FP), 3),
+    Recall = round(TP / (TP + FN), 3)
+  )
+}))
+knitr::kable(thr_table,
+  row.names = FALSE,
+  caption = "Lower threshold = more warnings = higher recall, more false alarms"
+)
+```
+
+## 6.5 The ROC Curve — Judging Across ALL Thresholds at Once
+
+The ROC curve plots **Recall (TPR)** against **False Alarm Rate (FPR)** for every possible threshold. The **Area Under the Curve (AUC)** summarises it: 1.0 = perfect, 0.5 = coin-flip guessing.
+
+```{r roc}
+thresholds <- seq(0, 1, by = 0.01)
+tpr <- sapply(thresholds, function(t) sum(p_model >= t & actual == "Flood") / sum(actual == "Flood"))
+fpr <- sapply(thresholds, function(t) sum(p_model >= t & actual == "No Flood") / sum(actual == "No Flood"))
+
+roc_df <- data.frame(fpr, tpr)[order(fpr, tpr), ]
+auc <- sum(diff(roc_df$fpr) * (head(roc_df$tpr, -1) + tail(roc_df$tpr, -1)) / 2) # trapezoid rule
+c(AUC = round(auc, 3))
+```
+
+```{r roc-plot}
+ggplot(roc_df, aes(x = fpr, y = tpr)) +
+  geom_line(color = "#8e44ad", linewidth = 1.3) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    title = paste0("ROC curve (AUC = ", round(auc, 2), ")"),
+    subtitle = "Dashed diagonal = random guessing. Closer to the top-left = better.",
+    x = "False Positive Rate (false alarms)",
+    y = "True Positive Rate (floods caught)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+<div class="tipbox"> <b>Note:</b> we built the ROC by hand so you understand it. In practice, the `pROC` or `ROCR` packages do this in one line — and Unit 4's logistic regression will produce these probabilities directly.</div>
+
+---
+
+# Statistical Challenges — Overfitting, Underfitting & the Bias–Variance Tradeoff
+
+### What is it?
+
+The Goldilocks problem of ML: a model can be **too simple**, **too complicated**, or **just right**.
+
+<div class="keybox"> <b>Student analogy:</b>
+- <b>Underfitting</b> = a student who didn't study at all — fails the mock exam AND the final (poor everywhere).
+- <b>Overfitting</b> = a student who memorised the mock exam answers word-for-word — aces the mock, fails the final because questions changed.
+- <b>Good fit</b> = a student who understood the concepts — good in both.</div>
+
+## 7.1 Experiment: Seasonal Groundwater Level
+
+Groundwater follows a seasonal wave. We fit polynomials of degree 1 (a straight line), 4 (smooth curve), and 15 (a noodle) and compare **training vs test RMSE**:
+
+```{r overfit-data}
+set.seed(100)
+n_fit <- 60
+x_all <- runif(n_fit, 0, 12) # month of year
+y_all <- 8 + 3 * sin(2 * pi * x_all / 12) + rnorm(n_fit, 0, 0.8) # water table (m)
+
+split_idx <- sample(seq_len(n_fit), size = 0.7 * n_fit)
+d_train <- data.frame(x = x_all[split_idx], y = y_all[split_idx])
+d_test <- data.frame(x = x_all[-split_idx], y = y_all[-split_idx])
+```
+
+```{r overfit-fits}
+degrees <- c(1, 4, 15)
+results <- do.call(rbind, lapply(degrees, function(d) {
+  m <- lm(y ~ poly(x, d), data = d_train)
+  data.frame(
+    Degree = d,
+    Train_RMSE = round(rmse(d_train$y, predict(m)), 3),
+    Test_RMSE = round(rmse(d_test$y, predict(m, newdata = d_test)), 3)
+  )
+}))
+results$Verdict <- c("Too simple → UNDERFITS", "Good balance ", "Memorises noise → OVERFITS")
+results
+```
+
+```{r overfit-plot}
+grid <- data.frame(x = seq(0, 12, length.out = 300))
+grid$deg1 <- predict(lm(y ~ poly(x, 1), d_train), newdata = grid)
+grid$deg4 <- predict(lm(y ~ poly(x, 4), d_train), newdata = grid)
+grid$deg15 <- predict(lm(y ~ poly(x, 15), d_train), newdata = grid)
+
+ggplot() +
+  geom_point(data = d_train, aes(x, y), color = "grey30", size = 2) +
+  geom_line(data = grid, aes(x, deg1, color = "1: Underfit"), linewidth = 1) +
+  geom_line(data = grid, aes(x, deg4, color = "4: Balanced"), linewidth = 1) +
+  geom_line(data = grid, aes(x, deg15, color = "15: Overfit"), linewidth = 1) +
+  scale_color_manual(values = c(
+    "1: Underfit" = "#c0392b",
+    "4: Balanced" = "#1e8449",
+    "15: Overfit" = "#7d3c98"
+  ), name = "Polynomial degree") +
+  labs(
+    title = "Same data, three models — which would you trust on a new site?",
+    x = "Month", y = "Groundwater level (m)"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+**Read the table:** the degree-15 model has the _lowest training error_ but its _test error explodes_ — classic overfitting. **The test row is the only row that tells the truth.**
+
+## 7.2 The Bias–Variance Tradeoff
+
+Total expected error decomposes as:
+
+$$\text{Total Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise}$$
+
+Think of a **dartboard**: **bias** = systematically aiming wrong (darts clustered away from the bullseye); **variance** = shaky hands (darts scattered everywhere).
+
+| Model                              | Bias      | Variance  | Behaviour      |
+| ---------------------------------- | --------- | --------- | -------------- |
+| Degree 1 (straight line on a wave) |  High   |  Low    | Underfits      |
+| Degree 4 (smooth curve)            |  Medium |  Medium | **Just right** |
+| Degree 15 (noodle)                 |  Low    |  High   | Overfits       |
+
+**How engineers fight it:** more data, simpler models, fewer features, regularisation — and **cross-validation** to _find_ the sweet spot, which brings us to…
+
+---
+
+# Cross-Validation Techniques — Many Mock Exams, Not One
+
+### What is it?
+
+A single train/test split can be lucky or unlucky. **K-fold cross-validation** rotates the exam: split training data into k folds, train on k−1, test on the remaining fold, repeat k times, and average. **Every data point gets examined exactly once.**
+
+```{r cv-fold-table}
+fold_demo <- matrix(" Train", nrow = 5, ncol = 5)
+diag(fold_demo) <- " TEST"
+knitr::kable(fold_demo,
+  col.names = paste0("Fold ", 1:5),
+  caption = "5-fold CV: in each round one red block is the test set"
+)
+```
+
+```{r cv-loop}
+set.seed(5)
+k <- 5
+folds <- sample(rep(1:k, length.out = nrow(train_set)))
+
+cv_results <- data.frame(fold = 1:k, rmse_with_log_age = NA, rmse_without_log_age = NA)
+
+for (i in 1:k) {
+  cv_train <- train_set[folds != i, ]
+  cv_test <- train_set[folds == i, ]
+
+  m_full <- lm(strength ~ cement + water + log_age, data = cv_train)
+  m_simple <- lm(strength ~ cement + water, data = cv_train)
+
+  cv_results$rmse_with_log_age[i] <- rmse(cv_test$strength, predict(m_full, newdata = cv_test))
+  cv_results$rmse_without_log_age[i] <- rmse(cv_test$strength, predict(m_simple, newdata = cv_test))
+}
+cv_results
+```
+
+```{r cv-summary}
+knitr::kable(data.frame(
+  Model = c("With log_age feature", "Without log_age"),
+  Mean_CV_RMSE = round(colMeans(cv_results[, 2:3]), 2),
+  SD_CV_RMSE = round(apply(cv_results[, 2:3], 2, sd), 2)
+), caption = "Average of 5 exams is far more trustworthy than one exam")
+```
+
+<div class="civilbox">️ <b>Civil reading:</b> CV confirms the `log_age` feature genuinely helps (lower mean RMSE) — this is the honest way to justify design decisions, just like a load test averages several specimens instead of trusting one cube.</div>
+
+<div class="keybox"> <b>Variants you should recognise:</b>
+- **LOOCV** (Leave-One-Out): k = n — every single row takes a turn as the test set (accurate but slow).
+- **Repeated k-fold**: repeat the whole procedure several times for extra stability.
+- **Golden rule:** run CV *inside the training data only* to choose models; touch the held-out test set **once**, at the very end.</div>
+
+---
+
+#  One-Page Summary (Pin This!)
+
+| Concept             | One-line takeaway                                                               |
+| ------------------- | ------------------------------------------------------------------------------- |
+| ML workflow         | Ask → Collect → Prepare → Split → Train → Evaluate → Deploy                     |
+| Cleaning            | No NA, no duplicates, no impossible values before modelling                     |
+| Min-Max / Z-score   | Fair comparison when columns have different units/spreads                       |
+| One-hot encoding    | Words → 1/0 columns (for categories with no order)                              |
+| Feature engineering | Rainfall intensity, runoff C, NDVI anomaly, log(age) = raw data made meaningful |
+| Train/test split    | Mock exam vs final exam — never leak                                            |
+| MAE / RMSE / R²     | Avg error / avg error punishing blunders / % of variation explained             |
+| Precision / Recall  | Alarm accuracy / floods caught — rare dangers need recall                       |
+| F1 / ROC-AUC        | Balance of P&R / quality across all thresholds                                  |
+| Overfitting         | Memorises noise; train error ↓, test error ↑                                    |
+| Bias–Variance       | Too simple vs too wiggly — seek the sweet spot                                  |
+| K-fold CV           | Average of k exams; the honest model selector                                   |
+
+---
+
+#  Mini Glossary
+
+- **Feature** — an input column the model learns from (cement, rainfall intensity).
+- **Label / Target** — what we predict (strength, Flood/No Flood).
+- **Training set** — data the model learns from. **Test set** — data for honest grading.
+- **Imputation** — filling missing values (e.g., with the median).
+- **Normalization / Standardization** — rescaling features to comparable ranges.
+- **One-hot encoding** — one 1/0 column per category.
+- **Confusion matrix** — 2×2 table of TP, FP, FN, TN.
+- **ROC curve / AUC** — performance across all thresholds / area under it.
+- **Bias** — systematic error from a too-simple model. **Variance** — instability of a too-complex model.
+- **Cross-validation** — rotating train/test rounds averaged for reliability.
+
+---
+
+# ️ Exit Ticket — Test Yourself!
+
+**Q1.** Normalise cement = 350 kg/m³ given min = 200 and max = 500.
+
+**Q2.** A storm drops 48 mm in 1.5 hours. Compute the rainfall intensity.
+
+**Q3.** Using the Rational Method, find Q for C = 0.75, i = 40 mm/hr, A = 10 ha.
+
+**Q4.** A flood model gives TP = 40, FP = 10, FN = 20, TN = 130. Find Accuracy, Precision, Recall, and F1.
+
+**Q5.** Why can 99% accuracy be a disaster for flood prediction?
+
+<details><summary><b> Click for answers</b></summary>
+
+**A1.** $x' = (350-200)/(500-200) = 0.5$
+
+**A2.** $I = 48/1.5 = 32$ mm/hr.
+
+**A3.** $Q = 0.75 \times 40 \times 10 / 360 \approx 8.33$ m³/s.
+
+**A4.** Accuracy = 170/200 = **0.85**; Precision = 40/50 = **0.80**; Recall = 40/60 ≈ **0.667**; F1 = 2(0.8)(0.667)/(0.8+0.667) ≈ **0.727**.
+
+**A5.** If floods are 1% of cases, "always say No Flood" scores 99% accuracy but **Recall = 0** — it misses every real flood, which is exactly the dangerous failure mode. Use Recall/F1 for rare, hazardous events.
+
+</details>
+
+---
+
+#  Where This Comes From (Further Reading)
+
+1. James, G., Witten, D., Hastie, T., & Tibshirani, R. (2021). _An Introduction to Statistical Learning_ (2nd ed.) — Chapters 2 & 5 (resampling/CV). Free at statlearning.com.
+2. Wickham, C., Çetinkaya-Rundel, M., & Grolemund, G. (2023). _R for Data Science_ (2nd ed.) — data cleaning & transformation. Free at r4ds.hadley.nz.
+3. Musoko, C. (2024). _Explainable Machine Learning for Geospatial Data Analysis_ — feature engineering for spatial data.
+4. Course notes 24CV201T, Units 3 & 4 (next unit: real algorithms — logistic regression, trees, KNN — evaluated with exactly these metrics!).

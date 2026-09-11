@@ -1,0 +1,1366 @@
+---
+title: "Unit 2: Statistics & Exploratory Data Analysis — Complete Study Handout"
+subtitle: "14hr | 24CV201T"
+author: "Dr. Ankit Deshmukh"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: readable
+    highlight: tango
+    code_folding: hide
+    self_contained: true
+header-includes:
+  - |
+    <style>
+      body, p, li, td, th {
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: 17px;
+        line-height: 1.7;
+      }
+      h1, h2, h3, h4 {
+        font-family: "Georgia", serif;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+      h1 { font-size: 30px; border-bottom: 3px solid #2c3e50; padding-bottom: 8px; }
+      h2 { font-size: 24px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }
+      h3 { font-size: 20px; color: #34495e; }
+      .key-box {
+        background-color: #e8f5e9;
+        border-left: 5px solid #4caf50;
+        padding: 12px 18px;
+        margin: 18px 0;
+        border-radius: 0 6px 6px 0;
+      }
+      .warn-box {
+        background-color: #fff3cd;
+        border-left: 5px solid #ffc107;
+        padding: 12px 18px;
+        margin: 18px 0;
+        border-radius: 0 6px 6px 0;
+      }
+      .formula-box {
+        background-color: #e3f2fd;
+        border-left: 5px solid #1976d2;
+        padding: 12px 18px;
+        margin: 18px 0;
+        border-radius: 0 6px 6px 0;
+      }
+      .exam-tip {
+        background-color: #fce4ec;
+        border-left: 5px solid #e91e63;
+        padding: 12px 18px;
+        margin: 18px 0;
+        border-radius: 0 6px 6px 0;
+        font-weight: bold;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 15px 0;
+      }
+      th, td {
+        border: 1px solid #bdc3c7;
+        padding: 8px 12px;
+        text-align: left;
+      }
+      th {
+        background-color: #2c3e50;
+        color: white;
+      }
+      tr:nth-child(even) { background-color: #f2f2f2; }
+    </style>
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+# Preface: How to Use This Handout
+
+This handout condenses the entire Unit 2 syllabus into a single, exam-focused reference. It covers:
+
+- **Statistical thinking** and the role of statistics in engineering
+- **Statistical learning** (supervised vs. unsupervised, parametric vs. non-parametric)
+- **Data types** and structures in R
+- **Descriptive statistics** (mean, median, variance, quartiles, IQR)
+- **Probability foundations** for risk assessment
+- **Data cleaning** (missing values, duplicates, outliers)
+- **Exploratory Data Analysis (EDA)** workflow
+- **Visual analytics** with ggplot2 (7 chart types)
+- **Correlation and feature relationships**
+- **Regression analysis** (linear, multiple, polynomial, logistic, LDA, ridge, lasso, quantile)
+- **Two complete case studies** (Rainfall variability and Retail Sales EDA)
+
+No code is required for the exam — only concepts, examples, and statistical reasoning.
+
+---
+
+# 1. Introduction to Statistics and Its Role in Engineering
+
+## 1.1 What Is Statistics?
+
+**Statistics** is the science of collecting, organizing, summarizing, analyzing, and interpreting data to make informed decisions. In engineering, statistics is used for:
+
+- **Quality control** — monitoring manufacturing defects
+- **Reliability analysis** — predicting failure times of components
+- **Experimental design** — testing which factors affect performance
+- **Risk assessment** — estimating probability of extreme events (floods, earthquakes)
+- **Process optimization** — reducing waste and improving yield
+
+<div class="key-box">
+<b>Key Definition:</b> Statistics is not just about numbers — it is a framework for <i>decision-making under uncertainty</i>. Engineers use it to separate signal from noise.
+</div>
+
+## 1.2 Descriptive vs. Inferential Statistics
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Descriptive** | Summarize and describe the data at hand | Mean rainfall of Sydney = 85 mm |
+| **Inferential** | Draw conclusions about a population from a sample | Is Sydney's rainfall increasing over time? |
+
+Descriptive statistics form the foundation of Exploratory Data Analysis (EDA). Inferential statistics build on EDA for hypothesis testing and modeling.
+
+## 1.3 Population vs. Sample
+
+- **Population**: The complete set of all items of interest (e.g., all rainfall days in Sydney's history).
+- **Sample**: A subset of the population actually measured (e.g., 800 days of rainfall data).
+- **Parameter**: A numerical summary of a population (e.g., true mean rainfall $\mu$).
+- **Statistic**: A numerical summary of a sample (e.g., sample mean $\bar{x}$).
+
+<div class="exam-tip">
+Exam Tip: A statistic estimates a parameter. The sample mean ($\bar{x}$) estimates the population mean ($\mu$). The sample standard deviation ($s$) estimates the population standard deviation ($\sigma$).
+</div>
+
+---
+
+# 2. Statistical Learning: Supervised and Unsupervised
+
+## 2.1 What Is Statistical Learning?
+
+**Statistical learning** refers to a vast set of tools for modeling and understanding complex datasets. It blends statistics with machine learning and is central to modern data science.
+
+> Statistical learning = using data to estimate the unknown function $f$ that maps inputs $X$ to output $Y$.
+
+## 2.2 The General Framework
+
+We observe a quantitative response $Y$ and $p$ predictors $X_1, X_2, \ldots, X_p$. We assume:
+
+$$Y = f(X) + \varepsilon$$
+
+Where:
+
+- $f$ is the **fixed but unknown function** relating $X$ to $Y$
+- $\varepsilon$ is a **random error term** with mean zero
+
+The goal of statistical learning is to **estimate $f$**.
+
+## 2.3 Supervised vs. Unsupervised Learning
+
+| Aspect | Supervised Learning | Unsupervised Learning |
+|--------|---------------------|----------------------|
+| **Inputs** | $X$ and $Y$ (labeled data) | Only $X$ (no labels) |
+| **Goal** | Predict $Y$ from $X$ | Discover structure in $X$ |
+| **Examples** | Regression, classification, LDA | Clustering, PCA |
+| **Engineering Use** | Predicting strength of concrete | Grouping similar soil samples |
+
+<div class="key-box">
+<b>Supervised</b> = "learning with a teacher" (we know the correct answers).<br>
+<b>Unsupervised</b> = "learning without a teacher" (we discover patterns ourselves).
+</div>
+
+## 2.4 Why Estimate $f$? Prediction and Inference
+
+There are two main reasons to estimate $f$:
+
+### Prediction
+When inputs $X$ are available but output $Y$ is not, we predict $Y$ using:
+
+$$\hat{Y} = \hat{f}(X)$$
+
+*Example:* Predict a patient's risk of adverse drug reaction from blood sample characteristics.
+
+### Inference
+We want to understand **how** $Y$ changes as $X_1, \ldots, X_p$ change. We care about the form of $f$, not just prediction accuracy.
+
+*Example:* Which media (TV, radio, newspaper) actually contribute to sales?
+
+## 2.5 Parametric vs. Non-Parametric Methods
+
+### Parametric Methods
+Two-step approach:
+
+1. **Assume a functional form** for $f$ (e.g., linear: $f(X) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$)
+2. **Fit/train the model** using data (e.g., least squares)
+
+**Advantages:**
+
+- Simpler to estimate (only $p+1$ coefficients)
+- Requires fewer observations
+- Easy to interpret
+
+**Disadvantages:**
+
+- The assumed form may not match the true $f$ (model misspecification)
+- Rigid — cannot capture complex shapes
+
+### Non-Parametric Methods
+Make **no explicit assumptions** about the functional form of $f$. Instead, they seek an estimate that closely follows the data without excessive wiggliness.
+
+**Advantages:**
+
+- Extremely flexible — can fit a wide range of shapes
+- Avoids model misspecification
+
+**Disadvantages:**
+
+- Requires **many more observations** to achieve accuracy
+- Risk of **overfitting** (following noise too closely)
+- Harder to interpret
+
+<div class="warn-box">
+<b>Overfitting:</b> When a model follows the random noise in the training data too closely, it performs poorly on new data. Flexible models with many parameters are prone to overfitting.
+</div>
+
+## 2.6 Trade-off: Simplicity vs. Flexibility
+
+- **Linear models** are simple but may underfit complex relationships.
+- **Highly flexible models** (e.g., splines) can fit complex data but may overfit.
+- The goal is to find the **sweet spot** — a model that captures the true signal without fitting noise.
+
+This is the **bias-variance trade-off**:
+
+- High bias = too simple (underfitting)
+- High variance = too complex (overfitting)
+
+---
+
+# 3. R: The Tool for Statistical Data Analysis
+
+## 3.1 What Is R?
+
+**R** is a free, open-source programming language for statistical computing and data visualization. It is widely adopted in:
+
+- Data mining and bioinformatics
+- Data analysis and data science
+- Academia, government, and industry
+
+## 3.2 Brief History
+
+- **1992**: Developed by Ross Ihaka and Robert Gentleman at the University of Auckland
+- **Inspired by**: S programming language (Bell Laboratories)
+- **1995**: Released as free software under GNU GPL
+- **1997**: CRAN (Comprehensive R Archive Network) established
+- **2000**: R version 1.0.0 released
+- **Today**: 20,000+ packages on CRAN for statistics, ML, visualization, finance, healthcare, geospatial analysis, and engineering
+
+## 3.3 Why R for Engineers?
+
+- **Reproducible analysis** — scripts document every step
+- **Powerful visualization** — ggplot2 creates publication-quality plots
+- **Rich ecosystem** — packages for every statistical method
+- **Free and open-source** — no licensing costs
+- **Community support** — massive online resources
+
+---
+
+# 4. Engineering Data Types and R Data Structures
+
+## 4.1 Types of Engineering Data
+
+| Data Type | Description | Example |
+|-----------|-------------|---------|
+| **Numerical** | Continuous or discrete numbers | Temperature = 23.5°C, Rainfall = 12 mm |
+| **Categorical** | Labels or groups | Soil type = {Clay, Sand, Silt} |
+| **Time-Series** | Observations indexed by time | Daily rainfall from 2011–2014 |
+| **Spatial** | Data with geographic coordinates | Rainfall at different weather stations |
+| **Ordinal** | Ordered categories | Concrete grade = {M20, M25, M30} |
+| **Binary** | Two categories | Yes/No, Pass/Fail |
+
+## 4.2 R Data Structures
+
+| Structure | Description | Can Hold Mixed Types? |
+|-----------|-------------|----------------------|
+| **Vector** | 1D sequence of same type | No |
+| **Factor** | Categorical variable | No (levels) |
+| **Matrix** | 2D, same type | No |
+| **Data Frame** | 2D, columns can differ | Yes |
+| **List** | Ordered collection of anything | Yes |
+| **Tibble** | Modern data frame | Yes |
+
+<div class="key-box">
+A <b>data frame</b> is the workhorse of R data analysis — it is like an Excel sheet where each column can be a different type (numeric, character, factor, date).
+</div>
+
+---
+
+# 5. Descriptive Statistics
+
+## 5.1 Measures of Central Tendency
+
+### Mean (Average)
+$$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$$
+
+- Sensitive to outliers
+- Used for normally distributed data
+
+### Median
+The middle value when data is sorted. If $n$ is even, average of the two middle values.
+
+- Robust to outliers
+- Used for skewed data
+
+### Mode
+The most frequently occurring value.
+
+- Used for categorical data
+- A dataset can have multiple modes
+
+<div class="exam-tip">
+Exam Tip: When data is skewed (e.g., rainfall, income), the median is a better measure of center than the mean. When data is symmetric, mean = median = mode.
+</div>
+
+## 5.2 Measures of Spread (Dispersion)
+
+### Range
+$$\text{Range} = \text{Max} - \text{Min}$$
+
+- Simple but sensitive to outliers
+
+### Variance
+$$s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$$
+
+- Average squared deviation from the mean
+- Units are squared (hard to interpret)
+
+### Standard Deviation
+$$s = \sqrt{s^2}$$
+
+- Same units as data
+- Most common measure of spread
+
+### Interquartile Range (IQR)
+$$\text{IQR} = Q_3 - Q_1$$
+
+- Range of the middle 50% of data
+- Robust to outliers
+- Used in boxplots and outlier detection
+
+## 5.3 Quartiles and Percentiles
+
+- **Q1 (First Quartile)**: 25th percentile
+- **Q2 (Second Quartile)**: 50th percentile = median
+- **Q3 (Third Quartile)**: 75th percentile
+- **Percentile**: The value below which a given percentage of data falls
+
+## 5.4 Five-Number Summary
+
+1. **Minimum**
+2. **Q1** (25th percentile)
+3. **Median** (Q2, 50th percentile)
+4. **Q3** (75th percentile)
+5. **Maximum**
+
+This summary is the basis of the **boxplot**.
+
+## 5.5 Shape of Distribution
+
+| Shape | Description | Mean vs. Median |
+|-------|-------------|-----------------|
+| **Symmetric** | Bell-shaped, equal tails | Mean ≈ Median |
+| **Right-skewed (positive)** | Long right tail | Mean > Median |
+| **Left-skewed (negative)** | Long left tail | Mean < Median |
+
+<div class="key-box">
+<b>Rainfall example:</b> Most days have little rain, but a few days have heavy downpours. This creates a <b>right-skewed</b> distribution. The mean is pulled upward by extreme values, so the median is a better summary.
+</div>
+
+## 5.6 Coefficient of Variation (CV)
+
+$$\text{CV} = \frac{s}{\bar{x}} \times 100\%$$
+
+- Measures relative variability
+- Useful when comparing datasets with different units or means
+- Unitless
+
+## 5.7 Standard Error and Confidence Intervals
+
+- **Standard Error (SE)**: $SE = s / \sqrt{n}$ — measures uncertainty of the sample mean
+- **95% Confidence Interval**: $\bar{x} \pm 1.96 \times SE$
+
+---
+
+# 6. Probability Foundations for Risk Assessment
+
+## 6.1 Basic Probability Concepts
+
+- **Experiment**: A process with uncertain outcomes (e.g., rolling a die)
+- **Sample Space ($S$)**: All possible outcomes
+- **Event ($A$)**: A subset of the sample space
+- **Probability**: $0 \leq P(A) \leq 1$
+
+### Rules of Probability
+- **Complement**: $P(A^c) = 1 - P(A)$
+- **Addition**: $P(A \cup B) = P(A) + P(B) - P(A \cap B)$
+- **Multiplication (independent)**: $P(A \cap B) = P(A) \times P(B)$
+- **Conditional**: $P(A|B) = P(A \cap B) / P(B)$
+
+## 6.2 Random Variables
+
+- **Discrete**: Countable outcomes (e.g., number of defects)
+- **Continuous**: Infinite outcomes in an interval (e.g., rainfall depth)
+
+### Probability Distributions
+
+| Distribution | Type | Use Case |
+|--------------|------|----------|
+| **Binomial** | Discrete | Number of successes in $n$ trials |
+| **Poisson** | Discrete | Number of events in a time interval |
+| **Normal** | Continuous | Heights, errors, temperatures |
+| **Exponential** | Continuous | Time between events |
+| **Log-normal** | Continuous | Rainfall, income |
+| **Weibull** | Continuous | Reliability, failure times |
+
+## 6.3 Engineering Applications
+
+- **Flood risk**: Probability that rainfall exceeds a threshold in a given year
+- **Reliability**: Probability that a component survives beyond time $t$
+- **Quality control**: Probability that a batch meets specifications
+- **Structural safety**: Probability of failure under extreme loads
+
+<div class="exam-tip">
+Exam Tip: For risk assessment, engineers use return periods. A 100-year flood has a 1% chance of occurring in any given year. This is based on probability distributions fitted to historical data.
+</div>
+
+---
+
+# 7. Data Cleaning Procedures
+
+## 7.1 Why Data Cleaning Matters
+
+Real-world data is messy. Common issues:
+
+- **Missing values** (NA)
+- **Duplicate records**
+- **Outliers**
+- **Inconsistent formatting**
+- **Wrong data types**
+
+<div class="key-box">
+<b>Garbage In, Garbage Out (GIGO):</b> No statistical method can fix bad data. Cleaning is often 60–80% of the analysis effort.
+</div>
+
+## 7.2 Handling Missing Values
+
+### Types of Missingness
+- **MCAR** (Missing Completely At Random): No pattern
+- **MAR** (Missing At Random): Depends on observed variables
+- **MNAR** (Missing Not At Random): Depends on unobserved variables
+
+### Strategies
+| Strategy | When to Use | Drawback |
+|----------|-------------|----------|
+| **Remove rows** | Few missing values, MCAR | Loses information |
+| **Mean/Median imputation** | Simple, quick | Reduces variance, biases |
+| **Mode imputation** | Categorical data | Same as above |
+| **Regression imputation** | MAR, correlated variables | Complex, can overfit |
+| **Multiple imputation** | Best practice | Computationally intensive |
+
+### Visualizing Missing Data
+A **missingness heatmap** shows where NAs occur (red = missing, gray = present). This helps identify patterns.
+
+## 7.3 Removing Duplicates
+
+Duplicate rows over-represent certain observations and bias results.
+
+- Use `distinct()` in R to remove exact duplicates
+- Check for near-duplicates (same customer, different timestamp)
+- Document how many duplicates were removed
+
+<div class="warn-box">
+<b>Caution:</b> Not all duplicates are errors. Multiple orders from the same customer on the same day may be legitimate. Understand the context before removing.
+</div>
+
+## 7.4 Outlier Detection
+
+### IQR Method
+An observation is an outlier if:
+
+$$x < Q_1 - 1.5 \times IQR \quad \text{or} \quad x > Q_3 + 1.5 \times IQR$$
+
+- Robust to extreme values
+- Used in boxplots
+- Non-parametric (no distribution assumption)
+
+### Z-Score Method
+$$z = \frac{x - \bar{x}}{s}$$
+
+- Observation is an outlier if $|z| > 3$ (or sometimes 2.5)
+- Assumes normal distribution
+- Sensitive to the very outliers it tries to detect
+
+### What to Do with Outliers?
+1. **Investigate** — Is it a data entry error or a real extreme event?
+2. **Correct** — Fix if clearly an error
+3. **Remove** — Only if justified and documented
+4. **Keep** — If it represents a real phenomenon (e.g., a storm event)
+5. **Use robust methods** — Quantile regression, median-based statistics
+
+<div class="exam-tip">
+Exam Tip: In rainfall data, extreme values (storms) are often real and important. Removing them would destroy the analysis of extreme events. Always investigate before removing outliers.
+</div>
+
+## 7.5 Data Validation and Quality Checks
+
+- **Range checks**: Are values within plausible bounds?
+- **Type checks**: Are numbers stored as numeric?
+- **Consistency checks**: Do start dates precede end dates?
+- **Uniqueness checks**: Are IDs unique?
+- **Completeness checks**: What percentage of values are missing?
+
+---
+
+# 8. Exploratory Data Analysis (EDA)
+
+## 8.1 What Is EDA?
+
+**Exploratory Data Analysis (EDA)** is the process of examining data before formal modeling to:
+
+- Understand distributions
+- Detect patterns, anomalies, and relationships
+- Form hypotheses
+- Guide model selection
+
+> EDA is detective work. You look for clues before building a case (model).
+
+## 8.2 The EDA Workflow
+
+1. **Import data** — Load CSV, Excel, or database
+2. **Inspect structure** — Check dimensions, types, head, tail
+3. **Check missing values** — Count and visualize
+4. **Clean data** — Handle missing, duplicates, outliers
+5. **Univariate analysis** — Summarize each variable
+6. **Bivariate analysis** — Relationships between pairs
+7. **Multivariate analysis** — Correlations, interactions
+8. **Visualize** — Plots for each finding
+9. **Interpret** — Draw conclusions and form hypotheses
+
+## 8.3 Univariate Analysis
+
+Examine one variable at a time:
+
+- **Numerical**: Histogram, density plot, boxplot, summary statistics
+- **Categorical**: Bar chart, frequency table
+
+## 8.4 Bivariate Analysis
+
+Examine relationships between two variables:
+
+- **Numerical vs. Numerical**: Scatter plot, correlation
+- **Numerical vs. Categorical**: Boxplot, violin plot, grouped summary
+- **Categorical vs. Categorical**: Contingency table, stacked bar chart
+
+## 8.5 Multivariate Analysis
+
+Examine three or more variables:
+
+- **Scatterplot matrix** (pairs plot)
+- **Correlation heatmap**
+- **Faceting** (small multiples)
+- **Coloring by group**
+
+## 8.6 The Iris Dataset: A Classic Example
+
+The **Iris dataset** (Fisher, 1936) contains 150 flowers from 3 species:
+
+- *Iris setosa* (50 flowers)
+- *Iris versicolor* (50 flowers)
+- *Iris virginica* (50 flowers)
+
+Four measurements per flower (in cm):
+
+1. Sepal.Length
+2. Sepal.Width
+3. Petal.Length
+4. Petal.Width
+
+**Why it's a perfect teaching tool:**
+
+- Small enough to understand completely
+- Clear structure and patterns
+- Demonstrates regression, classification, and dimensionality reduction
+- Connects to real-world biology
+
+### Botanical Background: Sepals vs. Petals
+
+| Term | Description | Function |
+|------|-------------|----------|
+| **Sepal** | Outer, leaf-like protective structures | Protect flower bud before bloom |
+| **Petal** | Inner, often colorful structures | Attract pollinators |
+
+---
+
+# 9. Visual Analytics with ggplot2
+
+## 9.1 The Grammar of Graphics
+
+**ggplot2** implements the *Grammar of Graphics* — a systematic approach to building plots layer-by-layer.
+
+Every plot has:
+
+1. **Data** — the dataset
+2. **Aesthetics (`aes`)** — map variables to visual properties (x, y, color, size)
+3. **Geoms** — geometric objects (`geom_point()`, `geom_bar()`, etc.)
+4. **Scales** — control mapping from data to visual space
+5. **Facets** — sub-plots by categorical variables
+6. **Themes** — non-data elements (fonts, colors, gridlines)
+
+<div class="key-box">
+<b>Layered philosophy:</b> Data → Aesthetics → Geoms → Scales → Facets → Themes<br>
+Start simple, then add layers iteratively.
+</div>
+
+## 9.2 Scatter Plots (`geom_point()`)
+
+**Purpose:** Visualize relationship between **two continuous variables**.
+
+**What to look for:**
+
+- **Direction**: Positive (both increase) or negative (one increases, other decreases)
+- **Form**: Linear or non-linear
+- **Strength**: Tight cluster (strong) or loose (weak)
+- **Outliers**: Points far from the main cloud
+
+**Enhancements:**
+
+- `geom_smooth()` adds trend line
+- `color`/`fill` for grouping
+- `alpha` for transparency (handles overplotting)
+- `size` for point emphasis
+
+**Example (mtcars):** Weight vs. MPG — heavier cars have lower fuel efficiency (negative relationship).
+
+**Best for:** Hypothesis generation, trend detection, identifying data gaps.
+
+## 9.3 Histograms (`geom_histogram()`)
+
+**Purpose:** Show distribution of a **single continuous variable** by binning values.
+
+**What to look for:**
+
+- **Skewness**: Tail direction (right/left)
+- **Modality**: Number of peaks (unimodal, bimodal, multimodal)
+- **Spread**: Range of values
+- **Gaps**: Missing regions
+
+**Key parameter:** `binwidth` — too wide hides detail, too narrow creates noise.
+
+**Example (mtcars):** Distribution of MPG — most cars get 15–25 MPG, with a few outliers.
+
+**Best for:** Initial data exploration, detecting data entry errors, understanding central tendency.
+
+## 9.4 Density Plots (`geom_density()`)
+
+**Purpose:** Smoothed version of histogram — estimates probability density function.
+
+**What to look for:** Same as histograms, but easier to compare multiple groups.
+
+**Key parameter:** `adjust` — controls smoothness (higher = smoother).
+
+**Example (mtcars):** Density of MPG by cylinder count — 4-cylinder cars have higher MPG, 8-cylinder lower.
+
+**When to prefer over histograms:**
+
+- Small sample size
+- Comparing multiple groups
+- Need a clean visual for overlapping distributions
+
+## 9.5 Boxplots (`geom_boxplot()`)
+
+**Purpose:** Display **five-number summary** (min, Q1, median, Q3, max) and outliers.
+
+**What to look for:**
+
+- **Median differences** between groups
+- **IQR** (spread of middle 50%)
+- **Symmetry** of the middle 50%
+- **Outliers** (points beyond whiskers)
+
+**Whiskers:** Extend to 1.5 × IQR; beyond that are plotted as points.
+
+**Example (mtcars):** MPG by cylinder count — 4-cylinder cars have higher median MPG.
+
+**Best for:** Comparing distributions across several categorical groups compactly.
+
+## 9.6 Violin Plots (`geom_violin()`)
+
+**Purpose:** Combine boxplot with **mirrored density plot** — shows full shape of distribution and summary statistics.
+
+**What to look for:**
+
+- **Multi-modality** (multiple peaks) which boxplots hide
+- **Full distribution shape**
+
+**Key parameters:**
+
+- `trim = FALSE` keeps the tails
+- `draw_quantiles` overlays quartile lines
+
+**Example (mtcars):** Violin plot of MPG by cylinders — shows the shape of each group's distribution.
+
+**Combination tip:** Overlay `geom_boxplot(width = 0.1)` on top of a violin to keep summary visible.
+
+**Best for:** Rich group comparisons when you suspect complex distributions (e.g., bimodal data).
+
+## 9.7 Heatmaps (`geom_tile()`)
+
+**Purpose:** Encode a matrix of numeric values using color intensity.
+
+**What to look for:**
+
+- Patterns, clusters, gradients across two dimensions
+
+**Best for:**
+
+- Visualizing aggregated tables (e.g., average sales by region and quarter)
+- Confusion matrices
+- Any 2-D grid of values
+
+**Example:** Average MPG by gear and cylinder — darker colors indicate higher fuel efficiency.
+
+**Note:** Use `coord_fixed()` for square tiles.
+
+## 9.8 Correlation Matrices (`geom_tile()` + `scale_fill_gradient2`)
+
+**Purpose:** Visualize **pairwise correlations** between multiple numeric variables.
+
+**What to look for:**
+
+- Strong positive (red) / negative (blue) relationships at a glance
+
+**Best for:**
+
+- Multicollinearity diagnosis in regression
+- Initial feature selection
+
+**Why diverging colors?** They make the sign and magnitude immediately obvious. `scale_fill_gradient2` is perfect (midpoint = 0).
+
+**Example (mtcars):** Correlation matrix of all variables — weight and MPG are strongly negatively correlated.
+
+## 9.9 Summary: When to Use Which Plot
+
+| Plot | Geom | Data Types | Primary Utility |
+|------|------|-----------|-----------------|
+| **Scatter** | `geom_point()` | 2 continuous | Relationship, trends, clustering, outliers |
+| **Histogram** | `geom_histogram()` | 1 continuous | Distribution shape, skewness, modality |
+| **Density** | `geom_density()` | 1 continuous (+ groups) | Smoothed distribution, compare groups |
+| **Boxplot** | `geom_boxplot()` | 1 continuous + 1 categorical | Summarize and compare distributions |
+| **Violin** | `geom_violin()` | 1 continuous + 1 categorical | Full distribution + summary |
+| **Heatmap** | `geom_tile()` | 2 categorical (values) | 2-D aggregated metrics / patterns |
+| **Correlation** | `geom_tile()` | Many numeric → matrix | Collinearity, feature relationships |
+
+---
+
+# 10. Correlation and Feature Relationships
+
+## 10.1 What Is Correlation?
+
+**Correlation** measures the strength and direction of a **linear relationship** between two variables.
+
+### Pearson Correlation Coefficient ($r$)
+$$r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2 \sum (y_i - \bar{y})^2}}$$
+
+- Range: $-1 \leq r \leq +1$
+- $r = +1$: Perfect positive linear relationship
+- $r = -1$: Perfect negative linear relationship
+- $r = 0$: No linear relationship
+
+<div class="warn-box">
+<b>Correlation ≠ Causation:</b> Just because two variables are correlated does not mean one causes the other. There may be a confounding variable, or the relationship may be coincidental.
+</div>
+
+## 10.2 Interpreting Correlation Strength
+
+| $|r|$ Value | Interpretation |
+|-----------|----------------|
+| 0.0 – 0.2 | Very weak / negligible |
+| 0.2 – 0.4 | Weak |
+| 0.4 – 0.6 | Moderate |
+| 0.6 – 0.8 | Strong |
+| 0.8 – 1.0 | Very strong |
+
+## 10.3 Spearman Correlation
+
+**Spearman's rank correlation** ($\rho$) measures monotonic relationships (not necessarily linear).
+
+- Based on ranks, not raw values
+- Robust to outliers
+- Use when relationship is monotonic but non-linear
+
+## 10.4 Correlation Matrix
+
+A **correlation matrix** shows pairwise correlations among multiple variables.
+
+- Diagonal is always 1 (variable correlated with itself)
+- Symmetric matrix ($r_{ij} = r_{ji}$)
+- Used to detect **multicollinearity** in regression
+
+## 10.5 Multicollinearity
+
+**Multicollinearity** occurs when predictors are highly correlated with each other.
+
+**Problems:**
+
+- Unstable coefficient estimates
+- Inflated standard errors
+- Difficult to interpret individual effects
+
+**Detection:**
+
+- Correlation matrix (|r| > 0.8 between predictors)
+- Variance Inflation Factor (VIF > 5 or 10)
+
+**Solution:**
+
+- Remove one of the correlated predictors
+- Use Ridge regression
+- Use PCA
+
+## 10.6 Feature Relationships in Practice
+
+When exploring feature relationships:
+
+1. **Visualize first** — scatterplot matrix, correlation heatmap
+2. **Quantify** — compute correlation coefficients
+3. **Check for non-linearity** — scatterplots may show curves
+4. **Consider interactions** — effects may depend on other variables
+5. **Domain knowledge** — statistical relationships must make sense
+
+---
+
+# 11. Regression Analysis
+
+## 11.1 What Is Regression?
+
+**Regression analysis** estimates relationships between a **dependent variable** (response) and one or more **independent variables** (predictors).
+
+**Goals:**
+
+1. **Predict** unknown values
+2. **Explain** how changes in $X$ affect $Y$
+3. **Control** for confounding variables
+4. **Classify** observations (logistic regression, LDA)
+
+## 11.2 Simple Linear Regression (SLR)
+
+### Model
+$$Y = \beta_0 + \beta_1 X + \varepsilon$$
+
+- $Y$: Dependent variable
+- $X$: Independent variable
+- $\beta_0$: Intercept (value of $Y$ when $X = 0$)
+- $\beta_1$: Slope (change in $Y$ per unit change in $X$)
+- $\varepsilon$: Error term
+
+### Least Squares Method
+Finds the line that minimizes the sum of squared errors (SSE):
+
+$$\text{SSE} = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$
+
+### Interpretation
+- **Slope**: For every 1-unit increase in $X$, $Y$ changes by $\beta_1$ units on average.
+- **Intercept**: The predicted $Y$ when $X = 0$ (may not always be meaningful).
+- **R-squared ($R^2$)**: Proportion of variance in $Y$ explained by $X$. Range: 0 to 1.
+
+### Assumptions (LINE)
+1. **Linearity**: Relationship between $X$ and $Y$ is linear
+2. **Independence**: Observations are independent
+3. **Normality**: Errors are normally distributed
+4. **Equal variance (Homoscedasticity)**: Constant variance of errors
+
+### Example (Iris)
+Predicting Petal.Length from Sepal.Length:
+
+- Slope ≈ 1.86: For every 1 cm increase in sepal length, petal length increases by 1.86 cm.
+- $R^2$ tells us how much variation in petal length is explained by sepal length.
+
+## 11.3 Multiple Linear Regression (MLR)
+
+### Model
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \varepsilon$$
+
+### Partial Regression Coefficients
+Each $\beta_j$ represents the change in $Y$ for a one-unit change in $X_j$, **holding all other predictors constant**.
+
+### Adjusted R-squared
+Penalizes for adding unnecessary predictors:
+
+$$R^2_{adj} = 1 - \frac{(1-R^2)(n-1)}{n-p-1}$$
+
+- Always use Adjusted $R^2$ for model comparison
+- Adding useless predictors increases $R^2$ but decreases Adjusted $R^2$
+
+### Example (Iris)
+Predicting Petal.Length from Sepal.Length, Sepal.Width, and Petal.Width:
+
+- Higher $R^2$ than simple linear regression
+- Each coefficient shows the unique contribution of that predictor
+
+## 11.4 Polynomial Regression
+
+### Model
+$$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \cdots + \varepsilon$$
+
+**Use when:** Relationship between $X$ and $Y$ is curved.
+
+**Example:** Plant growth vs. fertilizer — too little or too much fertilizer reduces growth (quadratic relationship).
+
+**Caution:** High-degree polynomials can overfit. Use only when justified by theory or data.
+
+## 11.5 Logistic Regression
+
+### Model
+$$P(Y=1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p)}}$$
+
+**Use when:** Response variable is **binary** (0/1, yes/no, pass/fail).
+
+**Output:** Predicted probability between 0 and 1.
+
+**Example (Iris):** Predicting whether a flower is *setosa* (1) or not (0) based on petal length.
+
+**Interpretation:**
+
+- S-shaped (sigmoid) curve
+- Coefficients are in log-odds; exponentiate to get odds ratios
+
+## 11.6 Linear Discriminant Analysis (LDA)
+
+### What Is LDA?
+LDA is both a **dimensionality reduction** technique and a **classification** method. Developed by Fisher (1936) — the same Fisher who gave us the iris dataset!
+
+### Assumptions
+1. **Normality**: Each class follows a multivariate normal distribution
+2. **Equal covariance matrices**: All classes share the same covariance structure
+3. **Independence**: Observations are independent
+
+### How It Works
+
+1. **Find discriminant axes**: Project data onto directions that maximize between-class variance while minimizing within-class variance
+2. **Classify**: Assign new observations to the class with the closest mean (in discriminant space)
+
+### Mathematics
+LDA seeks a projection vector $w$ that maximizes:
+
+$$J(w) = \frac{w^T S_B w}{w^T S_W w}$$
+
+Where:
+
+- $S_B$ = Between-class scatter matrix
+- $S_W$ = Within-class scatter matrix
+
+<div class="key-box">
+<b>Intuition:</b> LDA finds the "best viewing angle" to separate the species. Imagine rotating a 3D scatter plot until the three species are most clearly separated — that's what LDA does mathematically.
+</div>
+
+### Example (Iris)
+- 4 measurements → 2 discriminant axes (LD1, LD2)
+- LD1 separates setosa from the other two species
+- LD2 separates versicolor from virginica
+- Accuracy ≈ 98% on the training data
+
+### LDA Output
+- **Prior probabilities**: Proportion of each class
+- **Group means**: Average measurements per class
+- **Coefficients of linear discriminants**: Weights for each variable
+
+## 11.7 Ridge Regression (L2 Regularization)
+
+### Model
+$$\text{Minimize: } \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2$$
+
+**Use when:** Predictors are highly correlated (multicollinearity).
+
+**Effect:** Shrinks coefficients toward zero but never exactly zero.
+
+**Parameter $\lambda$:** Controls amount of shrinkage (higher = more shrinkage).
+
+## 11.8 Lasso Regression (L1 Regularization)
+
+### Model
+$$\text{Minimize: } \sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j|$$
+
+**Use when:** You need **feature selection** (some coefficients become exactly zero).
+
+**Effect:** Performs variable selection by shrinking some coefficients to zero.
+
+**Difference from Ridge:** Lasso can eliminate variables; Ridge only shrinks them.
+
+## 11.9 Quantile Regression
+
+### Model
+Estimates conditional quantiles (e.g., median, 10th percentile, 90th percentile) of the response, rather than the mean.
+
+**Use when:**
+
+- Outliers are present
+- Errors are non-normal
+- Interested in extreme values (e.g., 90th percentile of rainfall)
+
+**Advantage:** Robust to outliers.
+
+**Example:** 90th percentile regression shows how extreme rainfall changes with temperature, while median regression shows how typical rainfall changes.
+
+## 11.10 Model Comparison Summary
+
+| Method | Type | Response | Key Feature | Best Use Case |
+|--------|------|----------|-------------|---------------|
+| **Simple Linear** | Regression | Continuous | One predictor | Basic relationships |
+| **Multiple Linear** | Regression | Continuous | Multiple predictors | Complex relationships |
+| **Polynomial** | Regression | Continuous | Curved relationships | Non-linear patterns |
+| **Logistic** | Classification | Binary | Probability estimation | Binary outcomes |
+| **LDA** | Classification | Categorical | Dimension reduction | Multi-class problems |
+| **Ridge** | Regression | Continuous | L2 regularization | Correlated predictors |
+| **Lasso** | Regression | Continuous | L1 regularization | Feature selection |
+| **Quantile** | Regression | Continuous | Robust to outliers | Non-normal errors |
+
+## 11.11 Model Diagnostics
+
+### Residual Plots
+1. **Residuals vs. Fitted**: Should show random scatter around 0 (no pattern)
+2. **Normal Q-Q**: Points should fall along the diagonal line
+3. **Scale-Location**: Should show constant variance (horizontal line)
+4. **Residuals vs. Leverage**: Identifies influential points
+
+### Cook's Distance
+Measures influence of each observation on the model. Values > $4/n$ are potentially influential.
+
+### What to Do If Assumptions Are Violated
+- **Non-linearity**: Add polynomial terms or transform variables
+- **Non-normality**: Use robust methods or transform $Y$
+- **Heteroscedasticity**: Use weighted least squares or robust standard errors
+- **Outliers**: Investigate, remove, or use robust methods
+
+## 11.12 Decision Tree for Choosing a Regression Method
+
+1. **Is response continuous?**
+   - Yes → Go to 2
+   - No (categorical) → Logistic Regression or LDA
+
+2. **How many predictors?**
+   - One → Simple Linear Regression
+   - Multiple → Go to 3
+
+3. **Is relationship linear?**
+   - Yes → Multiple Linear Regression
+   - No → Polynomial Regression or transformation
+
+4. **Are predictors highly correlated?**
+   - Yes → Ridge Regression
+   - Need feature selection → Lasso Regression
+
+5. **Outliers or non-normal errors?**
+   - Yes → Quantile Regression or robust methods
+
+---
+
+# 12. Case Study 1: Rainfall Variability Analysis (weatherAUS)
+
+## 12.1 Dataset Overview
+- **Source**: Australian weather stations (weatherAUS)
+- **Focus**: Sydney
+- **Variables**: Rainfall, MinTemp, MaxTemp, Humidity9am, Humidity3pm, WindSpeed9am, WindSpeed3pm, Pressure9am, Pressure3pm, Sunshine
+- **Time period**: Multiple years of daily observations
+
+## 12.2 Data Cleaning
+- Filtered for Sydney
+- Removed rows with missing values
+- Result: ~800 complete days from original ~1,400
+- Created `AvgTemp` = (MinTemp + MaxTemp) / 2
+- Created `logRainfall` = log(Rainfall + 1) to handle skewness
+
+## 12.3 Key EDA Findings
+
+### Distributions
+- **Rainfall**: Heavily right-skewed — most days have little rain, few have heavy downpours
+- **AvgTemp**: Roughly bell-shaped, centered around 17–18°C
+- **Humidity**: Roughly normal, 3pm slightly lower than 9am
+- **Wind speed and pressure**: Approximately normal
+
+### Correlations with Rainfall
+- **Humidity3pm**: +0.39 (moderate positive)
+- **AvgTemp**: -0.28 (weak negative)
+- **Pressure9am**: Negative (lower pressure → more rain)
+- **WindSpeed9am**: Weak
+
+### Regression Model
+- Predictors: AvgTemp, Humidity9am, Humidity3pm, WindSpeed9am, Pressure9am
+- **Adjusted R² = 0.359** — about 36% of variation in log-rainfall explained
+- **Significant predictors**: Humidity3pm (+), Pressure9am (-), AvgTemp (-)
+- **Non-significant**: Humidity9am, WindSpeed9am
+- **VIF < 2**: No multicollinearity
+
+### Model Diagnostics
+- Residuals vs. Fitted: Roughly flat (good)
+- Normal Q-Q: Slight heavy tails (acceptable)
+- Scale-Location: Fairly flat (constant variance)
+- Cook's Distance: A few influential storm events
+
+### Temporal Patterns
+- **Seasonal**: Wettest months = February, March; driest = September, October
+- **Yearly trend**: Slight upward trend in average rainfall, but high variability
+- **STL Decomposition**: Strong seasonal component, weak trend, random remainder
+
+## 12.4 Key Takeaways
+1. Afternoon humidity is the strongest predictor of rainfall
+2. Lower pressure (storms) increases rainfall
+3. Warmer days tend to have less rain
+4. Rainfall is highly seasonal (late summer peak)
+5. A weak upward trend exists but is not statistically robust
+
+---
+
+# 13. Case Study 2: Retail Sales EDA (Superstore)
+
+## 13.1 Dataset Overview
+- **Source**: Kaggle Superstore Sales
+- **Records**: 9,994 orders, 21 features
+- **Time period**: 2011–2014
+- **Variables**: Order Date, Ship Date, Customer, Segment, Region, Category, Sub-Category, Sales, Quantity, Discount, Profit
+
+## 13.2 Data Preprocessing
+- Removed Row ID
+- Feature engineering:
+  - `month`, `year`, `year_month`
+  - `total_discount_in_dollars` = Sales × Discount
+  - `selling_price` = Sales / Quantity
+  - `profit_margin` = (Profit / Sales) × 100
+  - `order_fulfillment_time` = Ship Date - Order Date
+
+## 13.3 Sales Performance Findings
+- **Yearly growth**: Sales increased yearly
+  - 2011: $484,247
+  - 2012: $470,532 (slight dip, -2.83%)
+  - Fastest growth: 2013
+- **Seasonal trends**:
+  - Peaks in November, December (holidays)
+  - Peak in September (back-to-school)
+  - Dip in January and October
+- **Variability**: High in March, September, October
+
+## 13.4 Product Category Findings
+- **Top sales**: Phones (Technology), Chairs (Furniture), Storage (Office Supplies)
+- **Lowest sales**: Copiers (Technology), Furnishings (Furniture), Fasteners (Office Supplies)
+- **Fastest growing**: Supplies (185% AAGR), Copiers (86%), Appliances (43%)
+- **Slowest growing**: Envelopes, Chairs, Machines
+
+## 13.5 Geographic Findings
+- **Best performing regions**: West, then East
+- **Weakest region**: South
+- **2012 dip**: All regions negative except Central
+- **AAGR by region**: West > East > Central > South
+- **Product-region patterns**:
+  - Office supplies and technology higher in West/East
+  - Tables and machines higher in South
+
+## 13.6 Profitability Findings
+- **Overall profit margin**: >10%, slight decrease in 2014
+- **Most profitable sub-categories**: Furnishings, Copiers, Labels
+- **Least profitable**: Chairs, Phones, Storage (relative to sales)
+- **Loss-making**: Tables, Bookcases, Binders, Machines
+- **Discount impact**: Negative — high discounts do not correlate with higher sales or profit
+
+## 13.7 Key Recommendations
+1. Focus on high-performing products (phones, chairs, storage)
+2. Optimize pricing and discounts (reduce discounts on loss-making products)
+3. Regional strategies (target South and Central for growth)
+4. Seasonal planning (stock up for Nov, Dec, Sep)
+5. Product mix optimization (emphasize high-margin items)
+6. Invest in data analytics for real-time monitoring
+
+---
+
+# 14. Quick Reference Tables
+
+## 14.1 Descriptive Statistics Formulas
+
+| Measure | Formula | Robust? |
+|---------|---------|---------|
+| Mean | $\bar{x} = \frac{1}{n}\sum x_i$ | No |
+| Median | Middle value | Yes |
+| Variance | $s^2 = \frac{1}{n-1}\sum(x_i - \bar{x})^2$ | No |
+| Standard Deviation | $s = \sqrt{s^2}$ | No |
+| IQR | $Q_3 - Q_1$ | Yes |
+| Range | Max - Min | No |
+| CV | $\frac{s}{\bar{x}} \times 100\%$ | No |
+
+## 14.2 Outlier Detection
+
+| Method | Formula | Assumption |
+|--------|---------|------------|
+| IQR | $x < Q_1 - 1.5 \times IQR$ or $x > Q_3 + 1.5 \times IQR$ | None |
+| Z-score | $\|z\| > 3$ where $z = (x - \bar{x})/s$ | Normality |
+
+## 14.3 Regression Assumptions (LINE)
+
+| Assumption | Check | Fix |
+|------------|-------|-----|
+| **L**inearity | Residuals vs. Fitted | Add polynomial terms |
+| **I**ndependence | Residuals vs. order | Time-series models |
+| **N**ormality | Q-Q plot | Transform $Y$ |
+| **E**qual variance | Scale-Location | Weighted least squares |
+
+## 14.4 Correlation Strength
+
+| $|r|$ | Interpretation |
+|-----|----------------|
+| 0.0–0.2 | Very weak |
+| 0.2–0.4 | Weak |
+| 0.4–0.6 | Moderate |
+| 0.6–0.8 | Strong |
+| 0.8–1.0 | Very strong |
+
+## 14.5 Plot Selection Guide
+
+| Goal | Plot |
+|------|------|
+| Relationship between 2 continuous variables | Scatter |
+| Distribution of 1 continuous variable | Histogram or Density |
+| Compare distributions across groups | Boxplot or Violin |
+| 2-D aggregated values | Heatmap |
+| Pairwise correlations | Correlation matrix |
+| Time trend | Line plot |
+| Part-to-whole | Stacked bar or Pie |
+
+## 14.6 Model Selection Guide
+
+| Scenario | Recommended Method |
+|----------|-------------------|
+| Continuous response, 1 predictor | Simple Linear Regression |
+| Continuous response, multiple predictors | Multiple Linear Regression |
+| Curved relationship | Polynomial Regression |
+| Binary response | Logistic Regression |
+| Multi-class classification | LDA |
+| Multicollinearity | Ridge Regression |
+| Feature selection | Lasso Regression |
+| Outliers / non-normal errors | Quantile Regression |
+
+---
+
+# 15. Exam Preparation Tips
+
+<div class="exam-tip">
+<b>1. Understand concepts, don't memorize formulas.</b> Know <i>why</i> each method is used, not just <i>how</i> to compute it.
+</div>
+
+<div class="exam-tip">
+<b>2. Practice interpreting output.</b> Given a regression summary, explain what each coefficient means in context.
+</div>
+
+<div class="exam-tip">
+<b>3. Link plots to purposes.</b> For each plot type, know when to use it and what to look for.
+</div>
+
+<div class="exam-tip">
+<b>4. Know the assumptions.</b> Every statistical method has assumptions. Know what they are and how to check them.
+</div>
+
+<div class="exam-tip">
+<b>5. Think about the workflow.</b> EDA → Cleaning → Visualization → Modeling → Diagnostics → Interpretation.
+</div>
+
+<div class="exam-tip">
+<b>6. Use examples.</b> Bring in the iris, mtcars, rainfall, and superstore examples to illustrate concepts.
+</div>
+
+<div class="exam-tip">
+<b>7. Distinguish correlation from causation.</b> This is a common exam question.
+</div>
+
+<div class="exam-tip">
+<b>8. Know the difference between parametric and non-parametric.</b> And when to use each.
+</div>
+
+<div class="exam-tip">
+<b>9. Be able to explain R-squared and Adjusted R-squared.</b> Why is Adjusted R-squared preferred for model comparison?
+</div>
+
+<div class="exam-tip">
+<b>10. Understand LDA intuitively.</b> It finds the best viewing angle to separate classes.
+</div>
+
+---
+
+# 16. Glossary of Key Terms
+
+| Term | Definition |
+|------|------------|
+| **Aesthetics** | Mapping of variables to visual properties in ggplot2 |
+| **AAGR** | Average Annual Growth Rate |
+| **Bias** | Error from overly simple models (underfitting) |
+| **Boxplot** | Plot showing five-number summary |
+| **Categorical** | Data consisting of labels or groups |
+| **Cooks Distance** | Measure of influence of an observation |
+| **Correlation** | Strength and direction of linear relationship |
+| **CV** | Coefficient of Variation |
+| **Density Plot** | Smoothed histogram |
+| **EDA** | Exploratory Data Analysis |
+| **Facet** | Sub-plot by categorical variable |
+| **Geom** | Geometric object in ggplot2 |
+| **GIGO** | Garbage In, Garbage Out |
+| **Heatmap** | Color-encoded matrix of values |
+| **Histogram** | Binned distribution of a continuous variable |
+| **Homoscedasticity** | Constant variance of errors |
+| **IQR** | Interquartile Range |
+| **LDA** | Linear Discriminant Analysis |
+| **Lasso** | L1 regularization for feature selection |
+| **Least Squares** | Method minimizing sum of squared errors |
+| **Logistic Regression** | Regression for binary response |
+| **MCAR** | Missing Completely At Random |
+| **Multicollinearity** | High correlation among predictors |
+| **Non-parametric** | Methods making no distributional assumptions |
+| **Outlier** | Observation far from other data points |
+| **Overfitting** | Model follows noise too closely |
+| **Parametric** | Methods assuming a functional form |
+| **Pearson** | Correlation for linear relationships |
+| **Polynomial Regression** | Regression with curved terms |
+| **Quantile Regression** | Regression for conditional quantiles |
+| **R-squared** | Proportion of variance explained |
+| **Ridge** | L2 regularization for correlated predictors |
+| **Scatter Plot** | Plot of two continuous variables |
+| **Spearman** | Rank-based correlation |
+| **Standard Deviation** | Average distance from the mean |
+| **STL** | Seasonal-Trend decomposition using Loess |
+| **Supervised Learning** | Learning with labeled data |
+| **Unsupervised Learning** | Learning without labels |
+| **Variance** | Average squared deviation from mean |
+| **VIF** | Variance Inflation Factor |
+| **Violin Plot** | Boxplot + density plot |
+| **Z-score** | Standardized value $(x-\bar{x})/s$ |
+
+---
+
+# 17. Final Summary
+
+This handout has covered the complete Unit 2 syllabus:
+
+1. **Statistics in engineering** — decision-making under uncertainty
+2. **Statistical learning** — supervised vs. unsupervised, parametric vs. non-parametric
+3. **R** — the tool for statistical computing
+4. **Data types** — numerical, categorical, time-series, spatial
+5. **Descriptive statistics** — mean, median, variance, IQR, five-number summary
+6. **Probability** — foundations for risk assessment
+7. **Data cleaning** — missing values, duplicates, outliers
+8. **EDA** — workflow, univariate, bivariate, multivariate analysis
+9. **Visual analytics** — 7 chart types and when to use each
+10. **Correlation** — Pearson, Spearman, multicollinearity
+11. **Regression** — simple, multiple, polynomial, logistic, LDA, ridge, lasso, quantile
+12. **Case studies** — rainfall variability and retail sales
+
+<div class="key-box">
+<b>Remember the layered philosophy of data analysis:</b><br><br>
+<i>Data → Cleaning → EDA → Visualization → Modeling → Diagnostics → Interpretation → Decision</i><br><br>
+Start simple, check assumptions, and iteratively add complexity to tell a compelling data story.
+</div>

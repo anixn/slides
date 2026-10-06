@@ -1,0 +1,1312 @@
+---
+title: "Unit-II: Statistics and Exploratory Data Analysis"
+subtitle: "14 hr | Subject Code: 24CV201T | ODD SEM 2026-27"
+author: "Dr. Ankit Deshmukh, Assistant Professor, SoT, PDEU"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{tcolorbox}
+  - \newtcolorbox{keybox}{colback=yellow!15, colframe=orange!80!black, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable, parbox=false}
+  - \newtcolorbox{civilbox}{colback=cyan!10, colframe=cyan!60!black, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable, parbox=false}
+  - \newtcolorbox{warnbox}{colback=red!10, colframe=red!70!black, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable, parbox=false}
+  - \newtcolorbox{tipbox}{colback=green!10, colframe=green!50!black, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable, parbox=false}
+  - \newtcolorbox{readbox}{colback=violet!10, colframe=violet!60!black, boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt, breakable, parbox=false}
+---
+
+<style>
+body { font-size: 15px; line-height: 1.7; }
+.keybox   { border-left: 6px solid #d79921; background: #f7ecc8; padding: 12px 16px; margin: 14px 0; border-radius: 5px; }
+.civilbox { border-left: 6px solid #458588; background: #e0e8e6; padding: 12px 16px; margin: 14px 0; border-radius: 5px; }
+.warnbox  { border-left: 6px solid #cc241d; background: #f6ddd6; padding: 12px 16px; margin: 14px 0; border-radius: 5px; }
+.tipbox   { border-left: 6px solid #98971a; background: #e8eac9; padding: 12px 16px; margin: 14px 0; border-radius: 5px; }
+.readbox  { border-left: 6px solid #8e44ad; background: #ece0f2; padding: 12px 16px; margin: 14px 0; border-radius: 5px; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo        = TRUE,
+  message     = FALSE,
+  warning     = FALSE,
+  fig.width   = 7.0,
+  fig.height  = 4.2,
+  fig.align   = "center",
+  dev         = "pdf",
+  tidy        = FALSE
+)
+```
+
+```{r packages, echo=FALSE}
+pkgs <- c("ggplot2", "dplyr", "tidyr", "MASS")
+for (p in pkgs) {
+  if (!requireNamespace(p, quietly = TRUE)) {
+    install.packages(p, repos = "https://cloud.r-project.org")
+  }
+}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(MASS)
+```
+
+---
+
+\newpage
+
+# How to Use This Handout
+
+This handout have the complete **Unit 2 (Statistics & EDA)** material. It is organised into six parts:
+
+1. **Statistical Foundations** -- the vocabulary, thinking, and probability required for data-driven engineering.
+2. **Data Cleaning & Preparation** -- the unglamorous 60-80% of every real project.
+3. **Exploratory Data Analysis (EDA)** -- the workflow, the Iris example, and the visual grammar of ggplot2.
+4. **Correlation & Feature Relationships** -- how to spot signal vs. redundancy.
+5. **Regression Analysis** -- simple, multiple, polynomial, logistic, LDA, ridge, lasso, quantile.
+6. **Two Case Studies** -- rainfall variability and retail sales, each end-to-end.
+
+::: {.tipbox}
+**How to read this handout:** Read a section, then run its code chunk in RStudio (or knit the file). Change the numbers. Break the data on purpose. Watch what the model does. That is how engineers learn machines -- by poking them until they behave.
+:::
+
+---
+
+\newpage
+
+# Part I -- Statistical Foundations
+
+## What is Statistics?
+
+**Statistics** is the science of collecting, organizing, summarizing, analyzing, and interpreting data to make informed decisions under uncertainty. In engineering, statistics is used for:
+
+- **Quality control** -- monitoring manufacturing defects.
+- **Reliability analysis** -- predicting failure times of components.
+- **Experimental design** -- testing which factors affect performance.
+- **Risk assessment** -- estimating probability of extreme events (floods, earthquakes).
+- **Process optimization** -- reducing waste and improving yield.
+
+::: {.keybox}
+**Key definition:** Statistics is not just about numbers -- it is a framework for **decision-making under uncertainty**. Engineers use it to separate signal from noise.
+:::
+
+### Descriptive vs. Inferential Statistics
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Descriptive** | Summarize and describe the data at hand | Mean rainfall of Sydney = 85 mm |
+| **Inferential** | Draw conclusions about a population from a sample | Is Sydney's rainfall increasing over time? |
+
+### Population vs. Sample
+
+- **Population** -- the complete set of all items of interest (e.g., all rainfall days in Sydney's history).
+- **Sample** -- a subset of the population actually measured (e.g., 800 days of rainfall data).
+- **Parameter** -- a numerical summary of a population (e.g., true mean rainfall $\mu$).
+- **Statistic** -- a numerical summary of a sample (e.g., sample mean $\bar{x}$).
+
+::: {.tipbox}
+**Exam tip:** A statistic *estimates* a parameter. The sample mean $\bar{x}$ estimates the population mean $\mu$. The sample standard deviation $s$ estimates the population standard deviation $\sigma$.
+:::
+
+---
+
+## Statistical Learning
+
+**Statistical learning** is the set of tools for modeling and understanding complex datasets. It blends statistics with machine learning.
+
+> Statistical learning = using data to estimate the unknown function $f$ that maps inputs $X$ to output $Y$.
+
+We observe a quantitative response $Y$ and $p$ predictors $X_1, \ldots, X_p$, and assume:
+
+$$Y = f(X) + \varepsilon$$
+
+where $f$ is a fixed but unknown function and $\varepsilon$ is random noise with mean zero.
+
+### Supervised vs. Unsupervised Learning
+
+| Aspect | Supervised Learning | Unsupervised Learning |
+|--------|---------------------|----------------------|
+| **Inputs** | $X$ and $Y$ (labeled data) | Only $X$ (no labels) |
+| **Goal** | Predict $Y$ from $X$ | Discover structure in $X$ |
+| **Examples** | Regression, classification, LDA | Clustering, PCA |
+| **Engineering use** | Predicting strength of concrete | Grouping similar soil samples |
+
+### Parametric vs. Non-Parametric Methods
+
+**Parametric** methods assume a functional form for $f$ (e.g., linear). They require fewer observations and are easy to interpret, but the assumed form may not match reality.
+
+**Non-parametric** methods make no explicit assumptions. They are flexible but require many more observations and risk overfitting.
+
+::: {.warnbox}
+**Overfitting:** When a model follows the random noise in training data too closely, it performs poorly on new data. Flexible models with many parameters are prone to overfitting.
+:::
+
+### Prediction vs. Inference
+
+- **Prediction:** use $\hat{Y} = \hat{f}(X)$ when $Y$ is unavailable.
+- **Inference:** understand *how* $Y$ changes with $X_1, \ldots, X_p$ -- the *form* of $f$ matters, not just prediction accuracy.
+
+### The Bias–Variance Trade-off
+
+- High bias = model too simple = **underfitting**.
+- High variance = model too complex = **overfitting**.
+- The goal is the **sweet spot** -- a model that captures signal without fitting noise.
+
+---
+
+## R and Data Structures
+
+**R** is a free, open-source language for statistical computing and graphics.
+
+- **1992:** Ross Ihaka and Robert Gentleman, University of Auckland.
+- **1997:** CRAN established.
+- **Today:** 20,000+ packages on CRAN for statistics, ML, visualization, geospatial, and engineering.
+
+### Types of Engineering Data
+
+| Data Type | Description | Example |
+|-----------|-------------|---------|
+| **Numerical** | Continuous or discrete numbers | Temperature = 23.5°C, Rainfall = 12 mm |
+| **Categorical** | Labels or groups | Soil type = {Clay, Sand, Silt} |
+| **Time-series** | Observations indexed by time | Daily rainfall 2011–2014 |
+| **Spatial** | Data with geographic coordinates | Rainfall at weather stations |
+| **Ordinal** | Ordered categories | Concrete grade = {M20, M25, M30} |
+| **Binary** | Two categories | Yes/No, Pass/Fail |
+
+### R Data Structures
+
+| Structure | Description | Mixed types? |
+|-----------|-------------|--------------|
+| **Vector** | 1D sequence of same type | No |
+| **Factor** | Categorical variable | No (levels) |
+| **Matrix** | 2D, same type | No |
+| **Data frame** | 2D, columns can differ | Yes |
+| **List** | Ordered collection of anything | Yes |
+| **Tibble** | Modern data frame | Yes |
+
+::: {.keybox}
+A **data frame** is the workhorse of R data analysis -- it is like an Excel sheet where each column can be a different type (numeric, character, factor, date).
+:::
+
+---
+
+## Descriptive Statistics
+
+### Central Tendency
+
+$$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i \qquad \text{(mean)}$$
+
+- **Median** -- middle value when sorted. Robust to outliers.
+- **Mode** -- most frequent value.
+
+::: {.tipbox}
+When data is skewed (rainfall, income), the **median** is a better measure of centre. When symmetric, mean = median = mode.
+:::
+
+### Measures of Spread
+
+$$s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \qquad s = \sqrt{s^2}$$
+
+$$\text{IQR} = Q_3 - Q_1 \qquad \text{Range} = \text{Max} - \text{Min}$$
+
+### Five-Number Summary
+
+1. Minimum
+2. Q1 (25th percentile)
+3. Median (Q2)
+4. Q3 (75th percentile)
+5. Maximum
+
+```{r xkcd, echo=FALSE, out.width="100%"}
+knitr::include_graphics("images/u2/boxplot.jpg")
+```
+
+This is the basis of the **boxplot**.
+
+### Shape of Distribution
+
+| Shape | Description | Mean vs. Median |
+|-------|-------------|-----------------|
+| **Symmetric** | Bell-shaped | Mean ≈ Median |
+| **Right-skewed** | Long right tail | Mean > Median |
+| **Left-skewed** | Long left tail | Mean < Median |
+
+::: {.keybox}
+**Rainfall example:** Most days have little rain, but a few days have downpours → **right-skewed**. The mean is pulled upward by extremes, so the median is a better summary.
+:::
+
+### Coefficient of Variation, Standard Error, Confidence Intervals
+
+$$\text{CV} = \frac{s}{\bar{x}} \times 100\% \qquad SE = \frac{s}{\sqrt{n}} \qquad \bar{x} \pm 1.96 \times SE \;\; (95\% \text{ CI})$$
+
+---
+
+## Probability Foundations for Risk Assessment
+
+### Basic Rules
+
+- **Complement:** $P(A^c) = 1 - P(A)$
+- **Addition:** $P(A \cup B) = P(A) + P(B) - P(A \cap B)$
+- **Multiplication (independent):** $P(A \cap B) = P(A) \times P(B)$
+- **Conditional:** $P(A|B) = P(A \cap B) / P(B)$
+
+### Common Distributions
+
+| Distribution | Type | Use case |
+|--------------|------|----------|
+| **Binomial** | Discrete | Number of successes in $n$ trials |
+| **Poisson** | Discrete | Number of events in a time interval |
+| **Normal** | Continuous | Heights, errors, temperatures |
+| **Exponential** | Continuous | Time between events |
+| **Log-normal** | Continuous | Rainfall, income |
+| **Weibull** | Continuous | Reliability, failure times |
+
+::: {.tipbox}
+**Return periods:** A 100-year flood has a **1%** chance of occurring in any given year. This is based on probability distributions fitted to historical data.
+:::
+
+---
+
+# Part II -- Data Cleaning & Preparation
+
+::: {.civilbox}
+**Civil connection:** You never build on an uncleared site. You remove debris, level the ground, and set out the grid before the first column is cast. Data preparation is exactly this -- and in practice it takes **60–80% of a data scientist's time**.
+:::
+
+## Handling Missing Values
+
+Missing values can skew analysis and cause errors in statistical modeling. Common strategies: **remove rows** or **impute** with mean/median/mode.
+
+### Demonstrating on the Iris Dataset
+
+```{r missing-demo}
+# Artificially introduce NA values for teaching
+iris_missing <- iris
+iris_missing$Sepal.Length[c(5, 15, 30, 50, 70, 130)] <- NA
+iris_missing$Petal.Width[c(10, 40, 53, 81, 132)] <- NA
+
+# Count missing values per column
+colSums(is.na(iris_missing))
+```
+
+### Visualising the Missingness Pattern
+
+```{r missing-plot}
+missing_matrix <- as.data.frame(is.na(iris_missing))
+missing_matrix$row_num <- seq_len(nrow(missing_matrix))
+missing_long <- tidyr::pivot_longer(
+  missing_matrix, -row_num,
+  names_to = "Variable", values_to = "Is_Missing"
+)
+
+ggplot(missing_long, aes(x = row_num, y = Variable, fill = Is_Missing)) +
+  geom_raster() +
+  scale_fill_manual(
+    values = c("TRUE" = "#cc241d", "FALSE" = "grey85"),
+    name = "Missing?", labels = c("No", "Yes")
+  ) +
+  labs(
+    title = "Missing-data pattern in the Iris dataset",
+    x = "Row index", y = NULL
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+::: {.readbox}
+**How to read this figure:** Each red square is a missing value. Red cells are scattered randomly -- consistent with *Missing Completely At Random* (MCAR). If they clustered (e.g., only in one species), we would suspect a systematic cause.
+:::
+
+### Imputation Strategy
+
+```{r imputation}
+iris_imputed <- iris_missing %>%
+  mutate(
+    Sepal.Length = ifelse(is.na(Sepal.Length),
+      median(Sepal.Length, na.rm = TRUE),
+      Sepal.Length
+    ),
+    Petal.Width = ifelse(is.na(Petal.Width),
+      median(Petal.Width, na.rm = TRUE),
+      Petal.Width
+    )
+  )
+colSums(is.na(iris_imputed))
+```
+
+::: {.keybox}
+**Drop vs. impute?**
+
+- **Drop** when only a few rows are missing (say < 5%) and you have plenty of data.
+- **Impute** when data is precious -- expensive field tests, rare flood events, long-term monitoring.
+- Use the **median** rather than the mean for skewed columns, because one wild value can drag the mean far away while the median barely moves.
+:::
+
+---
+
+## Removing Duplicates
+
+Duplicate rows over-represent certain observations and bias results.
+
+```{r duplicates}
+set.seed(1)
+iris_dup <- rbind(iris, iris[sample(150, 8), ]) # add 8 duplicates
+
+cat("Rows with duplicates:", nrow(iris_dup), "\n")
+
+iris_unique <- dplyr::distinct(iris_dup)
+
+cat("Rows after removing duplicates:", nrow(iris_unique), "\n")
+```
+
+::: {.warnbox}
+**Caution:** Not all duplicates are errors. Multiple orders from the same customer on the same day may be legitimate. Understand the context before removing.
+:::
+
+---
+
+## Outlier Detection
+
+### IQR Method
+
+An observation is an outlier if:
+
+$$x < Q_1 - 1.5 \times \text{IQR} \quad \text{or} \quad x > Q_3 + 1.5 \times \text{IQR}$$
+
+```{r iqr-outliers}
+Q1 <- quantile(iris$Sepal.Width, 0.25)
+Q3 <- quantile(iris$Sepal.Width, 0.75)
+IQR_val <- Q3 - Q1
+lower <- Q1 - 1.5 * IQR_val
+upper <- Q3 + 1.5 * IQR_val
+
+iris_out <- iris %>%
+  mutate(Outlier = ifelse(Sepal.Width < lower | Sepal.Width > upper,
+    "Outlier", "Normal"
+  ))
+
+ggplot(iris_out, aes(Sepal.Length, Sepal.Width, color = Outlier)) +
+  geom_point(size = 2.5, alpha = 0.8) +
+  scale_color_manual(values = c("Normal" = "#458588", "Outlier" = "#cc241d")) +
+  geom_hline(
+    yintercept = c(lower, upper), linetype = "dashed",
+    color = "grey40"
+  ) +
+  labs(
+    title = "Outlier detection in Iris (Sepal.Width)",
+    subtitle = "Dashed lines = IQR bounds (Q1 − 1.5·IQR, Q3 + 1.5·IQR)",
+    x = "Sepal Length (cm)", y = "Sepal Width (cm)"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Z-Score Method
+
+$$z = \frac{x - \bar{x}}{s}$$
+
+- Observation is an outlier if $|z| > 3$ (or sometimes 2.5).
+- Assumes normality; sensitive to the very outliers it tries to detect.
+
+::: {.tipbox}
+**In rainfall data, extreme values (storms) are often real and important.** Removing them would destroy the analysis of extreme events. Always investigate before removing outliers.
+:::
+
+---
+
+# Part III -- Exploratory Data Analysis (EDA)
+
+## What is EDA?
+
+**Exploratory Data Analysis** is the process of examining data before formal modeling to:
+
+- Understand distributions.
+- Detect patterns, anomalies, and relationships.
+- Form hypotheses.
+- Guide model selection.
+
+> EDA is detective work. You look for clues before building a case (model).
+
+### The EDA Workflow
+
+1. **Import data** -- CSV, Excel, or database.
+2. **Inspect structure** -- dimensions, types, head, tail.
+3. **Check missing values** -- count and visualize.
+4. **Clean data** -- missing, duplicates, outliers.
+5. **Univariate analysis** -- one variable at a time.
+6. **Bivariate analysis** -- relationships between pairs.
+7. **Multivariate analysis** -- correlations, interactions.
+8. **Visualise** -- plots for each finding.
+9. **Interpret** -- conclusions and hypotheses.
+
+### Univariate Analysis
+
+- **Numerical:** histogram, density plot, boxplot, summary statistics.
+- **Categorical:** bar chart, frequency table.
+
+### Bivariate Analysis
+
+- **Num vs. Num:** scatter plot, correlation.
+- **Num vs. Cat:** boxplot, violin plot, grouped summary.
+- **Cat vs. Cat:** contingency table, stacked bar chart.
+
+### Multivariate Analysis
+
+- Scatterplot matrix (pairs plot).
+- Correlation heatmap.
+- Faceting (small multiples).
+- Colouring by group.
+
+---
+
+## The Iris Dataset -- A Classic Teaching Tool
+
+The **Iris dataset** (Fisher, 1936) contains 150 flowers from three species:
+
+- *Iris setosa*, *Iris versicolor*, *Iris virginica* (50 each).
+
+Four measurements per flower (in cm): Sepal.Length, Sepal.Width, Petal.Length, Petal.Width.
+
+### Botanical Background
+
+| Term | Description | Function |
+|------|-------------|----------|
+| **Sepal** | Outer, leaf-like protective structures | Protect flower bud before bloom |
+| **Petal** | Inner, often colourful structures | Attract pollinators |
+
+### First Look
+
+```{r iris-summary}
+summary(iris)
+```
+
+```{r iris-counts}
+ggplot(iris, aes(Species, fill = Species)) +
+  geom_bar(color = "white", linewidth = 1.2) +
+  geom_text(
+    stat = "count", aes(label = after_stat(count)),
+    vjust = -0.4, size = 4, fontface = "bold"
+  ) +
+  scale_fill_manual(values = c("#E74C3C", "#3498DB", "#2ECC71")) +
+  labs(title = "Distribution of Iris species", x = NULL, y = "Count") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none") +
+  ylim(0, 60)
+```
+
+### Scatterplot Matrix
+
+```{r iris-pairs}
+pairs(iris[, 1:4],
+  col = c("#E74C3C", "#3498DB", "#2ECC71")[iris$Species],
+  pch = 19, cex = 0.7,
+  main = "Scatterplot matrix of Iris measurements"
+)
+```
+
+::: {.readbox}
+**How to read the pairs plot:** Each off-diagonal cell is a scatter of two measurements. Notice **Petal.Length vs. Petal.Width** cleanly separates *setosa* (red) from the other two. Sepals are less discriminating -- a key insight for feature selection.
+:::
+
+---
+
+## Visual Analytics with ggplot2
+
+**ggplot2** implements the *Grammar of Graphics* -- a systematic, layer-by-layer approach. Every plot has:
+
+1. **Data** -- the dataset.
+2. **Aesthetics (`aes`)** -- map variables to visual properties.
+3. **Geoms** -- geometric objects (`geom_point()`, `geom_bar()`, …).
+4. **Scales** -- control mapping from data to visual space.
+5. **Facets** -- sub-plots by categorical variables.
+6. **Themes** -- non-data elements (fonts, colours, gridlines).
+
+### Scatter Plots (`geom_point`)
+
+**Use for:** relationship between two continuous variables.
+
+```{r scatter-mtcars}
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(aes(color = factor(cyl)), size = 3, alpha = 0.8) +
+  geom_smooth(
+    method = "lm", se = TRUE, color = "black",
+    linetype = "dashed"
+  ) +
+  scale_color_manual(
+    values = c("#1e8449", "#d79921", "#cc241d"),
+    name = "Cylinders"
+  ) +
+  labs(
+    title = "Vehicle weight vs. fuel efficiency",
+    subtitle = "Coloured by cylinder count with linear trend",
+    x = "Weight (1000 lbs)", y = "Miles per gallon"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Histograms (`geom_histogram`)
+
+**Use for:** distribution of a single continuous variable.
+
+```{r histogram-mpg}
+ggplot(mtcars, aes(mpg)) +
+  geom_histogram(binwidth = 2, fill = "#458588", color = "white") +
+  labs(
+    title = "Distribution of miles per gallon",
+    subtitle = "Binwidth = 2",
+    x = "MPG", y = "Count"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Density Plots (`geom_density`)
+
+**Use for:** smoothed distribution, especially good for comparing groups.
+
+```{r density-mpg}
+ggplot(mtcars, aes(mpg, fill = factor(cyl))) +
+  geom_density(alpha = 0.5, adjust = 1.5) +
+  scale_fill_manual(
+    values = c("#1e8449", "#d79921", "#cc241d"),
+    name = "Cylinders"
+  ) +
+  labs(
+    title = "Density of MPG by cylinder count",
+    x = "MPG", y = "Density"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Boxplots (`geom_boxplot`)
+
+**Use for:** five-number summary + outliers; comparing distributions across groups.
+
+```{r boxplot-mpg}
+ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
+  geom_boxplot(outlier.color = "#cc241d", outlier.size = 2) +
+  scale_fill_manual(values = c("#1e8449", "#d79921", "#cc241d")) +
+  labs(
+    title = "MPG by cylinder count",
+    x = "Cylinders", y = "MPG"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none")
+```
+
+### Violin Plots (`geom_violin`)
+
+**Use for:** full distribution shape + summary statistics -- reveals multi-modality.
+
+```{r violin-mpg}
+ggplot(mtcars, aes(factor(cyl), mpg, fill = factor(cyl))) +
+  geom_violin(
+    trim = FALSE,
+    draw_quantiles = c(0.25, 0.5, 0.75), alpha = 0.7
+  ) +
+  scale_fill_manual(values = c("#1e8449", "#d79921", "#cc241d")) +
+  labs(
+    title = "Violin plot of MPG by cylinders",
+    subtitle = "Quartile lines (25%, 50%, 75%) superimposed",
+    x = "Cylinders", y = "MPG"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "none")
+```
+
+### Heatmaps (`geom_tile`)
+
+**Use for:** matrix of numeric values encoded by colour.
+
+```{r heatmap-mpg}
+heat_data <- mtcars %>%
+  group_by(gear, cyl) %>%
+  summarise(avg_mpg = mean(mpg), .groups = "drop")
+
+ggplot(heat_data, aes(factor(gear), factor(cyl), fill = avg_mpg)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = round(avg_mpg, 1)), size = 4) +
+  scale_fill_viridis_c(option = "plasma", name = "Avg MPG") +
+  labs(
+    title = "Average MPG by gear and cylinders",
+    x = "Number of gears", y = "Cylinders"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Correlation Matrices
+
+**Use for:** pairwise correlations between many numeric variables.
+
+```{r corr-heat}
+corr_matrix <- round(cor(mtcars), 2)
+corr_long <- as.data.frame(as.table(corr_matrix))
+names(corr_long) <- c("Var1", "Var2", "value")
+
+ggplot(corr_long, aes(Var1, Var2, fill = value)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = value), size = 2.3) +
+  scale_fill_gradient2(
+    low = "#2c3e50", mid = "white", high = "#cc241d",
+    midpoint = 0, limits = c(-1, 1),
+    name = "Correlation"
+  ) +
+  labs(
+    title = "Correlation matrix of mtcars",
+    subtitle = "Values range from −1 (negative) to +1 (positive)"
+  ) +
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title = element_blank()
+  )
+```
+
+### Plot Selection Guide
+
+| Goal | Plot |
+|------|------|
+| Relationship between 2 continuous variables | Scatter |
+| Distribution of 1 continuous variable | Histogram or Density |
+| Compare distributions across groups | Boxplot or Violin |
+| 2-D aggregated values | Heatmap |
+| Pairwise correlations | Correlation matrix |
+| Time trend | Line plot |
+| Part-to-whole | Stacked bar or Pie |
+
+---
+
+# Part IV -- Correlation & Feature Relationships
+
+## Pearson Correlation
+
+$$r = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2 \sum (y_i - \bar{y})^2}}$$
+
+- Range: $-1 \le r \le +1$.
+- $r = +1$: perfect positive; $r = -1$: perfect negative; $r = 0$: no *linear* relationship.
+
+| $|r|$ | Interpretation |
+|-------|----------------|
+| 0.0–0.2 | Very weak |
+| 0.2–0.4 | Weak |
+| 0.4–0.6 | Moderate |
+| 0.6–0.8 | Strong |
+| 0.8–1.0 | Very strong |
+
+::: {.warnbox}
+**Correlation ≠ causation.** Just because two variables are correlated does not mean one causes the other. There may be a confounding variable, or the relationship may be coincidental.
+:::
+
+## Spearman Correlation
+
+**Spearman's rank correlation** $\rho$ measures *monotonic* relationships (not necessarily linear).
+
+- Based on ranks, not raw values.
+- Robust to outliers.
+- Use when the relationship is monotonic but non-linear.
+
+## Multicollinearity
+
+**Multicollinearity** occurs when predictors are highly correlated with each other.
+
+- **Problems:** unstable coefficients, inflated standard errors, difficult interpretation.
+- **Detection:** correlation matrix (|r| > 0.8 between predictors); Variance Inflation Factor (VIF > 5 or 10).
+- **Solution:** remove one of the correlated predictors; use Ridge regression; use PCA.
+
+---
+
+# Part V -- Regression Analysis
+
+## Simple Linear Regression (SLR)
+
+$$Y = \beta_0 + \beta_1 X + \varepsilon$$
+
+- $Y$ -- dependent variable
+- $X$ -- independent variable
+- $\beta_0$ -- intercept
+- $\beta_1$ -- slope (change in $Y$ per unit change in $X$)
+- $\varepsilon$ -- error term
+
+**Least squares** finds the line minimising $\text{SSE} = \sum(y_i - \hat{y}_i)^2$.
+
+### Assumptions (LINE)
+
+1. **L**inearity
+2. **I**ndependence
+3. **N**ormality of errors
+4. **E**qual variance (homoscedasticity)
+
+### Worked Example -- Iris
+
+```{r slr-iris}
+model_slr <- lm(Petal.Length ~ Sepal.Length, data = iris)
+summary(model_slr)
+```
+
+```{r slr-plot}
+ggplot(iris, aes(Sepal.Length, Petal.Length)) +
+  geom_point(aes(color = Species), size = 2.5, alpha = 0.8) +
+  geom_smooth(
+    method = "lm", se = TRUE,
+    color = "black", linetype = "dashed"
+  ) +
+  scale_color_manual(values = c("#E74C3C", "#3498DB", "#2ECC71")) +
+  labs(
+    title = "Simple linear regression: Petal.Length ~ Sepal.Length",
+    x = "Sepal Length (cm)", y = "Petal Length (cm)"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+::: {.readbox}
+**How to read the summary:** The slope for `Sepal.Length` is roughly **+1.86** -- every extra 1 cm of sepal length is associated with about 1.86 cm more petal length. The R-squared tells us what fraction of variation in petal length is explained by sepal length alone.
+:::
+
+---
+
+## Multiple Linear Regression (MLR)
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \varepsilon$$
+
+Each $\beta_j$ is the change in $Y$ for a one-unit change in $X_j$, **holding all other predictors constant**.
+
+```{r mlr-iris}
+model_mlr <- lm(Petal.Length ~ Sepal.Length + Sepal.Width + Petal.Width,
+  data = iris
+)
+summary(model_mlr)
+```
+
+### Adjusted R-Squared
+
+$$R^2_{adj} = 1 - \frac{(1-R^2)(n-1)}{n-p-1}$$
+
+Always use **Adjusted $R^2$** for model comparison -- adding useless predictors increases $R^2$ but decreases Adjusted $R^2$.
+
+---
+
+## Polynomial Regression
+
+$$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \cdots + \varepsilon$$
+
+**Use when:** the relationship is curved. **Caution:** high-degree polynomials overfit.
+
+```{r poly-iris}
+model_poly <- lm(Petal.Length ~ Sepal.Length + I(Sepal.Length^2), data = iris)
+summary(model_poly)$r.squared
+```
+
+---
+
+## Logistic Regression
+
+$$P(Y = 1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p)}}$$
+
+**Use when:** response variable is **binary**.
+
+```{r logistic-iris}
+iris$is_setosa <- ifelse(iris$Species == "setosa", 1, 0)
+model_logit <- glm(is_setosa ~ Petal.Length, data = iris, family = binomial)
+summary(model_logit)
+```
+
+```{r logistic-plot}
+iris$prob_setosa <- predict(model_logit, type = "response")
+
+ggplot(iris, aes(Petal.Length, prob_setosa)) +
+  geom_point(aes(color = Species), size = 2.5, alpha = 0.7) +
+  geom_smooth(
+    method = "glm",
+    method.args = list(family = binomial),
+    color = "black", se = TRUE
+  ) +
+  scale_color_manual(values = c("#E74C3C", "#3498DB", "#2ECC71")) +
+  labs(
+    title = "Logistic regression: P(setosa) vs. Petal.Length",
+    x = "Petal Length (cm)", y = "P(setosa)"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+---
+
+## Linear Discriminant Analysis (LDA)
+
+LDA finds linear combinations of features that best separate classes.
+
+### Assumptions
+
+1. **Normality** -- each class is multivariate normal.
+2. **Equal covariance matrices** across classes.
+3. **Independence** of observations.
+
+### The Mathematics
+
+LDA seeks $w$ maximising $J(w) = \dfrac{w^T S_B w}{w^T S_W w}$, where $S_B$ is between-class and $S_W$ is within-class scatter.
+
+::: {.keybox}
+**Intuition:** LDA finds the "best viewing angle" to separate the species. Imagine rotating a 3D scatter plot until the three species are most clearly separated -- that is what LDA does mathematically.
+:::
+
+```{r lda-iris}
+model_lda <- lda(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width,
+  data = iris
+)
+
+lda_scores <- predict(model_lda)$x
+lda_df <- data.frame(
+  LD1     = lda_scores[, 1],
+  LD2     = lda_scores[, 2],
+  Species = iris$Species
+)
+
+ggplot(lda_df, aes(LD1, LD2, color = Species)) +
+  geom_point(size = 3, alpha = 0.8) +
+  stat_ellipse(level = 0.95, linewidth = 1) +
+  scale_color_manual(values = c("#E74C3C", "#3498DB", "#2ECC71")) +
+  labs(
+    title = "LDA projection of Iris species",
+    subtitle = "Two linear discriminants separate the three species",
+    x = "LD1", y = "LD2"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+```{r lda-acc}
+lda_pred <- predict(model_lda)$class
+conf_mat <- table(Predicted = lda_pred, Actual = iris$Species)
+acc <- sum(diag(conf_mat)) / sum(conf_mat)
+cat("LDA accuracy:", round(acc * 100, 2), "%\n")
+conf_mat
+```
+
+---
+
+## Ridge, Lasso and Quantile Regression
+
+### Ridge (L2)
+
+$$\text{Minimize: } \sum (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2$$
+
+- Use when predictors are highly correlated.
+- Shrinks coefficients toward zero but **never to exactly zero**.
+
+### Lasso (L1)
+
+$$\text{Minimize: } \sum (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j|$$
+
+- Performs **feature selection** -- some coefficients become exactly zero.
+
+### Quantile Regression
+
+Estimates conditional quantiles (median, 10th, 90th percentile) rather than the mean. **Robust to outliers**; ideal for extreme-value studies.
+
+---
+
+## Model Comparison and Selection
+
+| Method | Type | Response | Key feature | Best use |
+|--------|------|----------|-------------|----------|
+| Simple Linear | Regression | Continuous | One predictor | Basic relationships |
+| Multiple Linear | Regression | Continuous | Multiple predictors | Complex relationships |
+| Polynomial | Regression | Continuous | Curved relationships | Non-linear patterns |
+| Logistic | Classification | Binary | Probability | Binary outcomes |
+| LDA | Classification | Categorical | Dimension reduction | Multi-class problems |
+| Ridge | Regression | Continuous | L2 regularization | Correlated predictors |
+| Lasso | Regression | Continuous | L1 regularization | Feature selection |
+| Quantile | Regression | Continuous | Robust to outliers | Non-normal errors |
+
+### Decision Tree
+
+1. **Response continuous?**
+   - Yes → 2
+   - No (categorical) → Logistic or LDA.
+2. **One predictor?**
+   - Yes → Simple Linear.
+   - No → 3.
+3. **Linear relationship?**
+   - Yes → Multiple Linear.
+   - No → Polynomial or transform.
+4. **Predictors highly correlated?**
+   - Yes → Ridge.
+   - Need feature selection → Lasso.
+5. **Outliers / non-normal errors?**
+   - Yes → Quantile or robust methods.
+
+---
+
+# Part VI -- Case Studies
+
+## Case Study 1 -- Rainfall Variability (Synthetic weatherAUS)
+
+::: {.civilbox}
+**Why synthetic data?** The original dataset (`weatherAUS.csv`) is not shipped with this handout. We generate a realistic **synthetic** dataset that mimics the statistical properties of the Sydney observations so that every code chunk knits standalone.
+:::
+
+### Load and Clean
+
+```{r weather-load}
+set.seed(42)
+n_days <- 800
+dates <- seq(as.Date("2011-01-01"), by = "day", length.out = n_days)
+
+# Simulate realistic Sydney weather
+sydney <- data.frame(
+  Date         = dates,
+  MinTemp      = rnorm(n_days, 13, 5),
+  MaxTemp      = rnorm(n_days, 23, 6),
+  Humidity9am  = pmin(pmax(rnorm(n_days, 70, 15), 10), 100),
+  Humidity3pm  = pmin(pmax(rnorm(n_days, 55, 18), 10), 100),
+  WindSpeed9am = abs(rnorm(n_days, 15, 8)),
+  Pressure9am  = rnorm(n_days, 1015, 7)
+)
+
+# Synthetic rainfall: skewed, correlated with humidity and pressure
+sydney$Rainfall <- with(
+  sydney,
+  pmax(0, 0.03 * Humidity3pm - 0.01 * Pressure9am + rnorm(n_days, 2, 3))
+)
+
+sydney$AvgTemp <- (sydney$MinTemp + sydney$MaxTemp) / 2
+sydney$logRainfall <- log(sydney$Rainfall + 1)
+
+cat("Complete days:", nrow(sydney), "\n")
+head(sydney, 3)
+```
+
+### Distributions
+
+```{r weather-hists}
+vars <- c(
+  "Rainfall", "AvgTemp", "Humidity9am", "Humidity3pm",
+  "WindSpeed9am", "Pressure9am"
+)
+syd_long <- pivot_longer(sydney, all_of(vars),
+  names_to = "Variable", values_to = "Value"
+)
+
+ggplot(syd_long, aes(Value)) +
+  geom_histogram(bins = 30, fill = "#458588", color = "white") +
+  facet_wrap(~Variable, scales = "free") +
+  labs(
+    title = "Distributions of key weather variables (synthetic)",
+    x = "Value", y = "Count"
+  ) +
+  theme_minimal(base_size = 10)
+```
+
+::: {.readbox}
+**How to read this figure:** Rainfall is heavily **right-skewed** -- most days have little rain, but a few have downpours. Temperature is roughly bell-shaped. This skew justifies the **log-transform** for regression.
+:::
+
+### Correlation Heatmap
+
+```{r weather-corr}
+cor_matrix <- cor(sydney[, vars])
+cor_long <- as.data.frame(as.table(cor_matrix))
+names(cor_long) <- c("Var1", "Var2", "value")
+
+ggplot(cor_long, aes(Var1, Var2, fill = value)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = round(value, 2)), size = 2.5) +
+  scale_fill_gradient2(
+    low = "#2c3e50", mid = "white",
+    high = "#cc241d",
+    midpoint = 0, limits = c(-1, 1),
+    name = "r"
+  ) +
+  labs(title = "Correlation matrix -- Sydney weather (synthetic)") +
+  theme_minimal(base_size = 10) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title = element_blank()
+  )
+```
+
+### Multiple Regression on log(Rainfall)
+
+```{r weather-model}
+model_rain <- lm(logRainfall ~ AvgTemp + Humidity3pm + Pressure9am,
+  data = sydney
+)
+summary(model_rain)
+```
+
+::: {.readbox}
+**How to read the summary:** The coefficients tell us:
+
+- **Humidity3pm** -- strongly *positive*: humid afternoons precede rain.
+- **Pressure9am** -- *negative*: low pressure = storm systems.
+- **AvgTemp** -- *negative*: warmer days tend to be drier.
+- **Adjusted R-squared** tells us how much of the log-rainfall variability these three predictors jointly explain.
+:::
+
+### Diagnostics
+
+```{r weather-diag, fig.height=5}
+par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
+plot(model_rain, cex = 0.9)
+par(mfrow = c(1, 1))
+```
+
+::: {.readbox}
+**How to read diagnostics:**
+
+- **Residuals vs Fitted** -- random scatter around 0 is good; a curve means non-linearity.
+- **Normal Q-Q** -- points along the diagonal means normal errors.
+- **Scale-Location** -- flat line means constant variance.
+- **Residuals vs Leverage** -- points outside Cook's distance contours are influential.
+:::
+
+---
+
+## Case Study 2 -- Retail Sales EDA (Synthetic Superstore)
+
+::: {.civilbox}
+As with Case Study 1, the original `Superstore.xlsx` is not shipped. We generate a **synthetic** orders dataset that preserves the qualitative patterns (yearly growth, category mix, discount effects) so that all code chunks are reproducible.
+:::
+
+### Load and Prepare
+
+```{r store-load}
+set.seed(7)
+n <- 3000
+regions <- c("West", "East", "Central", "South")
+cats <- c("Furniture", "Office Supplies", "Technology")
+subs <- c(
+  "Chairs", "Tables", "Bookcases", "Furnishings",
+  "Phones", "Machines", "Copiers", "Accessories",
+  "Binders", "Storage", "Art", "Labels"
+)
+
+superstore <- data.frame(
+  OrderDate = sample(seq(as.Date("2011-01-01"),
+    as.Date("2014-12-31"),
+    by = "day"
+  ), n, replace = TRUE),
+  Region = sample(regions, n,
+    replace = TRUE,
+    prob = c(0.3, 0.3, 0.22, 0.18)
+  ),
+  Category = sample(cats, n, replace = TRUE),
+  SubCategory = sample(subs, n, replace = TRUE),
+  Quantity = sample(1:10, n, replace = TRUE),
+  Discount = sample(c(0, 0.1, 0.2, 0.3, 0.4), n,
+    replace = TRUE, prob = c(.5, .2, .15, .1, .05)
+  ),
+  Sales = round(runif(n, 20, 900), 2)
+)
+
+# Realistic profit: negative on heavy discounts, category-dependent
+superstore$Profit <- round(
+  superstore$Sales * (0.25 - 0.6 * superstore$Discount) +
+    rnorm(n, 0, 15), 2
+)
+
+superstore$Year <- as.integer(format(superstore$OrderDate, "%Y"))
+superstore$Month <- as.integer(format(superstore$OrderDate, "%m"))
+superstore$ProfitMargin <- superstore$Profit / superstore$Sales * 100
+```
+
+### Yearly Sales
+
+```{r store-yearly}
+yearly <- superstore %>%
+  group_by(Year) %>%
+  summarise(
+    total_sales = sum(Sales), orders = n(),
+    .groups = "drop"
+  )
+
+ggplot(yearly, aes(Year, total_sales)) +
+  geom_line(color = "#2c3e50", linewidth = 1) +
+  geom_point(size = 3, color = "#cc241d") +
+  labs(
+    title = "Yearly sales trend",
+    x = "Year", y = "Total Sales (USD)"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Monthly Seasonality
+
+```{r store-monthly}
+monthly <- superstore %>%
+  group_by(Month) %>%
+  summarise(total_sales = sum(Sales), .groups = "drop")
+
+ggplot(monthly, aes(factor(Month, labels = month.abb), total_sales)) +
+  geom_col(fill = "#458588") +
+  labs(
+    title = "Aggregated monthly sales",
+    subtitle = "Peaks in November–December and September",
+    x = NULL, y = "Total Sales (USD)"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+::: {.readbox}
+**How to read:** Sales peak in the holiday season (Nov–Dec) and around the start of the school year (Sept). Retailers plan stock and staffing around these peaks.
+:::
+
+### Sales by Sub-Category
+
+```{r store-subcat}
+subcat_sales <- superstore %>%
+  group_by(Category, SubCategory) %>%
+  summarise(Sales = sum(Sales), .groups = "drop") %>%
+  arrange(desc(Sales))
+
+ggplot(
+  subcat_sales,
+  aes(reorder(SubCategory, Sales), Sales, fill = Category)
+) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("#003049", "#d62828", "#f77f00")) +
+  labs(
+    title = "Total sales per sub-category",
+    x = NULL, y = "Sales (USD)"
+  ) +
+  theme_minimal(base_size = 10)
+```
+
+### Profitability
+
+```{r store-profit}
+profit_summary <- superstore %>%
+  group_by(Category, SubCategory) %>%
+  summarise(Margin = mean(ProfitMargin, na.rm = TRUE), .groups = "drop")
+
+ggplot(
+  profit_summary,
+  aes(Margin, reorder(SubCategory, Margin), fill = Category)
+) +
+  geom_col() +
+  scale_fill_manual(values = c("#003049", "#d62828", "#f77f00")) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey30") +
+  labs(
+    title = "Average profit margin by sub-category",
+    subtitle = "Bars left of zero indicate loss-making product lines",
+    x = "Profit margin (%)", y = NULL
+  ) +
+  theme_minimal(base_size = 10)
+```
+
+::: {.readbox}
+**Key insight:** Some product lines (typically those with heavy discounts) sit **left of zero** -- they are loss-making. Re-evaluating the discount policy on these lines is usually the fastest route to profit improvement.
+:::
+
+### Discount Impact
+
+```{r store-discount}
+ggplot(superstore, aes(factor(Discount), Profit)) +
+  geom_boxplot(fill = "#458588", outlier.alpha = 0.4) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "#cc241d") +
+  labs(
+    title = "Profit vs. discount level",
+    subtitle = "Higher discounts push profit toward or below zero",
+    x = "Discount rate", y = "Profit (USD)"
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+### Key Recommendations
+
+1. **Focus on high-performing products** -- invest in the top-selling sub-categories.
+2. **Optimise pricing and discounts** -- reduce discounts on loss-making products.
+3. **Regional strategies** -- target South and Central for growth.
+4. **Seasonal planning** -- stock up for November, December, September.
+5. **Product mix optimisation** -- emphasise high-margin items.
+6. **Invest in analytics** -- real-time dashboards for monitoring.
+
+---
+
+# Appendix A -- Quick Reference Tables
+
+## A.1 Descriptive Statistics Formulas
+
+| Measure | Formula | Robust? |
+|---------|---------|---------|
+| Mean | $\bar{x} = \frac{1}{n}\sum x_i$ | No |
+| Median | Middle value | Yes |
+| Variance | $s^2 = \frac{1}{n-1}\sum(x_i - \bar{x})^2$ | No |
+| Standard Deviation | $s = \sqrt{s^2}$ | No |
+| IQR | $Q_3 - Q_1$ | Yes |
+| Range | Max − Min | No |
+| CV | $\frac{s}{\bar{x}} \times 100\%$ | No |
+
+## A.2 Outlier Detection
+
+| Method | Rule | Assumption |
+|--------|------|------------|
+| IQR | $x < Q_1 - 1.5 \times \text{IQR}$ or $x > Q_3 + 1.5 \times \text{IQR}$ | None |
+| Z-score | $\|z\| > 3$, with $z = (x - \bar{x})/s$ | Normality |
+
+## A.3 Regression Assumptions (LINE)
+
+| Assumption | Check | Fix |
+|------------|-------|-----|
+| **L**inearity | Residuals vs. Fitted | Add polynomial terms |
+| **I**ndependence | Residuals vs. order | Time-series models |
+| **N**ormality | Q-Q plot | Transform $Y$ |
+| **E**qual variance | Scale-Location | Weighted least squares |
+
+## A.4 Model Selection Guide
+
+| Scenario | Recommended method |
+|----------|-------------------|
+| Continuous response, 1 predictor | Simple Linear Regression |
+| Continuous response, multiple predictors | Multiple Linear Regression |
+| Curved relationship | Polynomial Regression |
+| Binary response | Logistic Regression |
+| Multi-class classification | LDA |
+| Multicollinearity | Ridge Regression |
+| Feature selection | Lasso Regression |
+| Outliers / non-normal errors | Quantile Regression |
+
+---
+
+# Appendix B -- Mini Glossary
+
+- **Feature** -- an input column the model learns from (cement, rainfall intensity).
+- **Label / Target** -- what we predict (strength, Flood/No Flood).
+- **Training set** -- data the model learns from. **Test set** -- data used for honest grading.
+- **Imputation** -- filling missing values (e.g., with the median).
+- **Normalisation / Standardisation** -- rescaling features to comparable ranges.
+- **One-hot encoding** -- one 1/0 column per category.
+- **Pearson / Spearman** -- linear vs. rank-based correlation.
+- **Multicollinearity** -- high correlation among predictors.
+- **Ridge / Lasso** -- L2 / L1 regularisation.
+- **LDA** -- Linear Discriminant Analysis (classification + reduction).
+- **Overfitting / Underfitting** -- model too complex / too simple.
+- **Bias / Variance** -- systematic error vs. instability.
+- **STL** -- Seasonal-Trend decomposition using Loess.
+- **AAGR** -- Average Annual Growth Rate.
+- **VIF** -- Variance Inflation Factor.
+
+---
+
+# Appendix C -- Exam Preparation Tips
+
+::: {.tipbox}
+1. **Understand concepts, don't memorize formulas.** Know *why* a method is used.
+2. **Practice interpreting output.** Given a regression summary, explain each coefficient.
+3. **Link plots to purposes.** Know when to use each chart type and what to look for.
+4. **Know the assumptions.** Every method has them; know how to check them.
+5. **Think about the workflow.** EDA → Cleaning → Visualisation → Modeling → Diagnostics → Interpretation.
+6. **Use examples** -- iris, mtcars, rainfall, retail.
+7. **Distinguish correlation from causation.**
+8. **Parametric vs. non-parametric** -- know when to use each.
+9. **R-squared vs. Adjusted R-squared** -- why is the latter preferred?
+10. **LDA intuition** -- the "best viewing angle" to separate classes.
+:::
+
+---
+
+# Further Reading
+
+1. James, G., Witten, D., Hastie, T., and Tibshirani, R. (2021). *An Introduction to Statistical Learning* (2nd ed.). Springer.
+2. Wickham, H., Cetinkaya-Rundel, M., and Grolemund, G. (2023). *R for Data Science* (2nd ed.). O'Reilly.
+3. Hastie, T., Tibshirani, R., and Friedman, J. (2009). *The Elements of Statistical Learning* (2nd ed.). Springer.
+4. Boehmke, B., and Greenwell, B. M. (2019). *Hands-On Machine Learning with R*. CRC Press.
+5. Course notes 24CV201T, PDEU -- Units 2 and 3.

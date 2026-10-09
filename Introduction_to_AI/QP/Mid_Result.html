@@ -1,0 +1,2085 @@
+<style>
+  /* ===== Table component: modern clean style ===== */
+  .table_component {
+    --tc-font:
+      "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial,
+      "Noto Sans", sans-serif;
+
+    --tc-text: #1f2937;
+    --tc-text-soft: #4b5563;
+    --tc-head-bg: #0f172a;
+    --tc-head-text: #f8fafc;
+    --tc-border: #e5e7eb;
+    --tc-row-alt: #f9fafb;
+    --tc-row-hover: #eef2ff;
+    --tc-accent: #4f46e5;
+    --tc-radius: 10px;
+
+    font-family: var(--tc-font);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--tc-text);
+    overflow: auto;
+    max-height: 80vh;
+    width: 100%;
+    border: 1px solid var(--tc-border);
+    border-radius: var(--tc-radius);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 4px 12px rgba(15, 23, 42, 0.06);
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Scrollbar polish */
+  .table_component::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .table_component::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  .table_component::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+  }
+  .table_component::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* ===== Table ===== */
+  .table_component table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+    text-align: left;
+  }
+
+  /* Caption */
+  .table_component caption {
+    caption-side: top;
+    text-align: left;
+    padding: 14px 16px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--tc-head-bg);
+  }
+
+  /* ===== Header ===== */
+  .table_component thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--tc-head-bg);
+    color: var(--tc-head-text);
+    font-family: var(--tc-font);
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 12px 14px;
+    white-space: nowrap;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .table_component thead th + th {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ===== Body cells — same font everywhere ===== */
+  .table_component tbody td {
+    font-family: var(--tc-font);
+    font-size: 14px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--tc-border);
+    color: var(--tc-text);
+    vertical-align: middle;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Zebra striping */
+  .table_component tbody tr:nth-child(odd) td {
+    background: #ffffff;
+  }
+  .table_component tbody tr:nth-child(even) td {
+    background: var(--tc-row-alt);
+  }
+
+  /* Hover */
+  .table_component tbody tr:hover td {
+    background: var(--tc-row-hover);
+    transition: background-color 0.15s ease;
+  }
+
+  /* Last row: remove bottom border so it meets the rounded container */
+  .table_component tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* Emphasize the Total column (10th) — same font, just weight/color */
+  .table_component tbody td:nth-child(10) {
+    font-weight: 600;
+    color: var(--tc-accent);
+  }
+
+  /* Roll number: soft color, same font */
+  .table_component tbody td:nth-child(2) {
+    color: var(--tc-text-soft);
+  }
+
+  /* ===== Footer credit link ===== */
+  .table_component > div:last-child {
+    font-family: var(--tc-font);
+    font-size: 12px;
+    color: var(--tc-text-soft);
+    padding: 8px 16px 12px;
+    background: #fff;
+  }
+
+  .table_component > div:last-child a {
+    color: var(--tc-accent);
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+  }
+  .table_component > div:last-child a:hover {
+    border-bottom-style: solid;
+  }
+
+  /* ===== Responsive tweak ===== */
+  @media (max-width: 640px) {
+    .table_component {
+      font-size: 13px;
+      border-radius: 8px;
+    }
+    .table_component thead th,
+    .table_component tbody td {
+      padding: 8px 10px;
+    }
+  }
+</style>
+
+<div class="table_component" role="region" tabindex="0">
+  <table>
+    <caption>
+      <h3>Mid-Sem Marks: Introduction to AI</h3>
+    </caption>
+    <thead>
+      <tr>
+        <th>SN</th>
+        <th>Roll Number</th>
+        <th>Name</th>
+        <th>Section</th>
+        <th>Que. 1</th>
+        <th>Que. 2</th>
+        <th>Que. 3</th>
+        <th>Que. 4</th>
+        <th>Que. 5</th>
+        <th>Total</th>
+        <th>SL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>24BCL081</td>
+        <td>Patel Aksh Rameshbhai</td>
+        <td>2</td>
+        <td>1.5</td>
+        <td>1.5</td>
+        <td>0</td>
+        <td>2</td>
+        <td>2</td>
+        <td>7</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>24BCL118</td>
+        <td>Pruthvirajsinh Sisodiya</td>
+        <td>2</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>25BCL001</td>
+        <td>Saumya Manishkumar Patel</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>1</td>
+        <td>0</td>
+        <td>3.5</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>25BCL002</td>
+        <td>Patel Dharm Dhavalkumar</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>18</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>25BCL003</td>
+        <td>Parikh Roshan Pareshkumar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>25BCL004</td>
+        <td>Desai Ved Hareshkumar</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>3</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>25BCL005</td>
+        <td>Patel Devarshkumar</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>1.5</td>
+        <td>3.5</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>25BCL006</td>
+        <td>Kanani Krisha Alpeshbhai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>0</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>25BCL007</td>
+        <td>Smit Nazim Kazani</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>4.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>25BCL008</td>
+        <td>Somya Patel</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>0</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>10.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>25BCL009</td>
+        <td>Mandanka Princekumar Dilipbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>25BCL010</td>
+        <td>Rathod Hetul Prakashchandra</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>2.5</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>13</td>
+        <td>25BCL011</td>
+        <td>Kavan Rajan Desai</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>15</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td>25BCL013</td>
+        <td>Sisodiya Nilrajsinh Rajdevsinh</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>4</td>
+        <td>0</td>
+        <td>5</td>
+        <td>15</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>25BCL014</td>
+        <td>Vasava Krishkumar Bhadreshbhai</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>16</td>
+        <td>25BCL015</td>
+        <td>Ramani Priyank Mukundkumar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>20.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>17</td>
+        <td>25BCL016</td>
+        <td>Patel Yagnik Maheshbhai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>3</td>
+        <td>17.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>25BCL018</td>
+        <td>Kamdar Param Jitendra</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>18</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>19</td>
+        <td>25BCL019</td>
+        <td>Vatsal Nileshkumar Jain</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>18.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>25BCL021</td>
+        <td>Vora Hartish Rameshbhai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>5</td>
+        <td>21</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>21</td>
+        <td>25BCL022</td>
+        <td>Arnav Prakash Verma</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>2</td>
+        <td>0</td>
+        <td>10</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>22</td>
+        <td>25BCL024</td>
+        <td>Chaudhari Aryan Shaileshkumar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>4</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>23</td>
+        <td>25BCL025</td>
+        <td>Hathila Vividkumar Virmalbhai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>0</td>
+        <td>4.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>24</td>
+        <td>25BCL026</td>
+        <td>Singh Pranav Rupeshkumar</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>3</td>
+        <td>5</td>
+        <td>21</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>25</td>
+        <td>25BCL027</td>
+        <td>Ashish Kumar Jha</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>26</td>
+        <td>25BCL028</td>
+        <td>Bhoraniya Preet</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>2.5</td>
+        <td>3</td>
+        <td>2</td>
+        <td>13.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>27</td>
+        <td>25BCL029</td>
+        <td>Shivam Singh</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>28</td>
+        <td>25BCL030</td>
+        <td>Sonani Akshar Pragneshbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>2</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>29</td>
+        <td>25BCL031</td>
+        <td>Het Mohanbhai Desai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>2.5</td>
+        <td>5</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>30</td>
+        <td>25BCL032</td>
+        <td>Gandhi Shaishav Manishkumar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>31</td>
+        <td>25BCL033</td>
+        <td>Limbani Jal Prakashbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>2.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>32</td>
+        <td>25BCL035</td>
+        <td>Mayank Kumar</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>0.5</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>13.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>33</td>
+        <td>25BCL037</td>
+        <td>Dhritvan Bhavin Rajde</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>34</td>
+        <td>25BCL038</td>
+        <td>Patel Tvishakumari Anilkumar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>35</td>
+        <td>25BCL039</td>
+        <td>Kunjadiya Ayush Manishbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>36</td>
+        <td>25BCL040</td>
+        <td>Patel Nisarg Dipakbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>3</td>
+        <td>3</td>
+        <td>16</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>37</td>
+        <td>25BCL041</td>
+        <td>Dharmraj Bhavsar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>3</td>
+        <td>18.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>38</td>
+        <td>25BCL042</td>
+        <td>Patel Vedant Mukeshbhai</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>39</td>
+        <td>25BCL043</td>
+        <td>Kalp Hardik Shah</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>4</td>
+        <td>2</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>40</td>
+        <td>25BCL044</td>
+        <td>Haseja Prince Sunil Bhai</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>41</td>
+        <td>25BCL045</td>
+        <td>Devanshi Hirenbhai Pandya</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>42</td>
+        <td>25BCL046</td>
+        <td>Patel Raj Chandreshkumar</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>3</td>
+        <td>2</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>43</td>
+        <td>25BCL047</td>
+        <td>Patel Omkumar Rajendrabhai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>44</td>
+        <td>25BCL048</td>
+        <td>Chaudhari Abhay Sureshbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>45</td>
+        <td>25BCL049</td>
+        <td>Gadhavi Harshil Laxmandan</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>46</td>
+        <td>25BCL050</td>
+        <td>Chauhan Bhupendrakumar Rameshbhai</td>
+        <td>1</td>
+        <td>2.5</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>2.5</td>
+        <td>4</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>47</td>
+        <td>25BCL052</td>
+        <td>Patel Mahi Ashishkumar</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>5</td>
+        <td>22</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>48</td>
+        <td>25BCL053</td>
+        <td>Parmar Dhruv Nandkumar</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>49</td>
+        <td>25BCL054</td>
+        <td>Khatri Dhruv</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>18.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>50</td>
+        <td>25BCL055</td>
+        <td>Bharvadiya Yashkumar Rameshbhai</td>
+        <td>1</td>
+        <td>3</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>2.5</td>
+        <td>15</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>51</td>
+        <td>25BCL056</td>
+        <td>Tilak Bikram Sah</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>3</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>52</td>
+        <td>25BCL057</td>
+        <td>Shrushti Soni</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>5</td>
+        <td>4.5</td>
+        <td>22</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>53</td>
+        <td>25BCL060</td>
+        <td>Yug</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>2.5</td>
+        <td>3</td>
+        <td>4</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>54</td>
+        <td>25BCL061</td>
+        <td>Shrey Padmani</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>5</td>
+        <td>21</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>55</td>
+        <td>25BCL062</td>
+        <td>Thacker Het Jogesh</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>17.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>56</td>
+        <td>25BCL063</td>
+        <td>Veer Desai</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0.5</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>57</td>
+        <td>25BCL064</td>
+        <td>Krish Sanjaykumar Sutariya</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>5</td>
+        <td>4</td>
+        <td>16</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>58</td>
+        <td>25BCL065</td>
+        <td>Vishv Shiyani</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>59</td>
+        <td>25BCL066</td>
+        <td>Patel Divy Nareshbhai</td>
+        <td>1</td>
+        <td>2</td>
+        <td>2</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>4</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>60</td>
+        <td>25BCL067</td>
+        <td>Harshal</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>3</td>
+        <td>3</td>
+        <td>4</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>61</td>
+        <td>25BCL068</td>
+        <td>Mihir Mokani</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>62</td>
+        <td>25BCL069</td>
+        <td>Riyaben Bhargavbhai Bhuva</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>4</td>
+        <td>18</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>63</td>
+        <td>25BCL070</td>
+        <td>Gadhiya Ishan Kartik</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>64</td>
+        <td>25BCL071</td>
+        <td>Sounak Guchhait</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>18.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>65</td>
+        <td>25BCL072</td>
+        <td>Patel Janvi Dharmendrakumar</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>2.5</td>
+        <td>4</td>
+        <td>5</td>
+        <td>20.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>66</td>
+        <td>25BCL073</td>
+        <td>Bhojani Kaushil Gautam</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>5</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>67</td>
+        <td>25BCL075</td>
+        <td>Patel Kenvi Chetankumar</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>3</td>
+        <td>1.5</td>
+        <td>4</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>68</td>
+        <td>25BCL076</td>
+        <td>Shaurya Chaudhary</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>69</td>
+        <td>25BCL077</td>
+        <td>Vaghela Mayurdhvajsingh</td>
+        <td>2</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>1</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>70</td>
+        <td>25BCL078</td>
+        <td>Patel Parth Yogeshkumar</td>
+        <td>2</td>
+        <td>2.5</td>
+        <td>3.5</td>
+        <td>2</td>
+        <td>3</td>
+        <td>2.5</td>
+        <td>13.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>71</td>
+        <td>25BCL079</td>
+        <td>Prachi Prakashbhai Panchotiya</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>3</td>
+        <td>3</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>72</td>
+        <td>25BCL080</td>
+        <td>Patel Ansh Hiteshkumar</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>3</td>
+        <td>5</td>
+        <td>20.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>73</td>
+        <td>25BCL081</td>
+        <td>Hetvi Ratilal Bhoya</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>18</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>74</td>
+        <td>25BCL082</td>
+        <td>Mandeepsinh Gohil</td>
+        <td>2</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>2.5</td>
+        <td>2.5</td>
+        <td>15</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>75</td>
+        <td>25BCL083</td>
+        <td>Patel Anay Dharmesh</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>76</td>
+        <td>25BCL084</td>
+        <td>Thakor Shrey Virendrasinh</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>3</td>
+        <td>18.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>77</td>
+        <td>25BCL085</td>
+        <td>Joddha Dipensinh Dilipsinh</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>4</td>
+        <td>2</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>78</td>
+        <td>25BCL086</td>
+        <td>Shethiya Aayush Dilip</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>1</td>
+        <td>1</td>
+        <td>4</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>79</td>
+        <td>25BCL087</td>
+        <td>Sutariya Marshal Dashrathkumar</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>0</td>
+        <td>4</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>80</td>
+        <td>25BCL088</td>
+        <td>Pavagadhi Krishivkumar Umeshbhai</td>
+        <td>2</td>
+        <td>3</td>
+        <td>3</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>6</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>81</td>
+        <td>25BCL089</td>
+        <td>Aryankumar Mukeshkumar Prajapati</td>
+        <td>2</td>
+        <td>2.5</td>
+        <td>3.5</td>
+        <td>1</td>
+        <td>4</td>
+        <td>2.5</td>
+        <td>13.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>82</td>
+        <td>25BCL090</td>
+        <td>Riyan Suvagiya</td>
+        <td>2</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>1.5</td>
+        <td>3</td>
+        <td>10</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>83</td>
+        <td>25BCL091</td>
+        <td>Patel Dirgh Shaileshbhai</td>
+        <td>2</td>
+        <td>3</td>
+        <td>3</td>
+        <td>1</td>
+        <td>0</td>
+        <td>2</td>
+        <td>9</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>84</td>
+        <td>25BCL092</td>
+        <td>Dhyani Nitinbhai Patel</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>18.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>85</td>
+        <td>25BCL094</td>
+        <td>Gadhiya Naimish Rajeshbhai</td>
+        <td>2</td>
+        <td>3</td>
+        <td>3</td>
+        <td>0</td>
+        <td>1.5</td>
+        <td>2</td>
+        <td>9.5</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>86</td>
+        <td>25BCL096</td>
+        <td>Patel Jeel Dilipkumar</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>1</td>
+        <td>2</td>
+        <td>4</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>87</td>
+        <td>25BCL097</td>
+        <td>Parmar Riya Riteshbhai</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>13</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>88</td>
+        <td>25BCL098</td>
+        <td>Patel Meshw Kalpeshkumar</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>89</td>
+        <td>25BCL099</td>
+        <td>Patel Dev Vishnubhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>15</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>90</td>
+        <td>25BCL100</td>
+        <td>Ansh Mihir Shah</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>1.5</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>91</td>
+        <td>25BCL101</td>
+        <td>Shubh Khandelwal</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>92</td>
+        <td>25BCL103</td>
+        <td>Polra Ayan Firojbhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>93</td>
+        <td>25BCL104</td>
+        <td>Patel Anish Dahyalal</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>94</td>
+        <td>25BCL105</td>
+        <td>Anuj Tejas Dalal</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>95</td>
+        <td>25BCL106</td>
+        <td>Patel Anuragkumar Sureshbhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>3.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>96</td>
+        <td>25BCL107</td>
+        <td>Vanzara Amit Ishvarji</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>12</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>97</td>
+        <td>25BCL108</td>
+        <td>Rathod Rudra Sunilbhai</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>1</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>16</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>98</td>
+        <td>25BCL109</td>
+        <td>Dhorajiya Rishabh Ashwinbhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>1.5</td>
+        <td>4</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>99</td>
+        <td>25BCL110</td>
+        <td>Patel Om Bharatbhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>4.5</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>100</td>
+        <td>25BCL111</td>
+        <td>Nityam Raval</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>17.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>101</td>
+        <td>25BCL112</td>
+        <td>Meet Asari</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3</td>
+        <td>4</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>102</td>
+        <td>25BCL113</td>
+        <td>Sojitra Krish Pravinbhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>103</td>
+        <td>25BCL114</td>
+        <td>Patel Het Jigarkumar</td>
+        <td>2</td>
+        <td>3</td>
+        <td>2</td>
+        <td>0</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>11.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>104</td>
+        <td>25BCL115</td>
+        <td>Patel Niral Ishvarbhai</td>
+        <td>2</td>
+        <td>3</td>
+        <td>3</td>
+        <td>0</td>
+        <td>0</td>
+        <td>5</td>
+        <td>11</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>105</td>
+        <td>25BCL116</td>
+        <td>Patel Nisarg Chandreshkumar</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>106</td>
+        <td>25BCL117</td>
+        <td>Daiya Darshan Dwarkadas</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>107</td>
+        <td>25BCL118</td>
+        <td>Patel Param Narendrabhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>108</td>
+        <td>25BCL119</td>
+        <td>Keshwala Siddharth Vejabhai</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>0</td>
+        <td>4</td>
+        <td>3</td>
+        <td>16</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>109</td>
+        <td>25BCL120</td>
+        <td>Krish Patel</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>110</td>
+        <td>25BCL121</td>
+        <td>Dhruvrajsinh Gohil</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>2.5</td>
+        <td>2.5</td>
+        <td>4</td>
+        <td>17</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>111</td>
+        <td>25BCL122</td>
+        <td>Manya Trivedi</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>3</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>112</td>
+        <td>25BCL123</td>
+        <td>Sabhani Ayush Kalpeshbhai</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>113</td>
+        <td>25BCL124</td>
+        <td>Shyam</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>20.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>114</td>
+        <td>25BCL125</td>
+        <td>Darsh Mukesh Mistry</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>2</td>
+        <td>0</td>
+        <td>2.5</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>115</td>
+        <td>25BCL127</td>
+        <td>Prince Vaghela</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>0</td>
+        <td>0</td>
+        <td>3</td>
+        <td>10</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>116</td>
+        <td>25BCL128</td>
+        <td>Harshika Toke</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>19.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>117</td>
+        <td>25BCL130</td>
+        <td>Himeshprajapati</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>0</td>
+        <td>16.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>118</td>
+        <td>25BCL131</td>
+        <td>Rudra Makwana</td>
+        <td>2</td>
+        <td>4</td>
+        <td>2.5</td>
+        <td>0</td>
+        <td>0</td>
+        <td>2</td>
+        <td>8.5</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>119</td>
+        <td>25BCL133</td>
+        <td>Jeet Savaliya</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>2.5</td>
+        <td>2</td>
+        <td>12</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>120</td>
+        <td>25BCL135</td>
+        <td>Arjun Modhwadia</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>2</td>
+        <td>1.5</td>
+        <td>13.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>121</td>
+        <td>25BCL136</td>
+        <td>Dhruv Patel</td>
+        <td>2</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>2</td>
+        <td>1.5</td>
+        <td>14</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>122</td>
+        <td>25BCL137</td>
+        <td>Prajapati Parthkumar Pravinbhai</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>0</td>
+        <td>3</td>
+        <td>13</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>123</td>
+        <td>25BCL138</td>
+        <td>Dharm Ankitkumar Patel</td>
+        <td>2</td>
+        <td>4</td>
+        <td>1.5</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>2</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>124</td>
+        <td>25BCL139</td>
+        <td>Tirth Parasana</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>1.5</td>
+        <td>4.5</td>
+        <td>3.5</td>
+        <td>17.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>125</td>
+        <td>25BCL140</td>
+        <td>Mulangwa Mwenze Lajoie</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>126</td>
+        <td>25BCL141</td>
+        <td>Vanzara Kamlesh Ganpatbhai</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>2</td>
+        <td>1</td>
+        <td>2.5</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>127</td>
+        <td>25BCL142D</td>
+        <td>Raviraj Garchar</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>2.5</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>6</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>128</td>
+        <td>25BCL143D</td>
+        <td>Heet Patel</td>
+        <td>1</td>
+        <td>3</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>4.5</td>
+        <td>7.5</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>129</td>
+        <td>25BCL144D</td>
+        <td>Nirav Garchar</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>4.5</td>
+        <td>9</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>130</td>
+        <td>25BCL145D</td>
+        <td>Vandana Rajesh Kuchhadia</td>
+        <td>1</td>
+        <td>4.5</td>
+        <td>4.5</td>
+        <td>2.5</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>20</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>131</td>
+        <td>25BCL146D</td>
+        <td>Chauhan Chirag Vinodbhai</td>
+        <td>1</td>
+        <td>3.5</td>
+        <td>2</td>
+        <td>0</td>
+        <td>1.5</td>
+        <td>0</td>
+        <td>7</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>132</td>
+        <td>25BCL147D</td>
+        <td>Mohnish Murjani</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>2</td>
+        <td>3</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>133</td>
+        <td>25BCL148D</td>
+        <td>Pearl Uchwani</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4</td>
+        <td>4.5</td>
+        <td>21</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>134</td>
+        <td>25BCL149D</td>
+        <td>Parth Bhatt</td>
+        <td>2</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>135</td>
+        <td>25BCL150D</td>
+        <td>Manavrajsinh Parmar</td>
+        <td>2</td>
+        <td>2.5</td>
+        <td>3</td>
+        <td>1</td>
+        <td>1</td>
+        <td>2</td>
+        <td>9.5</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>136</td>
+        <td>25BCL151D</td>
+        <td>Dhara Sisotiya</td>
+        <td>2</td>
+        <td>4</td>
+        <td>4</td>
+        <td>0.5</td>
+        <td>2.5</td>
+        <td>4.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>137</td>
+        <td>25BCL152D</td>
+        <td>Prit Bodar</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>3</td>
+        <td>0</td>
+        <td>4</td>
+        <td>4</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>138</td>
+        <td>25BCL153D</td>
+        <td>Rahil Kanara</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>3</td>
+        <td>2</td>
+        <td>12.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>139</td>
+        <td>25BCL154D</td>
+        <td>Rabari Laxman</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>0</td>
+        <td>2</td>
+        <td>5</td>
+        <td>14.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>140</td>
+        <td>25BCL155D</td>
+        <td>Shrey Dixitkumar Jani</td>
+        <td>1</td>
+        <td>4</td>
+        <td>4</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>17.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>141</td>
+        <td>25BCL156D</td>
+        <td>Nihar Hareshbhai Prajapati</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>142</td>
+        <td>25BCL157D</td>
+        <td>Rishi Jemis Patel</td>
+        <td>2</td>
+        <td>4.5</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>3.5</td>
+        <td>19</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>143</td>
+        <td>25BCL158D</td>
+        <td>Jainam Kartik Shah</td>
+        <td>2</td>
+        <td>3.5</td>
+        <td>4</td>
+        <td>0</td>
+        <td>2.5</td>
+        <td>3</td>
+        <td>13</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>144</td>
+        <td>25BCL159D</td>
+        <td>Rushi Limbadia</td>
+        <td>1</td>
+        <td>4</td>
+        <td>3.5</td>
+        <td>1.5</td>
+        <td>3</td>
+        <td>3.5</td>
+        <td>15.5</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td>145</td>
+        <td>25BCL160D</td>
+        <td>Kothari Sanyam</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr>
+        <td>146</td>
+        <td>25BCL161D</td>
+        <td>Vasiyani Yash Pramodkumar</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+      </tr>
+      <tr></tr>
+    </tbody>
+  </table>
+</div>

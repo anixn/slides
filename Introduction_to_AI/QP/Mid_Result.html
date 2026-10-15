@@ -1,2085 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mid Sem Marks – Introduction to AI – Civil Engineering</title>
 <style>
-  /* ===== Table component: modern clean style ===== */
-  .table_component {
-    --tc-font:
-      "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial,
-      "Noto Sans", sans-serif;
-
-    --tc-text: #1f2937;
-    --tc-text-soft: #4b5563;
-    --tc-head-bg: #0f172a;
-    --tc-head-text: #f8fafc;
-    --tc-border: #e5e7eb;
-    --tc-row-alt: #f9fafb;
-    --tc-row-hover: #eef2ff;
-    --tc-accent: #4f46e5;
-    --tc-radius: 10px;
-
-    font-family: var(--tc-font);
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--tc-text);
-    overflow: auto;
-    max-height: 80vh;
-    width: 100%;
-    border: 1px solid var(--tc-border);
-    border-radius: var(--tc-radius);
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.04),
-      0 4px 12px rgba(15, 23, 42, 0.06);
-    background: #fff;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  :root{
+    --bg:#0f172a;
+    --card:#ffffff;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --brand:#1d4ed8;
+    --brand2:#0ea5e9;
+    --good:#16a34a;
+    --ok:#2563eb;
+    --warn:#d97706;
+    --bad:#dc2626;
+    --sl:#f59e0b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:#f1f5f9;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0ea5e9 100%);
+    color:#fff;
+    padding:34px 20px 30px;
+    text-align:center;
+    box-shadow:0 6px 24px rgba(15,23,42,.18);
+  }
+  header .eyebrow{
+    font-size:.78rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    opacity:.85;
+    margin:0 0 8px;
+  }
+  header h1{
+    margin:0;
+    font-size:clamp(1.25rem,3.4vw,2.05rem);
+    line-height:1.25;
+    font-weight:700;
+  }
+  header h1 span{display:block;font-weight:400;font-size:.72em;opacity:.92;margin-top:4px}
+  header p.sub{
+    margin:12px auto 0;
+    max-width:760px;
+    font-size:.9rem;
+    opacity:.9;
   }
 
-  /* Scrollbar polish */
-  .table_component::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+  .wrap{max-width:1240px;margin:0 auto;padding:22px 16px 60px}
+
+  /* ---------- stat cards ---------- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin:-46px 0 20px;
+    position:relative;
+    z-index:2;
   }
-  .table_component::-webkit-scrollbar-track {
-    background: #f1f5f9;
+  .stat{
+    background:var(--card);
+    border-radius:14px;
+    padding:14px 16px;
+    box-shadow:0 8px 22px rgba(15,23,42,.10);
+    border:1px solid var(--line);
   }
-  .table_component::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 999px;
+  .stat .label{
+    font-size:.7rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
   }
-  .table_component::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+  .stat .value{
+    font-size:1.55rem;
+    font-weight:800;
+    margin-top:4px;
+    line-height:1.1;
+  }
+  .stat .value small{font-size:.55em;font-weight:600;color:var(--muted)}
+
+  /* ---------- controls ---------- */
+  .controls{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
+    margin-bottom:16px;
+  }
+  .controls input[type="search"],
+  .controls select{
+    font:inherit;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#f8fafc;
+    color:var(--ink);
+    outline:none;
+    transition:.15s;
+  }
+  .controls input[type="search"]{flex:1 1 260px;min-width:180px}
+  .controls input[type="search"]:focus,
+  .controls select:focus{
+    border-color:var(--brand2);
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(14,165,233,.15);
+  }
+  .toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:.86rem;
+    color:#334155;
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .toggle input{accent-color:var(--brand);width:16px;height:16px;cursor:pointer}
+  .count{
+    margin-left:auto;
+    font-size:.82rem;
+    color:var(--muted);
+    font-weight:600;
+    white-space:nowrap;
   }
 
-  /* ===== Table ===== */
-  .table_component table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: auto;
-    text-align: left;
+  /* ---------- table ---------- */
+  .tablecard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 6px 22px rgba(15,23,42,.07);
   }
+  .scroller{max-height:74vh;overflow:auto}
+  table{
+    border-collapse:separate;
+    border-spacing:0;
+    width:100%;
+    font-size:.875rem;
+    min-width:900px;
+  }
+  thead th{
+    position:sticky;
+    top:0;
+    z-index:3;
+    background:#1e293b;
+    color:#e2e8f0;
+    font-size:.74rem;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    font-weight:700;
+    padding:11px 10px;
+    text-align:center;
+    white-space:nowrap;
+    cursor:pointer;
+    border-bottom:2px solid #0f172a;
+  }
+  thead th:hover{background:#334155}
+  thead th.sortable::after{content:"⇅";font-size:.85em;opacity:.45;margin-left:5px}
+  thead th.asc::after{content:"▲";opacity:1;color:#7dd3fc}
+  thead th.desc::after{content:"▼";opacity:1;color:#7dd3fc}
+  thead th:nth-child(1){text-align:center}
+  thead th:nth-child(2),
+  thead th:nth-child(3){text-align:left}
+  thead th:nth-child(3){padding-left:14px}
 
-  /* Caption */
-  .table_component caption {
-    caption-side: top;
-    text-align: left;
-    padding: 14px 16px 10px;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    color: var(--tc-head-bg);
+  tbody td{
+    padding:9px 10px;
+    border-bottom:1px solid #eef2f7;
+    text-align:center;
+    white-space:nowrap;
   }
+  tbody td:nth-child(2),
+  tbody td:nth-child(3){text-align:left}
+  tbody tr:nth-child(even){background:#fafbfd}
+  tbody tr:hover{background:#eef6ff}
+  tbody tr.absent{background:#fff5f5}
+  tbody tr.absent:hover{background:#ffe9e9}
+  tbody tr.slow{background:#fffbeb}
+  tbody tr.slow:hover{background:#fef3c7}
+  tbody tr.hidden{display:none}
 
-  /* ===== Header ===== */
-  .table_component thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: var(--tc-head-bg);
-    color: var(--tc-head-text);
-    font-family: var(--tc-font);
-    font-weight: 600;
-    font-size: 12.5px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 12px 14px;
-    white-space: nowrap;
-    border-bottom: 1px solid #1e293b;
+  td.name{font-weight:600;color:#1e293b;white-space:normal;min-width:190px}
+  td.roll{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.82rem;color:#334155}
+  td.total{font-weight:800;font-size:.95rem}
+  .secbadge{
+    display:inline-block;
+    min-width:24px;
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:.75rem;
+    font-weight:700;
+    background:#e0e7ff;
+    color:#3730a3;
   }
+  .secbadge.s2{background:#dcfce7;color:#166534}
+  .zero{color:#dc2626;font-weight:700;background:#fef2f2;border-radius:5px}
+  .absent .name{color:#9f1239}
 
-  .table_component thead th + th {
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  /* status badges */
+  .badge{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:999px;
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.03em;
+    text-transform:uppercase;
   }
+  .badge.absent{background:#fee2e2;color:#b91c1c}
+  .badge.sl{background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
+  .badge.regular{background:#f1f5f9;color:#94a3b8}
 
-  /* ===== Body cells — same font everywhere ===== */
-  .table_component tbody td {
-    font-family: var(--tc-font);
-    font-size: 14px;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--tc-border);
-    color: var(--tc-text);
-    vertical-align: middle;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
+  /* total colour coding */
+  .t-hi{color:#15803d}
+  .t-mid{color:#1d4ed8}
+  .t-low{color:#b45309}
+  .t-vlow{color:#b91c1c}
+  .t-zero{color:#94a3b8}
 
-  /* Zebra striping */
-  .table_component tbody tr:nth-child(odd) td {
-    background: #ffffff;
+  /* ---------- footer ---------- */
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    align-items:center;
+    margin:14px 4px 0;
+    font-size:.78rem;
+    color:#475569;
   }
-  .table_component tbody tr:nth-child(even) td {
-    background: var(--tc-row-alt);
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+  footer.note{
+    margin-top:22px;
+    font-size:.78rem;
+    color:#64748b;
+    text-align:center;
+    line-height:1.7;
   }
-
-  /* Hover */
-  .table_component tbody tr:hover td {
-    background: var(--tc-row-hover);
-    transition: background-color 0.15s ease;
+  .empty{
+    padding:36px 16px;
+    text-align:center;
+    color:var(--muted);
+    font-weight:600;
   }
-
-  /* Last row: remove bottom border so it meets the rounded container */
-  .table_component tbody tr:last-child td {
-    border-bottom: 0;
-  }
-
-  /* Emphasize the Total column (10th) — same font, just weight/color */
-  .table_component tbody td:nth-child(10) {
-    font-weight: 600;
-    color: var(--tc-accent);
-  }
-
-  /* Roll number: soft color, same font */
-  .table_component tbody td:nth-child(2) {
-    color: var(--tc-text-soft);
-  }
-
-  /* ===== Footer credit link ===== */
-  .table_component > div:last-child {
-    font-family: var(--tc-font);
-    font-size: 12px;
-    color: var(--tc-text-soft);
-    padding: 8px 16px 12px;
-    background: #fff;
-  }
-
-  .table_component > div:last-child a {
-    color: var(--tc-accent);
-    text-decoration: none;
-    border-bottom: 1px dotted currentColor;
-  }
-  .table_component > div:last-child a:hover {
-    border-bottom-style: solid;
-  }
-
-  /* ===== Responsive tweak ===== */
-  @media (max-width: 640px) {
-    .table_component {
-      font-size: 13px;
-      border-radius: 8px;
-    }
-    .table_component thead th,
-    .table_component tbody td {
-      padding: 8px 10px;
-    }
+  @media print{
+    header{box-shadow:none}
+    .controls,.stats{display:none}
+    .scroller{max-height:none;overflow:visible}
+    body{background:#fff}
   }
 </style>
+</head>
+<body>
 
-<div class="table_component" role="region" tabindex="0">
-  <table>
-    <caption>
-      <h3>Mid-Sem Marks: Introduction to AI</h3>
-    </caption>
-    <thead>
-      <tr>
-        <th>SN</th>
-        <th>Roll Number</th>
-        <th>Name</th>
-        <th>Section</th>
-        <th>Que. 1</th>
-        <th>Que. 2</th>
-        <th>Que. 3</th>
-        <th>Que. 4</th>
-        <th>Que. 5</th>
-        <th>Total</th>
-        <th>SL</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>24BCL081</td>
-        <td>Patel Aksh Rameshbhai</td>
-        <td>2</td>
-        <td>1.5</td>
-        <td>1.5</td>
-        <td>0</td>
-        <td>2</td>
-        <td>2</td>
-        <td>7</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>24BCL118</td>
-        <td>Pruthvirajsinh Sisodiya</td>
-        <td>2</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>25BCL001</td>
-        <td>Saumya Manishkumar Patel</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>1</td>
-        <td>0</td>
-        <td>3.5</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>4</td>
-        <td>25BCL002</td>
-        <td>Patel Dharm Dhavalkumar</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>5</td>
-        <td>25BCL003</td>
-        <td>Parikh Roshan Pareshkumar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>6</td>
-        <td>25BCL004</td>
-        <td>Desai Ved Hareshkumar</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>3</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>7</td>
-        <td>25BCL005</td>
-        <td>Patel Devarshkumar</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>1.5</td>
-        <td>3.5</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>8</td>
-        <td>25BCL006</td>
-        <td>Kanani Krisha Alpeshbhai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>0</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>9</td>
-        <td>25BCL007</td>
-        <td>Smit Nazim Kazani</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>4.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>10</td>
-        <td>25BCL008</td>
-        <td>Somya Patel</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>0</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>10.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>11</td>
-        <td>25BCL009</td>
-        <td>Mandanka Princekumar Dilipbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>12</td>
-        <td>25BCL010</td>
-        <td>Rathod Hetul Prakashchandra</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>2.5</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>13</td>
-        <td>25BCL011</td>
-        <td>Kavan Rajan Desai</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>15</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>14</td>
-        <td>25BCL013</td>
-        <td>Sisodiya Nilrajsinh Rajdevsinh</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>4</td>
-        <td>0</td>
-        <td>5</td>
-        <td>15</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>15</td>
-        <td>25BCL014</td>
-        <td>Vasava Krishkumar Bhadreshbhai</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>16</td>
-        <td>25BCL015</td>
-        <td>Ramani Priyank Mukundkumar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>20.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>17</td>
-        <td>25BCL016</td>
-        <td>Patel Yagnik Maheshbhai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>3</td>
-        <td>17.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>18</td>
-        <td>25BCL018</td>
-        <td>Kamdar Param Jitendra</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>19</td>
-        <td>25BCL019</td>
-        <td>Vatsal Nileshkumar Jain</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>18.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>20</td>
-        <td>25BCL021</td>
-        <td>Vora Hartish Rameshbhai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>5</td>
-        <td>21</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>21</td>
-        <td>25BCL022</td>
-        <td>Arnav Prakash Verma</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>2</td>
-        <td>0</td>
-        <td>10</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>22</td>
-        <td>25BCL024</td>
-        <td>Chaudhari Aryan Shaileshkumar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>4</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>23</td>
-        <td>25BCL025</td>
-        <td>Hathila Vividkumar Virmalbhai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>0</td>
-        <td>4.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>24</td>
-        <td>25BCL026</td>
-        <td>Singh Pranav Rupeshkumar</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>3</td>
-        <td>5</td>
-        <td>21</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>25</td>
-        <td>25BCL027</td>
-        <td>Ashish Kumar Jha</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>26</td>
-        <td>25BCL028</td>
-        <td>Bhoraniya Preet</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>2.5</td>
-        <td>3</td>
-        <td>2</td>
-        <td>13.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>27</td>
-        <td>25BCL029</td>
-        <td>Shivam Singh</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>28</td>
-        <td>25BCL030</td>
-        <td>Sonani Akshar Pragneshbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>2</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>29</td>
-        <td>25BCL031</td>
-        <td>Het Mohanbhai Desai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>2.5</td>
-        <td>5</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>30</td>
-        <td>25BCL032</td>
-        <td>Gandhi Shaishav Manishkumar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>31</td>
-        <td>25BCL033</td>
-        <td>Limbani Jal Prakashbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>2.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>32</td>
-        <td>25BCL035</td>
-        <td>Mayank Kumar</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>0.5</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>13.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>33</td>
-        <td>25BCL037</td>
-        <td>Dhritvan Bhavin Rajde</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>34</td>
-        <td>25BCL038</td>
-        <td>Patel Tvishakumari Anilkumar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>35</td>
-        <td>25BCL039</td>
-        <td>Kunjadiya Ayush Manishbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>36</td>
-        <td>25BCL040</td>
-        <td>Patel Nisarg Dipakbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>3</td>
-        <td>3</td>
-        <td>16</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>37</td>
-        <td>25BCL041</td>
-        <td>Dharmraj Bhavsar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>3</td>
-        <td>18.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>38</td>
-        <td>25BCL042</td>
-        <td>Patel Vedant Mukeshbhai</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>39</td>
-        <td>25BCL043</td>
-        <td>Kalp Hardik Shah</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>4</td>
-        <td>2</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>40</td>
-        <td>25BCL044</td>
-        <td>Haseja Prince Sunil Bhai</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>41</td>
-        <td>25BCL045</td>
-        <td>Devanshi Hirenbhai Pandya</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>42</td>
-        <td>25BCL046</td>
-        <td>Patel Raj Chandreshkumar</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>3</td>
-        <td>2</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>43</td>
-        <td>25BCL047</td>
-        <td>Patel Omkumar Rajendrabhai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>44</td>
-        <td>25BCL048</td>
-        <td>Chaudhari Abhay Sureshbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>45</td>
-        <td>25BCL049</td>
-        <td>Gadhavi Harshil Laxmandan</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>2</td>
-        <td>3</td>
-        <td>4</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>46</td>
-        <td>25BCL050</td>
-        <td>Chauhan Bhupendrakumar Rameshbhai</td>
-        <td>1</td>
-        <td>2.5</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>2.5</td>
-        <td>4</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>47</td>
-        <td>25BCL052</td>
-        <td>Patel Mahi Ashishkumar</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>5</td>
-        <td>22</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>48</td>
-        <td>25BCL053</td>
-        <td>Parmar Dhruv Nandkumar</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>49</td>
-        <td>25BCL054</td>
-        <td>Khatri Dhruv</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>18.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>50</td>
-        <td>25BCL055</td>
-        <td>Bharvadiya Yashkumar Rameshbhai</td>
-        <td>1</td>
-        <td>3</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>2.5</td>
-        <td>15</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>51</td>
-        <td>25BCL056</td>
-        <td>Tilak Bikram Sah</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>3</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>52</td>
-        <td>25BCL057</td>
-        <td>Shrushti Soni</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>5</td>
-        <td>4.5</td>
-        <td>22</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>53</td>
-        <td>25BCL060</td>
-        <td>Yug</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>2.5</td>
-        <td>3</td>
-        <td>4</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>54</td>
-        <td>25BCL061</td>
-        <td>Shrey Padmani</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>5</td>
-        <td>21</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>55</td>
-        <td>25BCL062</td>
-        <td>Thacker Het Jogesh</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>17.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>56</td>
-        <td>25BCL063</td>
-        <td>Veer Desai</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0.5</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>57</td>
-        <td>25BCL064</td>
-        <td>Krish Sanjaykumar Sutariya</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>5</td>
-        <td>4</td>
-        <td>16</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>58</td>
-        <td>25BCL065</td>
-        <td>Vishv Shiyani</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>59</td>
-        <td>25BCL066</td>
-        <td>Patel Divy Nareshbhai</td>
-        <td>1</td>
-        <td>2</td>
-        <td>2</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>4</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>60</td>
-        <td>25BCL067</td>
-        <td>Harshal</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>3</td>
-        <td>3</td>
-        <td>4</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>61</td>
-        <td>25BCL068</td>
-        <td>Mihir Mokani</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>62</td>
-        <td>25BCL069</td>
-        <td>Riyaben Bhargavbhai Bhuva</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>4</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>63</td>
-        <td>25BCL070</td>
-        <td>Gadhiya Ishan Kartik</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>64</td>
-        <td>25BCL071</td>
-        <td>Sounak Guchhait</td>
-        <td>2</td>
-        <td>3</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>18.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>65</td>
-        <td>25BCL072</td>
-        <td>Patel Janvi Dharmendrakumar</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>2.5</td>
-        <td>4</td>
-        <td>5</td>
-        <td>20.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>66</td>
-        <td>25BCL073</td>
-        <td>Bhojani Kaushil Gautam</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>5</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>67</td>
-        <td>25BCL075</td>
-        <td>Patel Kenvi Chetankumar</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>3</td>
-        <td>1.5</td>
-        <td>4</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>68</td>
-        <td>25BCL076</td>
-        <td>Shaurya Chaudhary</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>69</td>
-        <td>25BCL077</td>
-        <td>Vaghela Mayurdhvajsingh</td>
-        <td>2</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>1</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>70</td>
-        <td>25BCL078</td>
-        <td>Patel Parth Yogeshkumar</td>
-        <td>2</td>
-        <td>2.5</td>
-        <td>3.5</td>
-        <td>2</td>
-        <td>3</td>
-        <td>2.5</td>
-        <td>13.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>71</td>
-        <td>25BCL079</td>
-        <td>Prachi Prakashbhai Panchotiya</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>3</td>
-        <td>3</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>72</td>
-        <td>25BCL080</td>
-        <td>Patel Ansh Hiteshkumar</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>3</td>
-        <td>5</td>
-        <td>20.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>73</td>
-        <td>25BCL081</td>
-        <td>Hetvi Ratilal Bhoya</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>18</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>74</td>
-        <td>25BCL082</td>
-        <td>Mandeepsinh Gohil</td>
-        <td>2</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>2.5</td>
-        <td>2.5</td>
-        <td>15</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>75</td>
-        <td>25BCL083</td>
-        <td>Patel Anay Dharmesh</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>76</td>
-        <td>25BCL084</td>
-        <td>Thakor Shrey Virendrasinh</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>3</td>
-        <td>18.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>77</td>
-        <td>25BCL085</td>
-        <td>Joddha Dipensinh Dilipsinh</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>4</td>
-        <td>2</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>78</td>
-        <td>25BCL086</td>
-        <td>Shethiya Aayush Dilip</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>1</td>
-        <td>1</td>
-        <td>4</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>79</td>
-        <td>25BCL087</td>
-        <td>Sutariya Marshal Dashrathkumar</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>0</td>
-        <td>4</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>80</td>
-        <td>25BCL088</td>
-        <td>Pavagadhi Krishivkumar Umeshbhai</td>
-        <td>2</td>
-        <td>3</td>
-        <td>3</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>6</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>81</td>
-        <td>25BCL089</td>
-        <td>Aryankumar Mukeshkumar Prajapati</td>
-        <td>2</td>
-        <td>2.5</td>
-        <td>3.5</td>
-        <td>1</td>
-        <td>4</td>
-        <td>2.5</td>
-        <td>13.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>82</td>
-        <td>25BCL090</td>
-        <td>Riyan Suvagiya</td>
-        <td>2</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>1.5</td>
-        <td>3</td>
-        <td>10</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>83</td>
-        <td>25BCL091</td>
-        <td>Patel Dirgh Shaileshbhai</td>
-        <td>2</td>
-        <td>3</td>
-        <td>3</td>
-        <td>1</td>
-        <td>0</td>
-        <td>2</td>
-        <td>9</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>84</td>
-        <td>25BCL092</td>
-        <td>Dhyani Nitinbhai Patel</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>18.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>85</td>
-        <td>25BCL094</td>
-        <td>Gadhiya Naimish Rajeshbhai</td>
-        <td>2</td>
-        <td>3</td>
-        <td>3</td>
-        <td>0</td>
-        <td>1.5</td>
-        <td>2</td>
-        <td>9.5</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>86</td>
-        <td>25BCL096</td>
-        <td>Patel Jeel Dilipkumar</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>1</td>
-        <td>2</td>
-        <td>4</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>87</td>
-        <td>25BCL097</td>
-        <td>Parmar Riya Riteshbhai</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>13</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>88</td>
-        <td>25BCL098</td>
-        <td>Patel Meshw Kalpeshkumar</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>89</td>
-        <td>25BCL099</td>
-        <td>Patel Dev Vishnubhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>15</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>90</td>
-        <td>25BCL100</td>
-        <td>Ansh Mihir Shah</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>1.5</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>91</td>
-        <td>25BCL101</td>
-        <td>Shubh Khandelwal</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>92</td>
-        <td>25BCL103</td>
-        <td>Polra Ayan Firojbhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>93</td>
-        <td>25BCL104</td>
-        <td>Patel Anish Dahyalal</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>94</td>
-        <td>25BCL105</td>
-        <td>Anuj Tejas Dalal</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>95</td>
-        <td>25BCL106</td>
-        <td>Patel Anuragkumar Sureshbhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>3.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>96</td>
-        <td>25BCL107</td>
-        <td>Vanzara Amit Ishvarji</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>12</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>97</td>
-        <td>25BCL108</td>
-        <td>Rathod Rudra Sunilbhai</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>1</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>16</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>98</td>
-        <td>25BCL109</td>
-        <td>Dhorajiya Rishabh Ashwinbhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>1.5</td>
-        <td>4</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>99</td>
-        <td>25BCL110</td>
-        <td>Patel Om Bharatbhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>4.5</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>100</td>
-        <td>25BCL111</td>
-        <td>Nityam Raval</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>17.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>101</td>
-        <td>25BCL112</td>
-        <td>Meet Asari</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3</td>
-        <td>4</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>102</td>
-        <td>25BCL113</td>
-        <td>Sojitra Krish Pravinbhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>103</td>
-        <td>25BCL114</td>
-        <td>Patel Het Jigarkumar</td>
-        <td>2</td>
-        <td>3</td>
-        <td>2</td>
-        <td>0</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>11.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>104</td>
-        <td>25BCL115</td>
-        <td>Patel Niral Ishvarbhai</td>
-        <td>2</td>
-        <td>3</td>
-        <td>3</td>
-        <td>0</td>
-        <td>0</td>
-        <td>5</td>
-        <td>11</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>105</td>
-        <td>25BCL116</td>
-        <td>Patel Nisarg Chandreshkumar</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>106</td>
-        <td>25BCL117</td>
-        <td>Daiya Darshan Dwarkadas</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>107</td>
-        <td>25BCL118</td>
-        <td>Patel Param Narendrabhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>108</td>
-        <td>25BCL119</td>
-        <td>Keshwala Siddharth Vejabhai</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>0</td>
-        <td>4</td>
-        <td>3</td>
-        <td>16</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>109</td>
-        <td>25BCL120</td>
-        <td>Krish Patel</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>110</td>
-        <td>25BCL121</td>
-        <td>Dhruvrajsinh Gohil</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>2.5</td>
-        <td>2.5</td>
-        <td>4</td>
-        <td>17</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>111</td>
-        <td>25BCL122</td>
-        <td>Manya Trivedi</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>3</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>112</td>
-        <td>25BCL123</td>
-        <td>Sabhani Ayush Kalpeshbhai</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>113</td>
-        <td>25BCL124</td>
-        <td>Shyam</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>20.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>114</td>
-        <td>25BCL125</td>
-        <td>Darsh Mukesh Mistry</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>2</td>
-        <td>0</td>
-        <td>2.5</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>115</td>
-        <td>25BCL127</td>
-        <td>Prince Vaghela</td>
-        <td>2</td>
-        <td>3</td>
-        <td>4</td>
-        <td>0</td>
-        <td>0</td>
-        <td>3</td>
-        <td>10</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>116</td>
-        <td>25BCL128</td>
-        <td>Harshika Toke</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>19.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>117</td>
-        <td>25BCL130</td>
-        <td>Himeshprajapati</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>0</td>
-        <td>16.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>118</td>
-        <td>25BCL131</td>
-        <td>Rudra Makwana</td>
-        <td>2</td>
-        <td>4</td>
-        <td>2.5</td>
-        <td>0</td>
-        <td>0</td>
-        <td>2</td>
-        <td>8.5</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>119</td>
-        <td>25BCL133</td>
-        <td>Jeet Savaliya</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>2.5</td>
-        <td>2</td>
-        <td>12</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>120</td>
-        <td>25BCL135</td>
-        <td>Arjun Modhwadia</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>2</td>
-        <td>1.5</td>
-        <td>13.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>121</td>
-        <td>25BCL136</td>
-        <td>Dhruv Patel</td>
-        <td>2</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>2</td>
-        <td>1.5</td>
-        <td>14</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>122</td>
-        <td>25BCL137</td>
-        <td>Prajapati Parthkumar Pravinbhai</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>0</td>
-        <td>3</td>
-        <td>13</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>123</td>
-        <td>25BCL138</td>
-        <td>Dharm Ankitkumar Patel</td>
-        <td>2</td>
-        <td>4</td>
-        <td>1.5</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>2</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>124</td>
-        <td>25BCL139</td>
-        <td>Tirth Parasana</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>1.5</td>
-        <td>4.5</td>
-        <td>3.5</td>
-        <td>17.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>125</td>
-        <td>25BCL140</td>
-        <td>Mulangwa Mwenze Lajoie</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>126</td>
-        <td>25BCL141</td>
-        <td>Vanzara Kamlesh Ganpatbhai</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>2</td>
-        <td>1</td>
-        <td>2.5</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>127</td>
-        <td>25BCL142D</td>
-        <td>Raviraj Garchar</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>2.5</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>6</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>128</td>
-        <td>25BCL143D</td>
-        <td>Heet Patel</td>
-        <td>1</td>
-        <td>3</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>4.5</td>
-        <td>7.5</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>129</td>
-        <td>25BCL144D</td>
-        <td>Nirav Garchar</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>4.5</td>
-        <td>9</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>130</td>
-        <td>25BCL145D</td>
-        <td>Vandana Rajesh Kuchhadia</td>
-        <td>1</td>
-        <td>4.5</td>
-        <td>4.5</td>
-        <td>2.5</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>20</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>131</td>
-        <td>25BCL146D</td>
-        <td>Chauhan Chirag Vinodbhai</td>
-        <td>1</td>
-        <td>3.5</td>
-        <td>2</td>
-        <td>0</td>
-        <td>1.5</td>
-        <td>0</td>
-        <td>7</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>132</td>
-        <td>25BCL147D</td>
-        <td>Mohnish Murjani</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>2</td>
-        <td>3</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>133</td>
-        <td>25BCL148D</td>
-        <td>Pearl Uchwani</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4</td>
-        <td>4.5</td>
-        <td>21</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>134</td>
-        <td>25BCL149D</td>
-        <td>Parth Bhatt</td>
-        <td>2</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>135</td>
-        <td>25BCL150D</td>
-        <td>Manavrajsinh Parmar</td>
-        <td>2</td>
-        <td>2.5</td>
-        <td>3</td>
-        <td>1</td>
-        <td>1</td>
-        <td>2</td>
-        <td>9.5</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>136</td>
-        <td>25BCL151D</td>
-        <td>Dhara Sisotiya</td>
-        <td>2</td>
-        <td>4</td>
-        <td>4</td>
-        <td>0.5</td>
-        <td>2.5</td>
-        <td>4.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>137</td>
-        <td>25BCL152D</td>
-        <td>Prit Bodar</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>3</td>
-        <td>0</td>
-        <td>4</td>
-        <td>4</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>138</td>
-        <td>25BCL153D</td>
-        <td>Rahil Kanara</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>3</td>
-        <td>2</td>
-        <td>12.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>139</td>
-        <td>25BCL154D</td>
-        <td>Rabari Laxman</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>0</td>
-        <td>2</td>
-        <td>5</td>
-        <td>14.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>140</td>
-        <td>25BCL155D</td>
-        <td>Shrey Dixitkumar Jani</td>
-        <td>1</td>
-        <td>4</td>
-        <td>4</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>17.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>141</td>
-        <td>25BCL156D</td>
-        <td>Nihar Hareshbhai Prajapati</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>142</td>
-        <td>25BCL157D</td>
-        <td>Rishi Jemis Patel</td>
-        <td>2</td>
-        <td>4.5</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>3.5</td>
-        <td>19</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>143</td>
-        <td>25BCL158D</td>
-        <td>Jainam Kartik Shah</td>
-        <td>2</td>
-        <td>3.5</td>
-        <td>4</td>
-        <td>0</td>
-        <td>2.5</td>
-        <td>3</td>
-        <td>13</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>144</td>
-        <td>25BCL159D</td>
-        <td>Rushi Limbadia</td>
-        <td>1</td>
-        <td>4</td>
-        <td>3.5</td>
-        <td>1.5</td>
-        <td>3</td>
-        <td>3.5</td>
-        <td>15.5</td>
-        <td>0</td>
-      </tr>
-      <tr>
-        <td>145</td>
-        <td>25BCL160D</td>
-        <td>Kothari Sanyam</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr>
-        <td>146</td>
-        <td>25BCL161D</td>
-        <td>Vasiyani Yash Pramodkumar</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-      <tr></tr>
-    </tbody>
-  </table>
+<header>
+  <p class="eyebrow">Civil Engineering Department</p>
+  <h1>Mid Semester Marks
+    <span>Introduction to AI – Civil Engineering</span>
+  </h1>
+  <p class="sub">Subject-wise question marks, total and status as per the official record sheet.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- STATS -->
+  <section class="stats" id="stats">
+    <div class="stat"><div class="label">Students</div><div class="value" id="sTotal">–</div></div>
+    <div class="stat"><div class="label">Appeared</div><div class="value" id="sApp" style="color:#16a34a">–</div></div>
+    <div class="stat"><div class="label">Absent</div><div class="value" id="sAbs" style="color:#dc2626">–</div></div>
+    <div class="stat"><div class="label">Slow Learners</div><div class="value" id="sSL" style="color:#d97706">–</div></div>
+    <div class="stat"><div class="label">Average</div><div class="value" id="sAvg" style="color:#1d4ed8">–<small> / 25</small></div></div>
+    <div class="stat"><div class="label">Highest</div><div class="value" id="sHigh" style="color:#7c3aed">–</div></div>
+  </section>
+
+  <!-- CONTROLS -->
+  <section class="controls">
+    <input type="search" id="search" placeholder="🔍  Search by name or roll number…" autocomplete="off">
+    <select id="sectionFilter" aria-label="Filter by section">
+      <option value="all">All Sections</option>
+      <option value="1">Section 1</option>
+      <option value="2">Section 2</option>
+    </select>
+    <label class="toggle"><input type="checkbox" id="hideAbsent"> Hide absent</label>
+    <label class="toggle"><input type="checkbox" id="hideSL"> Hide slow learners</label>
+    <span class="count" id="count">–</span>
+  </section>
+
+  <!-- TABLE -->
+  <section class="tablecard">
+    <div class="scroller">
+      <table id="marksTable">
+        <thead>
+          <tr>
+            <th data-key="sn"   class="sortable" data-type="num">SN</th>
+            <th data-key="roll" class="sortable" data-type="str">Roll Number</th>
+            <th data-key="name" class="sortable" data-type="str">Name</th>
+            <th data-key="sec"  class="sortable" data-type="num">Sec</th>
+            <th data-key="q1"   class="sortable" data-type="num">Que. 1</th>
+            <th data-key="q2"   class="sortable" data-type="num">Que. 2</th>
+            <th data-key="q3"   class="sortable" data-type="num">Que. 3</th>
+            <th data-key="q4"   class="sortable" data-type="num">Que. 4</th>
+            <th data-key="q5"   class="sortable" data-type="num">Que. 5</th>
+            <th data-key="total" class="sortable" data-type="num">Total</th>
+            <th data-key="status" class="sortable" data-type="str">Status</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="legend">
+    <span><i class="dot" style="background:#16a34a"></i> 18 &amp; above</span>
+    <span><i class="dot" style="background:#1d4ed8"></i> 15 – 17.5</span>
+    <span><i class="dot" style="background:#d97706"></i> 12 – 14.5</span>
+    <span><i class="dot" style="background:#dc2626"></i> Below 12</span>
+    <span><i class="dot" style="background:#94a3b8"></i> 0 / absent</span>
+    <span><i class="dot" style="background:#f59e0b"></i> SL = Slow Learner (≤ 10 marks)</span>
+  </div>
+
+  <footer class="note">
+    Marks shown are out of 5 per question (Total out of 25).<br>
+    <strong>Absent</strong> = all five question marks are zero. <strong>SL</strong> = Slow Learner (total ≤ 10, not absent).<br>
+    Click any column header to sort.
+  </footer>
 </div>
+
+<script>
+/* ============================================================
+   DATA  ->  [Roll, Name, Section, Q1, Q2, Q3, Q4, Q5, Total]
+   (Last column from original sheet is ignored; status is computed)
+   ============================================================ */
+const RAW = [
+["24BCL081","Patel Aksh Rameshbhai",2,1.5,1.5,0,2,2,7],
+["24BCL118","Pruthvirajsinh Sisodiya",2,3,4,0.5,1.5,3.5,12.5],
+["25BCL001","Saumya Manishkumar Patel",1,4,4,1,0,3.5,12.5],
+["25BCL002","Patel Dharm Dhavalkumar",1,3.5,4,3.5,3.5,3.5,18],
+["25BCL003","Parikh Roshan Pareshkumar",1,4,3.5,0,3,3.5,14],
+["25BCL004","Desai Ved Hareshkumar",1,3,3,3,4,3.5,16.5],
+["25BCL005","Patel Devarshkumar",1,3.5,4.5,4,1.5,3.5,17],
+["25BCL006","Kanani Krisha Alpeshbhai",1,4,4.5,0,3.5,4.5,16.5],
+["25BCL007","Smit Nazim Kazani",1,3.5,3.5,4,0,4.5,15.5],
+["25BCL008","Somya Patel",1,3,3,0,1,3.5,10.5],
+["25BCL009","Mandanka Princekumar Dilipbhai",1,3.5,4,3.5,4.5,3.5,19],
+["25BCL010","Rathod Hetul Prakashchandra",1,3.5,3.5,3.5,4,2.5,17],
+["25BCL011","Kavan Rajan Desai",1,3,3,2,3.5,3.5,15],
+["25BCL013","Sisodiya Nilrajsinh Rajdevsinh",1,3,3,4,0,5,15],
+["25BCL014","Vasava Krishkumar Bhadreshbhai",1,0,0,0,0,0,0],
+["25BCL015","Ramani Priyank Mukundkumar",1,4,4,4,4.5,4,20.5],
+["25BCL016","Patel Yagnik Maheshbhai",1,4,4,3.5,3,3,17.5],
+["25BCL018","Kamdar Param Jitendra",1,4,4,3,3.5,3.5,18],
+["25BCL019","Vatsal Nileshkumar Jain",1,3.5,4,3.5,4,3.5,18.5],
+["25BCL021","Vora Hartish Rameshbhai",1,4,4,4,4,5,21],
+["25BCL022","Arnav Prakash Verma",1,4,4,0,2,0,10],
+["25BCL024","Chaudhari Aryan Shaileshkumar",1,4,4,4,3,4,19],
+["25BCL025","Hathila Vividkumar Virmalbhai",1,4,4,3,0,4.5,15.5],
+["25BCL026","Singh Pranav Rupeshkumar",1,4.5,4.5,4,3,5,21],
+["25BCL027","Ashish Kumar Jha",1,0,0,0,0,0,0],
+["25BCL028","Bhoraniya Preet",1,3,3,3,3,2,14],
+["25BCL029","Shivam Singh",1,3.5,3.5,0,4,3.5,14.5],
+["25BCL030","Sonani Akshar Pragneshbhai",1,3.5,3.5,2,4,3.5,16.5],
+["25BCL031","Het Mohanbhai Desai",1,4,4,4,2.5,5,19.5],
+["25BCL032","Gandhi Shaishav Manishkumar",1,4,4,3.5,3.5,5,20],
+["25BCL033","Limbani Jal Prakashbhai",1,3.5,4,3.5,3,2.5,16.5],
+["25BCL035","Mayank Kumar",1,3.5,3,0.5,2,4.5,13.5],
+["25BCL037","Dhritvan Bhavin Rajde",1,4,3,1,3,3.5,14.5],
+["25BCL038","Patel Tvishakumari Anilkumar",1,4,3.5,3,3,3.5,17],
+["25BCL039","Kunjadiya Ayush Manishbhai",1,3.5,4,4,3.5,5,20],
+["25BCL040","Patel Nisarg Dipakbhai",1,3.5,3.5,3,3,3,16],
+["25BCL041","Dharmraj Bhavsar",1,4,4,3,4.5,3,18.5],
+["25BCL042","Patel Vedant Mukeshbhai",1,4.5,4,3.5,4.5,3.5,20],
+["25BCL043","Kalp Hardik Shah",1,4,4,0,4,2,14],
+["25BCL044","Haseja Prince Sunil Bhai",1,3,3,2,3.5,5,16.5],
+["25BCL045","Devanshi Hirenbhai Pandya",1,4,4.5,4,3.5,3.5,19.5],
+["25BCL046","Patel Raj Chandreshkumar",1,4,3.5,0,3,2,12.5],
+["25BCL047","Patel Omkumar Rajendrabhai",1,5,4,3.5,5,4,21.5],
+["25BCL048","Chaudhari Abhay Sureshbhai",1,3.5,4,2,3.5,3.5,16.5],
+["25BCL049","Gadhavi Harshil Laxmandan",1,4,3.5,2,3,4,16.5],
+["25BCL050","Chauhan Bhupendrakumar Rameshbhai",1,2.5,2,3.5,2.5,4,14.5],
+["25BCL052","Patel Mahi Ashishkumar",1,4.5,4,4,4.5,5,22],
+["25BCL053","Parmar Dhruv Nandkumar",1,4.5,4.5,3.5,3.5,4,20],
+["25BCL054","Khatri Dhruv",1,3.5,3.5,4,4,3.5,18.5],
+["25BCL055","Bharvadiya Yashkumar Rameshbhai",1,3,3,3.5,3,2.5,15],
+["25BCL056","Tilak Bikram Sah",1,4.5,4,3,4.5,3,19],
+["25BCL057","Shrushti Soni",1,4.5,4.5,3.5,5,4.5,22],
+["25BCL060","Yug",1,3.5,4,2.5,3,4,17],
+["25BCL061","Shrey Padmani",1,4,4,3.5,4.5,5,21],
+["25BCL062","Thacker Het Jogesh",1,4,4,1,4,4.5,17.5],
+["25BCL063","Veer Desai",1,4,4,0.5,4,4.5,17],
+["25BCL064","Krish Sanjaykumar Sutariya",1,3.5,3.5,0,5,4,16],
+["25BCL065","Vishv Shiyani",1,4,4,3,2,3.5,16.5],
+["25BCL066","Patel Divy Nareshbhai",1,2,2,0,0,0,4],
+["25BCL067","Harshal",1,3.5,3,3,3,4,16.5],
+["25BCL068","Mihir Mokani",1,4,4,3.5,3.5,4,19],
+["25BCL069","Riyaben Bhargavbhai Bhuva",1,4,3.5,3.5,3,4,18],
+["25BCL070","Gadhiya Ishan Kartik",1,4,4,3.5,4,4,19.5],
+["25BCL071","Sounak Guchhait",2,3,4,3.5,4,4,18.5],
+["25BCL072","Patel Janvi Dharmendrakumar",2,4.5,4.5,2.5,4,5,20.5],
+["25BCL073","Bhojani Kaushil Gautam",2,3.5,4,3.5,3.5,5,19.5],
+["25BCL075","Patel Kenvi Chetankumar",2,4,4.5,3,1.5,4,17],
+["25BCL076","Shaurya Chaudhary",2,3.5,4,0,2,4.5,14],
+["25BCL077","Vaghela Mayurdhvajsingh",2,3,3.5,1,2,4.5,14],
+["25BCL078","Patel Parth Yogeshkumar",2,2.5,3.5,2,3,2.5,13.5],
+["25BCL079","Prachi Prakashbhai Panchotiya",2,4,4,0,3,3,14],
+["25BCL080","Patel Ansh Hiteshkumar",2,4,4.5,4,3,5,20.5],
+["25BCL081","Hetvi Ratilal Bhoya",2,3.5,4,4,3,3.5,18],
+["25BCL082","Mandeepsinh Gohil",2,3,3.5,3.5,2.5,2.5,15],
+["25BCL083","Patel Anay Dharmesh",2,4,4,3.5,4.5,4,20],
+["25BCL084","Thakor Shrey Virendrasinh",2,3.5,4,3.5,4.5,3,18.5],
+["25BCL085","Joddha Dipensinh Dilipsinh",2,4,4,0,4,2,14],
+["25BCL086","Shethiya Aayush Dilip",2,4,4,1,1,4,14],
+["25BCL087","Sutariya Marshal Dashrathkumar",2,4.5,4,0,0,4,12.5],
+["25BCL088","Pavagadhi Krishivkumar Umeshbhai",2,3,3,0,0,0,6],
+["25BCL089","Aryankumar Mukeshkumar Prajapati",2,2.5,3.5,1,4,2.5,13.5],
+["25BCL090","Riyan Suvagiya",2,2,3.5,0,1.5,3,10],
+["25BCL091","Patel Dirgh Shaileshbhai",2,3,3,1,0,2,9],
+["25BCL092","Dhyani Nitinbhai Patel",2,4,4,3,3,4.5,18.5],
+["25BCL094","Gadhiya Naimish Rajeshbhai",2,3,3,0,1.5,2,9.5],
+["25BCL096","Patel Jeel Dilipkumar",2,3.5,4,1,2,4,14.5],
+["25BCL097","Parmar Riya Riteshbhai",2,3.5,4,0,1,4.5,13],
+["25BCL098","Patel Meshw Kalpeshkumar",2,4,4,3,2,3.5,16.5],
+["25BCL099","Patel Dev Vishnubhai",2,4,3.5,0,4,3.5,15],
+["25BCL100","Ansh Mihir Shah",2,4,4.5,1.5,3.5,3,16.5],
+["25BCL101","Shubh Khandelwal",2,4,4,3.5,4,4.5,20],
+["25BCL103","Polra Ayan Firojbhai",2,4,4,0,3,4.5,15.5],
+["25BCL104","Patel Anish Dahyalal",2,4,4,0,3,4.5,15.5],
+["25BCL105","Anuj Tejas Dalal",2,3.5,4,0,2,4.5,14],
+["25BCL106","Patel Anuragkumar Sureshbhai",2,4,4,4,0,3.5,15.5],
+["25BCL107","Vanzara Amit Ishvarji",2,3.5,4,0,1,3.5,12],
+["25BCL108","Rathod Rudra Sunilbhai",2,3.5,4,1,3,4.5,16],
+["25BCL109","Dhorajiya Rishabh Ashwinbhai",2,4,4,3.5,1.5,4,17],
+["25BCL110","Patel Om Bharatbhai",2,4,4,3.5,3,4.5,19],
+["25BCL111","Nityam Raval",2,3.5,4,2,4.5,3.5,17.5],
+["25BCL112","Meet Asari",2,4,4,4,3,4,19],
+["25BCL113","Sojitra Krish Pravinbhai",2,4,4,0,4.5,4,16.5],
+["25BCL114","Patel Het Jigarkumar",2,3,2,0,3,3.5,11.5],
+["25BCL115","Patel Niral Ishvarbhai",2,3,3,0,0,5,11],
+["25BCL116","Patel Nisarg Chandreshkumar",2,4.5,4.5,3.5,3.5,4,20],
+["25BCL117","Daiya Darshan Dwarkadas",2,4,4.5,3.5,3,5,20],
+["25BCL118","Patel Param Narendrabhai",2,4,4,2.5,4,4.5,19],
+["25BCL119","Keshwala Siddharth Vejabhai",2,4.5,4.5,4,4,3,20],
+["25BCL120","Krish Patel",2,4.5,4.5,4.5,4,4.5,22],
+["25BCL121","Dhruvrajsinh Gohil",2,3.5,4.5,2.5,2.5,4,17],
+["25BCL122","Manya Trivedi",2,4,4.5,3,4,4.5,20],
+["25BCL123","Sabhani Ayush Kalpeshbhai",2,4,4.5,4,2,4.5,19],
+["25BCL124","Shyam",2,4,4.5,3.5,4.5,4,20.5],
+["25BCL125","Darsh Mukesh Mistry",2,4,4,2,0,2.5,12.5],
+["25BCL127","Prince Vaghela",2,3,4,0,0,3,10],
+["25BCL128","Harshika Toke",2,4,4,4,4,3.5,19.5],
+["25BCL130","Himeshprajapati",2,4,4,4,4.5,0,16.5],
+["25BCL131","Rudra Makwana",2,4,2.5,0,0,2,8.5],
+["25BCL133","Jeet Savaliya",2,3.5,4,0,2.5,2,12],
+["25BCL135","Arjun Modhwadia",2,3.5,3.5,3,2,1.5,13.5],
+["25BCL136","Dhruv Patel",2,4,3.5,3,2,1.5,14],
+["25BCL137","Prajapati Parthkumar Pravinbhai",2,3.5,3.5,3,0,3,13],
+["25BCL138","Dharm Ankitkumar Patel",2,4,1.5,3.5,3.5,2,14.5],
+["25BCL139","Tirth Parasana",2,4,4,1.5,4.5,3.5,17.5],
+["25BCL140","Mulangwa Mwenze Lajoie",1,0,0,0,0,0,0],
+["25BCL141","Vanzara Kamlesh Ganpatbhai",2,3.5,3.5,2,1,2.5,12.5],
+["25BCL142D","Raviraj Garchar",1,3.5,2.5,0,0,0,6],
+["25BCL143D","Heet Patel",1,3,0,0,0,4.5,7.5],
+["25BCL144D","Nirav Garchar",1,3.5,1,0,0,4.5,9],
+["25BCL145D","Vandana Rajesh Kuchhadia",1,4.5,4.5,4,4,4.5,21.5],
+["25BCL146D","Chauhan Chirag Vinodbhai",1,3.5,2,0,1.5,0,7],
+["25BCL147D","Mohnish Murjani",2,3.5,4,0,2,3,12.5],
+["25BCL148D","Pearl Uchwani",2,4.5,4,4,4,4.5,21],
+["25BCL149D","Parth Bhatt",2,0,0,0,0,0,0],
+["25BCL150D","Manavrajsinh Parmar",2,2.5,3,1,1,2,9.5],
+["25BCL151D","Dhara Sisotiya",2,4,4,0.5,2.5,4.5,15.5],
+["25BCL152D","Prit Bodar",2,3.5,3,0,4,4,14.5],
+["25BCL153D","Rahil Kanara",2,3.5,4,0,3,2,12.5],
+["25BCL154D","Rabari Laxman",1,4,3.5,0,2,5,14.5],
+["25BCL155D","Shrey Dixitkumar Jani",1,4,4,2,3.5,4,17.5],
+["25BCL156D","Nihar Hareshbhai Prajapati",1,0,0,0,0,0,0],
+["25BCL157D","Rishi Jemis Patel",2,4.5,4,3.5,3.5,3.5,19],
+["25BCL158D","Jainam Kartik Shah",2,3.5,4,0,2.5,3,13],
+["25BCL159D","Rushi Limbadia",1,4.5,4,1.5,3,3.5,16.5],
+["25BCL160D","Kothari Sanyam",1,0,0,0,0,0,0],
+["25BCL161D","Vasiyani Yash Pramodkumar",1,0,0,0,0,0,0]
+];
+
+/* build objects */
+const DATA = RAW.map((r, i) => ({
+  sn: i + 1,
+  roll: r[0],
+  name: r[1],
+  sec: r[2],
+  q1: r[3], q2: r[4], q3: r[5], q4: r[6], q5: r[7],
+  total: r[8]
+}));
+
+/* ---------- element refs ---------- */
+const tbody   = document.getElementById('tbody');
+const searchEl= document.getElementById('search');
+const secEl   = document.getElementById('sectionFilter');
+const hideAbsentEl = document.getElementById('hideAbsent');
+const hideSLEl = document.getElementById('hideSL');
+const countEl = document.getElementById('count');
+
+let sortKey = 'sn';
+let sortDir = 'asc';
+
+/* ---------- helpers ---------- */
+const fmt = n => Number.isInteger(n) ? n : n.toFixed(1);
+
+function totalClass(t){
+  if (t === 0)   return 't-zero';
+  if (t >= 18)   return 't-hi';
+  if (t >= 15)   return 't-mid';
+  if (t >= 12)   return 't-low';
+  return 't-vlow';
+}
+function qCell(v){
+  return v === 0 ? '<td class="zero">0</td>' : '<td>' + fmt(v) + '</td>';
+}
+
+/* compute status for a row */
+function getStatus(r){
+  if (r.total === 0) return 'Absent';          // all questions zero
+  if (r.total <= 10) return 'SL';              // slow learner
+  return 'Regular';
+}
+
+/* ---------- render ---------- */
+function render(){
+  const q   = searchEl.value.trim().toLowerCase();
+  const sec = secEl.value;
+  const hideAbsent = hideAbsentEl.checked;
+  const hideSL = hideSLEl.checked;
+
+  let rows = DATA.filter(r => {
+    if (sec !== 'all' && String(r.sec) !== sec) return false;
+    const status = getStatus(r);
+    if (hideAbsent && status === 'Absent') return false;
+    if (hideSL && status === 'SL') return false;
+    if (q){
+      const hit = r.name.toLowerCase().includes(q) || r.roll.toLowerCase().includes(q);
+      if (!hit) return false;
+    }
+    return true;
+  });
+
+  /* sorting */
+  rows.sort((a, b) => {
+    let x = a[sortKey], y = b[sortKey];
+    if (sortKey === 'status'){
+      x = getStatus(a);
+      y = getStatus(b);
+    }
+    if (typeof x === 'string'){ x = x.toLowerCase(); y = y.toLowerCase(); }
+    if (x < y) return sortDir === 'asc' ? -1 : 1;
+    if (x > y) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  /* rows html */
+  let html = '';
+  if (!rows.length){
+    html = '<tr><td colspan="11" class="empty">No matching records found.</td></tr>';
+  } else {
+    html = rows.map(r => {
+      const status = getStatus(r);
+      const isAbsent = status === 'Absent';
+      const isSL = status === 'SL';
+      const rowClass = isAbsent ? 'absent' : (isSL ? 'slow' : '');
+      let badgeHtml = '';
+      if (isAbsent) badgeHtml = '<span class="badge absent">Absent</span>';
+      else if (isSL) badgeHtml = '<span class="badge sl">SL</span>';
+      else badgeHtml = '<span class="badge regular">–</span>';
+
+      return `
+        <tr class="${rowClass}">
+          <td>${r.sn}</td>
+          <td class="roll">${r.roll}</td>
+          <td class="name">${r.name}</td>
+          <td><span class="secbadge ${r.sec === 2 ? 's2' : ''}">${r.sec}</span></td>
+          ${qCell(r.q1)}${qCell(r.q2)}${qCell(r.q3)}${qCell(r.q4)}${qCell(r.q5)}
+          <td class="total ${totalClass(r.total)}">${fmt(r.total)}</td>
+          <td>${badgeHtml}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+  tbody.innerHTML = html;
+
+  /* stats (based on current filtered view) */
+  const totalCount = rows.length;
+  const absentRows = rows.filter(r => getStatus(r) === 'Absent');
+  const slRows = rows.filter(r => getStatus(r) === 'SL');
+  const appearedRows = rows.filter(r => getStatus(r) !== 'Absent');
+  const avg = appearedRows.length
+      ? (appearedRows.reduce((s, r) => s + r.total, 0) / appearedRows.length)
+      : 0;
+  const high = rows.length ? Math.max(...rows.map(r => r.total)) : 0;
+
+  document.getElementById('sTotal').textContent = totalCount;
+  document.getElementById('sApp').textContent   = appearedRows.length;
+  document.getElementById('sAbs').textContent   = absentRows.length;
+  document.getElementById('sSL').textContent    = slRows.length;
+  document.getElementById('sAvg').innerHTML     = avg.toFixed(2) + '<small> / 25</small>';
+  document.getElementById('sHigh').textContent  = fmt(high);
+
+  countEl.textContent = `Showing ${rows.length} of ${DATA.length} students`;
+}
+
+/* ---------- sorting UI ---------- */
+document.querySelectorAll('thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.key;
+    if (sortKey === key){
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey = key;
+      sortDir = 'asc';
+    }
+    document.querySelectorAll('thead th').forEach(h => h.classList.remove('asc','desc'));
+    th.classList.add(sortDir);
+    render();
+  });
+});
+
+/* ---------- events ---------- */
+searchEl.addEventListener('input', render);
+secEl.addEventListener('change', render);
+hideAbsentEl.addEventListener('change', render);
+hideSLEl.addEventListener('change', render);
+
+/* init */
+document.querySelector('thead th[data-key="sn"]').classList.add('asc');
+render();
+</script>
+</body>
+</html>

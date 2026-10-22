@@ -1,0 +1,742 @@
+---
+title: "Early Warning Systems & Disaster Readiness"
+subtitle: "Developing Early Warning Systems and Disaster Readiness Framework through Resilient Community Engagement"
+author: "Srivastava, Singh, Deshmukh, Varshney & Panday"
+format:
+  dashboard:
+    orientation: rows
+    theme:
+      - cosmo
+      - brand
+    scrolling: true
+    expandable: true
+    nav-buttons:
+      - icon: github
+        href: https://ankitdeshmukh.com
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| warning: false
+#| message: false
+#| include: false
+library(leaflet)
+library(leaflet.extras)
+library(plotly)
+library(dplyr)
+library(tidyr)
+library(sf)
+library(jsonlite)
+library(DT)
+library(highcharter)
+library(htmltools)
+```
+
+```{css}
+/* ============================================================
+   THEME: Material-inspired, high-contrast, white background
+   ============================================================ */
+:root {
+  --bg:           #ffffff;
+  --bg-alt:       #f8f9fa;
+  --bg-subtle:    #eef1f5;
+  --border:       #dee2e6;
+  --border-strong:#ced4da;
+
+  --text:         #212529;
+  --text-muted:   #495057;
+  --text-faint:   #6c757d;
+
+  --primary:      #1565c0;   /* strong blue */
+  --primary-dark: #0d47a1;
+  --success:      #2e7d32;   /* green */
+  --warning:      #ef6c00;   /* orange */
+  --danger:       #c62828;   /* red */
+  --info:         #00838f;   /* teal */
+  --accent:       #6a1b9a;   /* purple */
+
+  --flood-low:    #2e7d32;
+  --flood-med:    #f9a825;
+  --flood-high:   #c62828;
+  --drought-low:  #1565c0;
+  --drought-med:  #ef6c00;
+  --drought-high: #b71c1c;
+}
+
+/* ---- Base ---- */
+body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+}
+.quarto-dashboard { background: var(--bg) !important; }
+
+h1, h2, h3, h4, h5 {
+  color: var(--text) !important;
+  font-weight: 700 !important;
+}
+
+/* ---- Header ---- */
+.quarto-dashboard .dashboard-header {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  border-bottom: 2px solid var(--border) !important;
+  padding: 0.6rem 1rem !important;
+}
+.quarto-dashboard .dashboard-header .title,
+.quarto-dashboard .dashboard-header h1.title {
+  color: var(--text) !important;
+  font-size: 1.2rem !important;
+}
+.quarto-dashboard .dashboard-header .subtitle {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+}
+
+/* ---- Navbar ---- */
+.navbar {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar a {
+  color: var(--text) !important;
+  font-weight: 600;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--primary) !important;
+}
+
+/* ---- Value boxes ---- */
+.value-box {
+  border-radius: 8px !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 5px solid var(--primary) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+  padding: 0.5rem 0.75rem !important;
+}
+.value-box .value-box-value {
+  font-size: 1.45rem !important;
+  font-weight: 700 !important;
+  color: var(--text) !important;
+}
+.value-box .value-box-title {
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.value-box[class*="success"]   { border-left-color: var(--success) !important; }
+.value-box[class*="warning"]   { border-left-color: var(--warning) !important; }
+.value-box[class*="primary"]   { border-left-color: var(--primary) !important; }
+.value-box[class*="danger"]    { border-left-color: var(--danger)  !important; }
+.value-box[class*="secondary"] { border-left-color: var(--info)    !important; }
+.value-box[class*="info"]      { border-left-color: var(--info)    !important; }
+
+/* ---- Cards ---- */
+.card {
+  background: var(--bg) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+  color: var(--text) !important;
+}
+.card-header {
+  background: var(--bg-alt) !important;
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 8px 8px 0 0 !important;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.3px;
+  padding: 0.45rem 0.75rem !important;
+}
+
+/* ---- Tables ---- */
+table.dataTable {
+  color: var(--text) !important;
+  background: var(--bg) !important;
+  font-size: 0.82rem;
+}
+table.dataTable thead th {
+  background: var(--bg-alt) !important;
+  color: var(--text) !important;
+  border-bottom: 2px solid var(--border) !important;
+  font-weight: 700;
+}
+table.dataTable tbody tr:hover {
+  background: var(--bg-alt) !important;
+}
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 4px;
+}
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+  color: var(--text-faint) !important;
+  font-size: 0.78rem;
+}
+
+/* ---- Tabs ---- */
+.nav-tabs .nav-link {
+  color: var(--text-muted) !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.nav-tabs .nav-link.active {
+  background: var(--bg-alt) !important;
+  color: var(--primary) !important;
+  border-bottom: 3px solid var(--primary) !important;
+}
+
+hr { border-color: var(--border) !important; }
+a  { color: var(--primary) !important; }
+a:hover { color: var(--primary-dark) !important; }
+
+/* ============================================================
+   FILL CARDS: rows hug content; cards stretch; widgets fill
+   ============================================================ */
+.quarto-dashboard .dashboard-row {
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  gap: 0.6rem !important;
+  margin-bottom: 0.6rem !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+.quarto-dashboard .dashboard-content,
+.quarto-dashboard .dashboard-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-content: flex-start !important;
+  justify-content: flex-start !important;
+}
+.quarto-dashboard .card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+.quarto-dashboard .card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0.4rem 0.6rem !important;
+}
+
+/* ---- Quarto wraps every widget in .cell-output-display — that is the real flex item ---- */
+.quarto-dashboard .card-body > .cell-output-display {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 340px !important;   /* <-- this gives the widget a real box to fill */
+  min-width: 0 !important;
+}
+
+/* ---- Widget itself fills that box ---- */
+.quarto-dashboard .card-body > .cell-output-display > .html-widget,
+.quarto-dashboard .card-body > .cell-output-display > .plotly,
+.quarto-dashboard .card-body > .cell-output-display > .js-plotly-plot,
+.quarto-dashboard .card-body > .cell-output-display > .leaflet,
+.quarto-dashboard .card-body > .cell-output-display > .highchart {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  max-height: none !important;
+}
+
+/* ---- Inner wrappers Plotly / Leaflet create need to know to fill too ---- */
+.quarto-dashboard .card-body .js-plotly-plot,
+.quarto-dashboard .card-body .plot-container,
+.quarto-dashboard .card-body .svg-container,
+.quarto-dashboard .card-body .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  min-height: 0 !important;
+}
+
+/* ---- Don't force 340px on tables (they shrink to content) ---- */
+.quarto-dashboard .card-body > .cell-output-display:has(.dataTables_wrapper) {
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+```
+
+## Row {.valuebox}
+
+```{r}
+#| content: valuebox
+#| title: "Survey Target (Total)"
+list(value = "10,000", icon = "people", color = "secondary")
+```
+
+```{r}
+#| content: valuebox
+#| title: "Step 1 Collected"
+list(value = "3,000", icon = "clipboard-check", color = "success")
+```
+
+```{r}
+#| content: valuebox
+#| title: "High Flood Risk Districts"
+list(value = "9", icon = "water", color = "primary")
+```
+
+```{r}
+#| content: valuebox
+#| title: "High Drought Risk Districts"
+list(value = "8", icon = "sun", color = "warning")
+```
+
+```{r}
+#| include: false
+hazard_df <- data.frame(
+  district = c(
+    "Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha",
+    "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod",
+    "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar",
+    "Junagadh", "Kheda", "Kutch", "Mahisagar", "Mehsana",
+    "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan",
+    "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar",
+    "Tapi", "Vadodara", "Valsad", "Vav-Tharad"
+  ),
+  flood_risk = c(
+    3.6, 1.8, 2.4, 1.6, 3.0,
+    2.7, 1.9, 1.5, 1.7, 1.4,
+    2.2, 1.9, 2.9, 1.6, 2.1,
+    1.8, 2.6, 1.2, 1.6, 2.3,
+    1.4, 2.4, 3.0, 2.0, 2.5,
+    1.3, 2.0, 1.9, 3.5, 2.2,
+    2.9, 2.8, 3.2, 2.6
+  ),
+  drought_risk = c(
+    1.0, 3.4, 1.3, 2.9, 3.5,
+    1.4, 3.5, 3.7, 1.8, 2.7,
+    1.9, 3.6, 1.1, 3.2, 3.7,
+    3.0, 1.2, 4.1, 1.9, 2.2,
+    3.8, 1.7, 1.0, 2.4, 3.2,
+    3.9, 3.6, 2.5, 1.3, 3.8,
+    1.6, 1.4, 1.2, 3.4
+  ),
+  survey_n = c(
+    380, 130, 240, 90, 200,
+    150, 170, 80, 70, 100,
+    40, 60, 280, 90, 140,
+    120, 210, 160, 110, 230,
+    95, 80, 180, 140, 175,
+    55, 220, 130, 310, 165,
+    100, 260, 190, 85
+  )
+)
+
+region_map <- c(
+  "Ahmedabad"="Central", "Anand"="Central", "Kheda"="Central",
+  "Panchmahal"="Central", "Dahod"="Central", "Mahisagar"="Central",
+  "Vadodara"="Central", "Chhota Udaipur"="Central", "Bharuch"="Central",
+  "Narmada"="Central", "Gandhinagar"="North", "Mehsana"="North",
+  "Sabarkantha"="North", "Aravalli"="North", "Banaskantha"="North",
+  "Patan"="North", "Vav-Tharad"="North",
+  "Surat"="South", "Tapi"="South", "Dang"="South",
+  "Navsari"="South", "Valsad"="South",
+  "Rajkot"="Saurashtra", "Jamnagar"="Saurashtra", "Devbhoomi Dwarka"="Saurashtra",
+  "Porbandar"="Saurashtra", "Junagadh"="Saurashtra", "Gir Somnath"="Saurashtra",
+  "Amreli"="Saurashtra", "Bhavnagar"="Saurashtra", "Botad"="Saurashtra",
+  "Surendranagar"="Saurashtra", "Morbi"="Saurashtra",
+  "Kutch"="Kutch"
+)
+hazard_df$region <- region_map[hazard_df$district]
+
+hazard_df$flood_class <- cut(hazard_df$flood_risk,
+  breaks = c(-Inf, 2, 3, Inf), labels = c("Low", "Medium", "High"))
+hazard_df$drought_class <- cut(hazard_df$drought_risk,
+  breaks = c(-Inf, 2, 3, Inf), labels = c("Low", "Medium", "High"))
+```
+
+## Row
+
+### Column {width="58%"}
+
+```{r}
+#| title: "Gujarat: Flood Risk by District (34 Districts)"
+#| warning: false
+#| message: false
+
+gujarat_geojson <- "https://cdn.jsdelivr.net/gh/udit-001/india-maps-data@2884453/geojson/states/gujarat.geojson"
+guj_sf <- st_read(gujarat_geojson, quiet = TRUE)
+
+dist_col <- intersect(c("district","DISTRICT","NAME","name","District"),
+                      names(guj_sf))[1]
+
+guj_map <- guj_sf
+if (!is.na(dist_col)) {
+  guj_map$district_key <- toupper(trimws(guj_map[[dist_col]]))
+  hazard_df$district_key <- toupper(trimws(hazard_df$district))
+  guj_map <- merge(guj_map, hazard_df, by = "district_key", all.x = TRUE)
+} else {
+  guj_map$district_key  <- NA
+  guj_map$flood_risk    <- NA
+  guj_map$drought_risk  <- NA
+  guj_map$survey_n      <- NA
+  guj_map$region        <- NA
+  guj_map$flood_class   <- NA
+  guj_map$drought_class <- NA
+}
+
+pal_flood <- colorFactor(
+  palette  = c("#2e7d32", "#f9a825", "#c62828"),
+  domain   = c("Low", "Medium", "High"),
+  na.color = "#ced4da"
+)
+
+leaflet(guj_map, height = "100%") %>%
+  addTiles() %>%
+  setView(lng = 71.7, lat = 22.5, zoom = 6.3) %>%
+  addPolygons(
+    fillColor = ~pal_flood(flood_class),
+    fillOpacity = 0.82,
+    weight = 1.1,
+    color = "#343a40",
+    opacity = 0.75,
+    highlightOptions = highlightOptions(
+      weight = 2.8, color = "#1565c0",
+      fillOpacity = 0.95, bringToFront = TRUE
+    ),
+    popup = ~paste0(
+      "<div style='font-family: IBM Plex Sans; color:#212529;'>",
+      "<b style='font-size:1.05em;color:#0d47a1;'>", district_key, "</b><br/>",
+      "<span style='color:#495057;'>Region: ", region, "</span>",
+      "<hr style='margin:6px 0;border:0;border-top:1px solid #dee2e6;'>",
+      "<b>Flood Risk:</b> ", flood_risk, " (", flood_class, ")<br/>",
+      "<b>Drought Risk:</b> ", drought_risk, " (", drought_class, ")<br/>",
+      "<b>Survey N:</b> ", survey_n,
+      "</div>"
+    ),
+    label = ~district_key
+  ) %>%
+  addLegend(
+    pal = pal_flood, values = ~flood_class,
+    title = "<span style='font-weight:700;color:#212529;'>Flood Risk</span>",
+    position = "bottomright",
+    opacity = 0.95
+  ) %>%
+  addFullscreenControl()
+```
+
+### Column {width="42%"}
+
+```{r}
+#| title: "Survey Progress by Region"
+survey_region <- hazard_df %>%
+  group_by(region) %>%
+  summarise(collected = sum(survey_n, na.rm = TRUE), .groups = "drop") %>%
+  mutate(
+    region = factor(region, levels = c("North","Central","Saurashtra","Kutch","South")),
+    target = c(2000, 2500, 3000, 1000, 1500)[match(region,
+      c("North","Central","Saurashtra","Kutch","South"))]
+  )
+
+plot_ly(survey_region, x = ~region, y = ~target, type = "bar",
+        name = "Target", marker = list(color = "#cfd8dc")) %>%
+  add_trace(y = ~collected, name = "Collected",
+            marker = list(color = "#2e7d32")) %>%
+  layout(
+    barmode = "overlay",
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    plot_bgcolor  = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 11),
+    xaxis = list(title = "", tickangle = -30, color = "#212529",
+                 gridcolor = "#eef1f5"),
+    yaxis = list(title = "Respondents", color = "#212529",
+                 gridcolor = "#eef1f5"),
+    legend = list(orientation = "h", y = -0.32,
+                  font = list(color = "#212529")),
+    margin = list(t = 10, b = 55, l = 50, r = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+## Row
+
+### Column {width="50%"}
+
+```{r}
+#| title: "Flood vs Drought Risk: All 34 Districts"
+plot_ly(hazard_df, x = ~flood_risk, y = ~drought_risk,
+        text = ~district, type = "scatter", mode = "markers",
+        textposition = "top center",
+        textfont = list(size = 8, color = "#495057"),
+        marker = list(
+          size = ~(survey_n/14 + 5),
+          color = ~flood_risk,
+          colorscale = list(c(0,"#2e7d32"), c(0.5,"#f9a825"), c(1,"#c62828")),
+          opacity = 0.85,
+          line = list(color = "#343a40", width = 1),
+          showscale = FALSE
+        ),
+        hoverinfo = "text") %>%
+  layout(
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    plot_bgcolor  = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 11),
+    xaxis = list(title = "Flood Risk", range = c(0.5, 4.2),
+                 color = "#212529", gridcolor = "#eef1f5"),
+    yaxis = list(title = "Drought Risk", range = c(0.5, 4.5),
+                 color = "#212529", gridcolor = "#eef1f5"),
+    margin = list(t = 10, b = 40, l = 50, r = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+### Column {width="50%"}
+
+```{r}
+#| title: "Hazard Profile: How Many Districts?"
+hazard_profile <- hazard_df %>%
+  mutate(profile = case_when(
+    flood_class == "High" & drought_class == "High" ~ "Both High",
+    flood_class == "High" & drought_class != "High" ~ "Flood-Dominant",
+    drought_class == "High" & flood_class != "High" ~ "Drought-Dominant",
+    TRUE ~ "Moderate / Low"
+  )) %>%
+  count(profile)
+
+hchart(hazard_profile, "column", hcaes(x = profile, y = n)) %>%
+  hc_colors(c("#c62828", "#ef6c00", "#f9a825", "#2e7d32")) %>%
+  hc_xAxis(title = list(text = ""),
+           labels = list(style = list(color = "#212529", fontSize = "11px"))) %>%
+  hc_yAxis(title = list(text = "Districts"),
+           labels = list(style = list(color = "#212529", fontSize = "11px")),
+           gridLineColor = "#eef1f5") %>%
+  hc_title(text = "") %>%
+  hc_chart(backgroundColor = "#ffffff", reflow = TRUE)
+```
+
+## Row
+
+```{r}
+#| title: "District-Level Hazard & Survey Matrix (All 34)"
+datatable(
+  hazard_df %>%
+    select(district, region, flood_risk, drought_risk, survey_n) %>%
+    arrange(desc(flood_risk + drought_risk)),
+  options = list(
+    pageLength = 8,
+    dom = "ftp",
+    autoWidth = TRUE,
+    columnDefs = list(list(className = "dt-center", targets = "_all"))
+  ),
+  rownames = FALSE,
+  colnames = c("District", "Region", "Flood", "Drought", "Survey N"),
+  class = "compact stripe hover"
+) %>%
+  formatStyle("flood_risk",
+    backgroundColor = styleInterval(c(2, 3),
+      c("#e8f5e9", "#fff8e1", "#ffebee")),
+    color = styleInterval(c(2, 3),
+      c("#1b5e20", "#e65100", "#b71c1c")),
+    fontWeight = "bold") %>%
+  formatStyle("drought_risk",
+    backgroundColor = styleInterval(c(2, 3),
+      c("#e3f2fd", "#fff3e0", "#ffebee")),
+    color = styleInterval(c(2, 3),
+      c("#0d47a1", "#bf360c", "#b71c1c")),
+    fontWeight = "bold")
+```
+
+# Page 2: Flood Risk {.tabset}
+
+## Flood Exposure
+
+```{r}
+#| title: "Flood Risk District Ranking (All 34)"
+flood_rank <- hazard_df %>%
+  arrange(desc(flood_risk)) %>%
+  mutate(district = factor(district, levels = district))
+
+plot_ly(flood_rank, x = ~flood_risk, y = ~district, type = "bar",
+        orientation = "h",
+        marker = list(color = ~flood_risk,
+          colorscale = list(c(0,"#2e7d32"), c(0.5,"#f9a825"), c(1,"#c62828")),
+          showscale = FALSE)) %>%
+  layout(
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    plot_bgcolor  = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 10),
+    xaxis = list(title = "Flood Risk Score", range = c(0, 4.2),
+                 color = "#212529", gridcolor = "#eef1f5"),
+    yaxis = list(title = "", color = "#212529", tickfont = list(size = 9)),
+    margin = list(l = 140, t = 10, b = 40, r = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+## Community Readiness
+
+```{r}
+#| title: "Early Warning Awareness (Simulated)"
+awareness <- data.frame(
+  response = c("Received warning", "Understood warning", "Took action", "Evacuated"),
+  pct = c(78, 62, 45, 28)
+)
+
+plot_ly(awareness, labels = ~response, values = ~pct,
+        type = "pie", hole = 0.55,
+        marker = list(colors = c("#1565c0", "#2e7d32", "#ef6c00", "#c62828"),
+                      line = list(color = "#ffffff", width = 2))) %>%
+  layout(
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 11),
+    showlegend = TRUE,
+    legend = list(font = list(color = "#212529")),
+    margin = list(t = 10, b = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+# Page 3: Drought Risk {.tabset}
+
+## Drought Exposure
+
+```{r}
+#| title: "Drought Risk District Ranking (All 34)"
+drought_rank <- hazard_df %>%
+  arrange(desc(drought_risk)) %>%
+  mutate(district = factor(district, levels = district))
+
+plot_ly(drought_rank, x = ~drought_risk, y = ~district, type = "bar",
+        orientation = "h",
+        marker = list(color = ~drought_risk,
+          colorscale = list(c(0,"#1565c0"), c(0.5,"#ef6c00"), c(1,"#b71c1c")),
+          showscale = FALSE)) %>%
+  layout(
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    plot_bgcolor  = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 10),
+    xaxis = list(title = "Drought Risk Score", range = c(0, 4.5),
+                 color = "#212529", gridcolor = "#eef1f5"),
+    yaxis = list(title = "", color = "#212529", tickfont = list(size = 9)),
+    margin = list(l = 140, t = 10, b = 40, r = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+## Water Storage Context
+
+```{r}
+#| title: "Saurashtra Reservoir Levels (Context)"
+reservoir <- data.frame(
+  district = c("Devbhoomi Dwarka", "Jamnagar", "Porbandar", "Junagadh", "Rajkot"),
+  storage_pct = c(0.8, 8.5, 18.3, 22.4, 36.65)
+)
+
+plot_ly(reservoir, x = ~district, y = ~storage_pct, type = "bar",
+        marker = list(color = ~storage_pct,
+          colorscale = list(c(0,"#b71c1c"), c(0.5,"#ef6c00"), c(1,"#1565c0")),
+          showscale = FALSE)) %>%
+  layout(
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    plot_bgcolor  = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 11),
+    xaxis = list(title = "", tickangle = -25, color = "#212529",
+                 gridcolor = "#eef1f5"),
+    yaxis = list(title = "Reservoir Storage (%)", color = "#212529",
+                 gridcolor = "#eef1f5"),
+    margin = list(b = 65, t = 10, l = 55, r = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+# Page 4: Survey {.tabset}
+
+## Step 1 Progress
+
+```{r}
+#| title: "Step 1 Survey Distribution"
+plot_ly(survey_region, labels = ~region, values = ~collected,
+        type = "pie", hole = 0.5,
+        marker = list(
+          colors = c("#1565c0", "#2e7d32", "#f9a825", "#ef6c00", "#6a1b9a"),
+          line = list(color = "#ffffff", width = 2))) %>%
+  layout(
+    autosize = TRUE,
+    paper_bgcolor = "#ffffff",
+    font = list(color = "#212529", family = "IBM Plex Sans", size = 11),
+    title = list(text = "Collected by Region (Step 1)",
+                 font = list(color = "#212529", size = 13)),
+    legend = list(font = list(color = "#212529")),
+    margin = list(t = 45, b = 10)
+  ) %>%
+  config(responsive = TRUE)
+```
+
+## Survey Matrix
+
+```{r}
+#| title: "Survey Targets vs Collected"
+datatable(
+  survey_region %>%
+    mutate(progress = round(collected / target * 100, 1)) %>%
+    rename(Region = region, Target = target, Collected = collected,
+           `Progress (%)` = progress),
+  options = list(pageLength = 5, dom = "t"),
+  rownames = FALSE,
+  class = "compact stripe hover"
+) %>%
+  formatStyle("Progress (%)",
+              background = styleColorBar(c(0, 100), "#2e7d32"),
+              backgroundSize = "100% 80%",
+              backgroundRepeat = "no-repeat",
+              backgroundPosition = "center",
+              color = "#ffffff",
+              fontWeight = "600")
+```
+
+# Page 5: About
+
+```{r}
+#| title: "About This Project"
+#| echo: false
+htmltools::HTML("
+<div style='padding: 20px; line-height: 1.8; max-width: 850px; color: #212529;'>
+<h3 style='color: #c62828; margin-top:0;'>🌾 Early Warning Systems &amp; Disaster Readiness Framework</h3>
+<p><b style='color:#0d47a1;'>Project:</b> Developing Early Warning Systems and Disaster Readiness Framework through Resilient Community Engagement</p>
+<p><b style='color:#0d47a1;'>Funding:</b> 2nd Call for ICSSR Longitudinal Studies in Social and Human Sciences</p>
+<p><b style='color:#0d47a1;'>Team:</b> Dr. Anurag Srivastava, Dr. Prateek Kumar Singh, Dr. Ankit Deshmukh, Dr. Shreekant Varshney, Sandeep Panday</p>
+<hr style='border:0;border-top:1px solid #dee2e6;'>
+<h4 style='color: #2e7d32;'>Focus Areas</h4>
+<ul>
+  <li><b style='color:#212529;'>Urban Flood:</b> Gujarat districts facing increased flood frequency and swapping trends</li>
+  <li><b style='color:#212529;'>Agricultural Drought:</b> Saurashtra and Kutch regions with depleted reservoirs</li>
+  <li><b style='color:#212529;'>Survey:</b> 10,000 respondents (3,000 Step 1 + 7,000 Step 2) across 34 Gujarat districts</li>
+</ul>
+<h4 style='color: #2e7d32;'>Dashboard Tools</h4>
+<p>Built with <b>Quarto</b>, <b>Leaflet</b>, <b>Plotly</b>, <b>Highcharter</b>, and <b>DT</b>. Theme: Material-inspired high-contrast on white.</p>
+<p style='color: #6c757d; font-size: 0.9em;'>Boundary data: udit-001/india-maps-data (GitHub). Hazard indicators are illustrative placeholders pending field data collection.</p>
+</div>
+")
+```
